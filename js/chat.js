@@ -108,10 +108,4 @@ function sendMsg() {
   setMensajes(msgs);
   input.value = '';
   renderMessages();
-  setTimeout(() => {
-    const m2 = getMensajes();
-    m2.push({ id: Date.now() + 1, de: 'soporte', texto: 'Recibido, en breve te atendemos. ¡Gracias! 🙌', hora: nowTime() });
-    setMensajes(m2);
-    renderMessages();
-  }, 900);
 }

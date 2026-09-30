@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../BD/conexion.php';
 require_once __DIR__ . '/../funciones/funciones.php';
+session_name('SHIZEN_REPARTIDOR_SESSION');
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -12,7 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles/repartidor.css?v=scale-2" />
-    <link rel="stylesheet" href="styles/navigation.css?v=scale-3" />
+    <link rel="stylesheet" href="styles/navigation.css?v=nav-stable-4" />
   </head>
   <body>
     <main class="scroll">
@@ -94,10 +94,9 @@
         <span class="nav-status-label">Activo</span>
       </button>
       <a
-        href="pedidos.html"
-        class="nav-item is-active"
-        aria-current="page"
-        aria-label="Pedidos"
+        href="notificaciones.php"
+        class="nav-item"
+        aria-label="Notificaciones"
         ><svg
           fill="none"
           viewBox="0 0 24 24"
@@ -107,10 +106,10 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M6 7h12l-1 13H7L6 7Zm3 0a3 3 0 0 1 6 0M9 12v4m6-4v4"
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
           /></svg
-        ><span>Pedidos</span
-        ><b class="badge" id="badge-pedidos"></b
+        ><span>Notificaciones</span
+        ><b class="badge" id="badge-notificaciones"></b
       ></a>
       <a
         href="../php/perfil.php"
@@ -136,20 +135,50 @@
     <script>
       async function render() {
         const result = await cargarEntregas("available");
-        const list = result.items;
+        const list = result.items || [];
         const full = false;
         document.querySelector("#orders").innerHTML =
           list.length
             ? list
                 .map(
                   (p) =>
-                    `<article class="card order"><div class="order-head"><div class="order-main"><p class="name">${p.cliente_nombre} ${p.cliente_apellido}</p><p class="muted">Pedido #${p.id_pedido}</p></div><div class="earn"><strong>${fmt(p.total)}</strong></div></div><div class="route">📍 Recoger: ${p.negocio_nombre}<br>🏁 Entregar: ${p.direccion_entrega}</div><div class="actions"><button class="btn-green" ${full ? 'disabled style="opacity:.55"' : ""} onclick="accept('${p.id_entrega}')">Aceptar</button></div></article>`,
+                    `<article class="card order">
+                      <div class="order-head">
+                        <div class="order-main">
+                          <p class="name">${p.cliente_nombre} ${p.cliente_apellido}</p>
+                          <p class="muted">Pedido #${p.id_pedido}</p>
+                        </div>
+                        <div class="earn"><strong>${fmt(p.total)}</strong></div>
+                      </div>
+                      <div class="route">📍 Recoger: ${p.negocio_nombre}<br>🏁 Entregar: ${p.direccion_entrega}</div>
+                      ${
+                        p.pedido_estado === "Preparado"
+                          ? `<div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;margin:8px 0">
+                              🧑‍🍳 ¡Plato PREPARADO y listo para recoger!
+                             </div>`
+                          : p.tiempo_preparacion
+                            ? `<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;margin:8px 0">
+                                ⏱️ Tiempo prep: ~${p.minutos_restantes !== null && p.minutos_restantes > 0 ? p.minutos_restantes + " min restantes" : p.tiempo_preparacion + " min"}
+                               </div>`
+                            : ""
+                      }
+                      <div class="actions">
+                        <button class="btn-green" ${full ? 'disabled style="opacity:.55"' : ""} onclick="accept('${p.id_entrega}')">
+                          Aceptar pedido
+                        </button>
+                      </div>
+                    </article>`,
                 )
                 .join("")
             : `<div class="card" style="padding:32px;text-align:center;color:#9ca3af;font-size:13px">No hay pedidos disponibles ahora</div>`;
       }
       async function accept(id) {
-        try { await actualizarEntrega("accept", id); await render(); } catch (error) { alert(error.message); }
+        try {
+          await actualizarEntrega("accept", id);
+          window.location.href = "activos.html";
+        } catch (error) {
+          alert(error.message);
+        }
       }
       render();
       iniciarBotonEstadoRepartidor();

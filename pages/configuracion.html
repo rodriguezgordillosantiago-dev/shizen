@@ -12,7 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles/perfil.css" />
-    <link rel="stylesheet" href="styles/navigation.css?v=compact-2" />
+    <link rel="stylesheet" href="styles/navigation.css?v=nav-stable-4" />
     <style>
       .header-back {
         display: flex;
@@ -91,7 +91,7 @@
               type="checkbox"
               name="notificaciones_push"
               checked
-            />
+            /><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
           </div>
           <div
             class="setting-item"
@@ -104,7 +104,7 @@
               type="checkbox"
               name="sonido_pedidos"
               checked
-            />
+            /><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
           </div>
         </div>
 
@@ -197,9 +197,9 @@
         <span class="nav-status-label">Activo</span>
       </button>
       <a
-        href="pedidos.html"
+        href="notificaciones.php"
         class="nav-item"
-        aria-label="Pedidos"
+        aria-label="Notificaciones"
       >
         <svg
           fill="none"
@@ -210,10 +210,10 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M6 7h12l-1 13H7L6 7Zm3 0a3 3 0 0 1 6 0M9 12v4m6-4v4"
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
           /></svg
-        ><span>Pedidos</span
-        ><b class="badge" id="badge-pedidos"></b>
+        ><span>Notificaciones</span
+        ><b class="badge" id="badge-notificaciones"></b>
       </a>
       <a
         href="../php/perfil.php"
@@ -236,7 +236,5 @@
       </a>
     </nav>
     <div id="chat-root"></div>
-    <?php include 'partials/nav.php'; ?> <?php include
-    'partials/chat.php'; ?>
-  </body>
+</body>
 </html>

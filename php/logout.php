@@ -1,4 +1,5 @@
 <?php
+session_name('SHIZEN_REPARTIDOR_SESSION');
 session_start();
 $_SESSION = [];
 

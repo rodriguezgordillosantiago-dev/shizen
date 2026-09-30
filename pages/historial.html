@@ -9,7 +9,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles/historial.css" />
-    <link rel="stylesheet" href="styles/navigation.css?v=compact-2" />
+    <link rel="stylesheet" href="styles/navigation.css?v=nav-stable-4" />
   </head>
   <body>
     <div class="scroll">
@@ -84,7 +84,7 @@
         ></span>
         <span class="nav-status-label">Activo</span>
       </button>
-      <a href="pedidos.html" class="nav-item" aria-label="Pedidos"
+      <a href="notificaciones.php" class="nav-item" aria-label="Notificaciones"
         ><svg
           fill="none"
           viewBox="0 0 24 24"
@@ -94,9 +94,9 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M6 7h12l-1 13H7L6 7Zm3 0a3 3 0 0 1 6 0M9 12v4m6-4v4"
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
           /></svg
-        ><span>Pedidos</span><b class="badge" id="badge-pedidos"></b
+        ><span>Notificaciones</span><b class="badge" id="badge-notificaciones"></b
       ></a>
       <a href="../php/perfil.php" class="nav-item" aria-label="Perfil"
         ><svg
@@ -162,7 +162,6 @@
 
       render();
       updateNavBadges();
-      iniciarBotonEstadoRepartidor();
       initChat();
     </script>
   </body>

@@ -1,35 +1,31 @@
-/* ── Shizen — shared data layer (localStorage) ─────────────────── */
+/* ── Shizen — shared data layer ─────────────────── */
 
 const _DEFAULTS = {
   activos: [],
   disponibles: [],
   historial: [],
   perfil: {
-    nombre: "Santiago",
-    apellido: "Vargas",
-    telefono: "310 456 7890",
-    localidad: "Chapinero",
-    vehiculo: "Moto",
-    calificacion: 4.8,
-    entregasHoy: 6,
-    gananciasHoy: 25800,
+    nombre: "",
+    apellido: "",
+    telefono: "",
+    localidad: "",
+    vehiculo: "",
+    calificacion: 0,
+    entregasHoy: 0,
+    gananciasHoy: 0,
   },
-  mensajes: [
-    {
-      id: 1,
-      de: "soporte",
-      texto: "¡Hola! ¿En qué te podemos ayudar hoy?",
-      hora: "9:00",
-    },
-    {
-      id: 2,
-      de: "soporte",
-      texto:
-        "Recuerda que puedes reportar cualquier inconveniente con un pedido aquí.",
-      hora: "9:01",
-    },
-  ],
+  mensajes: [],
 };
+
+function _resolveUrl(path) {
+  if (path === 'php/entregas.php' && window.repartidorApiUrl) {
+    return window.repartidorApiUrl;
+  }
+  if (window.location.pathname.includes('/pages/')) {
+    return '../' + path;
+  }
+  return '/' + path;
+}
 
 function _get(key) {
   try {
@@ -90,10 +86,11 @@ function repartidorEstaActivo() {
 
 async function cambiarEstadoRepartidor() {
   try {
-    const response = await fetch("../php/entregas.php", {
+    const response = await fetch(_resolveUrl('php/entregas.php'), {
       method: "POST",
       body: new URLSearchParams({ action: "toggle" }),
       credentials: "same-origin",
+      headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', Accept: 'application/json' }
     });
     const result = await response.json();
     if (!response.ok)
@@ -149,22 +146,32 @@ function iniciarBotonEstadoRepartidor() {
 // Helpers
 const MAX_ACTIVOS = 4;
 async function cargarEntregas(tipo) {
-  const response = await fetch(
-    "../php/entregas.php?type=" + encodeURIComponent(tipo),
-    { credentials: "same-origin" },
-  );
+  const url = _resolveUrl('php/entregas.php') + (window.repartidorApiUrl ? '?type=' : '?type=') + encodeURIComponent(tipo);
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    headers: { Accept: 'application/json' }
+  });
+  if (response.status === 401) {
+    window.location.href = window.location.pathname.includes('/pages/') ? "../index.html" : "/";
+    return { items: [] };
+  }
   if (!response.ok)
     throw new Error("No fue posible cargar las entregas.");
   return response.json();
 }
 
 async function cargarEstadisticas() {
-  const response = await fetch("../php/entregas.php?action=stats", {
+  const url = _resolveUrl('php/entregas.php') + (window.repartidorApiUrl ? '?type=stats' : '?action=stats');
+  const response = await fetch(url, {
     credentials: "same-origin",
+    headers: { Accept: 'application/json' }
   });
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(result.error || "No fue posible cargar las estadísticas.");
+    throw new Error(
+      result.error ||
+        "No fue posible cargar las estadísticas.",
+    );
   }
   return result;
 }
@@ -174,10 +181,11 @@ async function actualizarEntrega(action, id) {
     action,
     id_entrega: String(id),
   });
-  const response = await fetch("../php/entregas.php", {
+  const response = await fetch(_resolveUrl('php/entregas.php'), {
     method: "POST",
     body,
     credentials: "same-origin",
+    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', Accept: 'application/json' }
   });
   const result = await response.json();
   if (!response.ok || result.updated === false)
@@ -208,73 +216,50 @@ function nowTime() {
   });
 }
 
-// Actions
-function aceptarPedido(id) {
-  if (cupoLleno()) return false;
-  const disp = getDisponibles();
-  const pedido = disp.find((p) => p.id === id);
-  if (!pedido) return false;
-  setDisponibles(disp.filter((p) => p.id !== id));
-  const activos = getActivos();
-  activos.push({ ...pedido, estado: "aceptado" });
-  setActivos(activos);
-  return true;
-}
-
-function rechazarPedido(id) {
-  setDisponibles(
-    getDisponibles().filter((p) => p.id !== id),
-  );
-}
-
-function avanzarEstado(id) {
-  const activos = getActivos();
-  const idx = activos.findIndex((p) => p.id === id);
-  if (idx === -1) return;
-  const p = activos[idx];
-  if (p.estado === "aceptado") {
-    activos[idx] = { ...p, estado: "en_camino" };
-    setActivos(activos);
-  } else if (p.estado === "en_camino") {
-    const terminado = {
-      ...p,
-      estado: "entregado",
-      hora: "Ahora",
-    };
-    setHistorial([terminado, ...getHistorial()]);
-    setActivos(activos.filter((a) => a.id !== id));
-    const perfil = getPerfil();
-    setPerfil({
-      ...perfil,
-      entregasHoy: perfil.entregasHoy + 1,
-      gananciasHoy: perfil.gananciasHoy + p.ganancia,
-    });
-  }
-}
-
-function cancelarPedido(id) {
-  const activos = getActivos();
-  const p = activos.find((a) => a.id === id);
-  if (!p) return;
-  setHistorial([
-    { ...p, estado: "cancelado", hora: "Ahora" },
-    ...getHistorial(),
-  ]);
-  setActivos(activos.filter((a) => a.id !== id));
-}
-
 // Update nav badges on any page that has them
-function updateNavBadges() {
+async function updateNavBadges() {
   const ba = document.getElementById("badge-activos");
-  const bp = document.getElementById("badge-pedidos");
-  const ca = countActivos();
-  const cd = getDisponibles().length;
+  const bn = document.getElementById("badge-notificaciones");
+
+  // Badge de pedidos activos
   if (ba) {
-    ba.textContent = ca > 9 ? "9+" : ca;
-    ba.style.display = ca > 0 ? "flex" : "none";
+    try {
+      const res = await cargarEntregas("active");
+      const ca = (res.items || []).length;
+      ba.textContent = ca > 9 ? "9+" : ca;
+      ba.style.display = ca > 0 ? "flex" : "none";
+    } catch (e) {
+      /* Silencioso si falla */
+    }
   }
-  if (bp) {
-    bp.textContent = cd > 9 ? "9+" : cd;
-    bp.style.display = cd > 0 ? "flex" : "none";
+
+  // Badge de notificaciones (punto naranja con conteo)
+  if (bn) {
+    try {
+      const resp = await fetch(_resolveUrl('php/notificaciones.php'), {
+        credentials: "same-origin",
+        headers: { Accept: 'application/json' }
+      });
+      if (resp.ok) {
+        const notifData = await resp.json();
+        const items = notifData.items || [];
+        const unreadCount = items.filter(n => Number(n.leida) === 0).length;
+        if (unreadCount > 0) {
+          bn.textContent = unreadCount > 9 ? "9+" : unreadCount;
+          bn.style.display = "flex";
+          bn.style.background = "#f97316";
+        } else {
+          bn.textContent = "";
+          bn.style.display = "none";
+        }
+      }
+    } catch (e) {
+      /* Silencioso si falla */
+    }
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateNavBadges();
+  setInterval(updateNavBadges, 15000);
+});

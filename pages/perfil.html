@@ -14,11 +14,11 @@
     />
     <link
       rel="stylesheet"
-      href="../pages/styles/perfil.css"
+      href="../pages/styles/perfil.css?v=logout-button-1"
     />
     <link
       rel="stylesheet"
-      href="../pages/styles/navigation.css?v=compact-2"
+      href="../pages/styles/navigation.css?v=nav-stable-4"
     />
 
     <style>
@@ -118,24 +118,7 @@
             align-items: center;
           "
         >
-          <div
-            style="
-              width: 88px;
-              height: 88px;
-              background: white;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-bottom: 12px;
-              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-              font-size: 32px;
-              font-weight: bold;
-              color: #4c9540;
-            "
-          >
-            {{INICIALES}}
-          </div>
+          <div class="profile-photo">{{FOTO_HTML}}</div>
           <h1
             style="
               color: #1b3a1d;
@@ -272,6 +255,59 @@
                   transition: all 0.2s;
                 "
               />
+              <script>
+                (function () {
+                  const field =
+                    document.currentScript
+                      .previousElementSibling;
+                  const message =
+                    document.createElement("small");
+                  message.className = "field-error-inline";
+                  message.style.cssText =
+                    "display:block;color:#dc2626;font-size:12px;margin-top:6px";
+                  field.insertAdjacentElement(
+                    "afterend",
+                    message,
+                  );
+                  function validate() {
+                    const valid =
+                      /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}$/.test(
+                        field.value.trim(),
+                      );
+                    field.setCustomValidity(
+                      valid
+                        ? ""
+                        : "Ingresa un nombre válido.",
+                    );
+                    message.textContent =
+                      field.dataset.touched === "true" &&
+                      !valid
+                        ? "Ingresa un nombre válido."
+                        : "";
+                  }
+                  field.addEventListener(
+                    "input",
+                    function () {
+                      field.dataset.touched = "true";
+                      validate();
+                    },
+                  );
+                  field.addEventListener(
+                    "blur",
+                    function () {
+                      field.dataset.touched = "true";
+                      validate();
+                    },
+                  );
+                  field.form.addEventListener(
+                    "submit",
+                    function () {
+                      field.dataset.touched = "true";
+                      validate();
+                    },
+                  );
+                })();
+              </script>
             </label>
             <label
               class="field-group"
@@ -294,6 +330,59 @@
                   transition: all 0.2s;
                 "
               />
+              <script>
+                (function () {
+                  const field =
+                    document.currentScript
+                      .previousElementSibling;
+                  const message =
+                    document.createElement("small");
+                  message.className = "field-error-inline";
+                  message.style.cssText =
+                    "display:block;color:#dc2626;font-size:12px;margin-top:6px";
+                  field.insertAdjacentElement(
+                    "afterend",
+                    message,
+                  );
+                  function validate() {
+                    const valid =
+                      /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}$/.test(
+                        field.value.trim(),
+                      );
+                    field.setCustomValidity(
+                      valid
+                        ? ""
+                        : "Ingresa un apellido válido.",
+                    );
+                    message.textContent =
+                      field.dataset.touched === "true" &&
+                      !valid
+                        ? "Ingresa un apellido válido."
+                        : "";
+                  }
+                  field.addEventListener(
+                    "input",
+                    function () {
+                      field.dataset.touched = "true";
+                      validate();
+                    },
+                  );
+                  field.addEventListener(
+                    "blur",
+                    function () {
+                      field.dataset.touched = "true";
+                      validate();
+                    },
+                  );
+                  field.form.addEventListener(
+                    "submit",
+                    function () {
+                      field.dataset.touched = "true";
+                      validate();
+                    },
+                  );
+                })();
+              </script>
             </label>
             <label
               class="field-group"
@@ -313,6 +402,54 @@
                   border-color: #e5e7eb;
                 "
               />
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo)
+                    return;
+                  c.dataset.validacionCampo = "1";
+                  var e =
+                    c.nextElementSibling &&
+                    c.nextElementSibling.classList.contains(
+                      "field-error-inline",
+                    )
+                      ? c.nextElementSibling
+                      : document.createElement("small");
+                  e.className = "field-error-inline";
+                  e.style.cssText =
+                    "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                  if (!e.parentNode)
+                    c.insertAdjacentElement("afterend", e);
+                  function v() {
+                    var x = c.required && !c.value.trim(),
+                      i = x || !c.validity.valid;
+                    e.textContent = i
+                      ? x
+                        ? "Este campo es obligatorio."
+                        : c.validationMessage
+                      : "";
+                    c.setAttribute(
+                      "aria-invalid",
+                      i ? "true" : "false",
+                    );
+                    return !i;
+                  }
+                  ["input", "change", "blur"].forEach(
+                    function (t) {
+                      c.addEventListener(t, v);
+                    },
+                  );
+                  if (c.form)
+                    c.form.addEventListener(
+                      "submit",
+                      function (a) {
+                        if (!v()) a.preventDefault();
+                      },
+                    );
+                })(
+                  document.currentScript
+                    .previousElementSibling,
+                );
+              </script>
             </label>
             <input
               type="hidden"
@@ -527,7 +664,7 @@
                 font-weight: 700;
                 color: #4c9540;
               "
-              >6</span
+              >{{ENTREGAS_HOY}}</span
             >
           </div>
 
@@ -567,7 +704,7 @@
                 font-weight: 700;
                 color: #4c9540;
               "
-              >$25.800</span
+              >{{GANANCIAS_HOY}}</span
             >
           </div>
 
@@ -643,6 +780,7 @@
             font-size: 15px;
           "
         >
+          <svg class="logout-icon" width="18" height="18" fill="currentColor" viewBox="0 0 512 512" aria-hidden="true"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path></svg>
           Cerrar sesión
         </a>
       </div>
@@ -720,7 +858,8 @@
       <a
         href="../pages/pedidos.html"
         class="nav-item"
-        aria-label="Pedidos"
+        href="notificaciones.php"
+        aria-label="Notificaciones"
       >
         <svg
           fill="none"
@@ -731,10 +870,10 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M6 7h12l-1 13H7L6 7Zm3 0a3 3 0 0 1 6 0M9 12v4m6-4v4"
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
           />
         </svg>
-        <span>Pedidos</span>
+        <span>Notificaciones</span>
       </a>
       <a
         href="../php/perfil.php"

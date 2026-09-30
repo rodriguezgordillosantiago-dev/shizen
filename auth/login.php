@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../BD/conexion.php';
 require_once __DIR__ . '/../funciones/funciones.php';
+session_name('SHIZEN_REPARTIDOR_SESSION');
 session_start();
 
 function mostrarErrorLogin(): void
@@ -25,7 +26,7 @@ $email = limpiarTexto($_POST['email'] ?? '');
 $password = (string) ($_POST['password'] ?? '');
 $emailValido = filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 
-if (!$emailValido || strlen($email) > 254 || strlen($password) < 6 || strlen($password) > 255) {
+if (!$emailValido || strlen($email) > 254 || strlen($password) < 8 || strlen($password) > 255) {
     mostrarErrorLogin();
 }
 

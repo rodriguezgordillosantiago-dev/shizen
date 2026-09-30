@@ -11,8 +11,8 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles/inicio.css?v=scale-3" />
-    <link rel="stylesheet" href="styles/navigation.css?v=scale-3" />
+    <link rel="stylesheet" href="styles/inicio.css?v=orders-card-3" />
+    <link rel="stylesheet" href="styles/navigation.css?v=nav-stable-4" />
   </head>
   <body>
     <div class="scroll" id="content">
@@ -22,7 +22,7 @@
     <!-- Bottom Nav -->
     <nav
       class="bottom-nav"
-      aria-label="Navegaci?n principal"
+      aria-label="Navegacion principal"
     >
       <a
         href="inicio.html"
@@ -84,9 +84,9 @@
         <span class="nav-status-label">Activo</span>
       </button>
       <a
-        href="pedidos.html"
+        href="notificaciones.php"
         class="nav-item"
-        aria-label="Pedidos"
+        aria-label="Notificaciones"
         ><svg
           fill="none"
           viewBox="0 0 24 24"
@@ -96,10 +96,10 @@
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M6 7h12l-1 13H7L6 7Zm3 0a3 3 0 0 1 6 0M9 12v4m6-4v4"
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
           /></svg
-        ><span>Pedidos</span
-        ><b class="badge" id="badge-pedidos"></b
+        ><span>Notificaciones</span
+        ><b class="badge" id="badge-notificaciones"></b
       ></a>
       <a
         href="../php/perfil.php"
@@ -123,11 +123,17 @@
     <!-- Chat root -->
     <div id="chat-root"></div>
 
-    <script src="../js/data.js?v=stats-1"></script>
+    <script src="../js/data.js"></script>
     <script src="../js/chat.js"></script>
     <script>
       async function render() {
-        const perfil = getPerfil();
+        const perfil = {
+          nombre: "",
+          apellido: "",
+          entregasHoy: 0,
+          gananciasHoy: 0,
+          calificacion: 0,
+        };
         try {
           Object.assign(perfil, await cargarEstadisticas());
         } catch (error) {
@@ -198,25 +204,69 @@
             : disponibles
                 .slice(0, 2)
                 .map(
-                  (p) => `
-          <div class="card" style="padding:14px;margin-bottom:12px">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-              <img src="${p.avatar}" alt="${p.cliente}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0">
-              <div style="flex:1;min-width:0">
-                <p style="margin:0 0 2px;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.cliente_nombre} ${p.cliente_apellido}</p>
-                <p style="margin:0;font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.negocio_nombre}</p>
-              </div>
-              <div style="text-align:right;flex-shrink:0">
-                <p style="margin:0 0 2px;font-size:13px;font-weight:800;color:#4c9540">${fmt(p.total)}</p>
-                <p style="margin:0;font-size:10px;color:#9ca3af">Pedido #${p.id_pedido}</p>
+                  (p, orderIndex) => `
+          <article class="new-order-card">
+            <div class="new-order-card__top">
+              <div class="new-order-card__summary">
+                <div class="new-order-card__business">
+                  <span class="new-order-card__badge">NUEVO PEDIDO</span>
+                  <span class="new-order-card__eyebrow">Recoger en</span>
+                  <h3>${p.negocio_nombre || "Negocio sin nombre"}</h3>
+                </div>
+                <div class="new-order-card__amount">
+                  <strong>${fmt(p.total)}</strong>
+                  <span>Pedido #${p.id_pedido}</span>
+                </div>
               </div>
             </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn-green" style="flex:1;height:36px;font-size:12px" ${lleno ? 'disabled style="flex:1;height:36px;font-size:12px;background:#a0c99b;cursor:not-allowed"' : ""} onclick="aceptar('${p.id_entrega}')">
-                ${lleno ? "Cupo lleno" : "Aceptar"}
-              </button>
+            <div class="new-order-card__dishes">
+              <span class="new-order-card__label">Platos por recoger</span>
+              <ul>
+                ${
+                  Array.isArray(p.detalles) && p.detalles.length
+                    ? p.detalles
+                        .map(
+                          (detalle) =>
+                            `<li><strong>${detalle.cantidad}×</strong> ${detalle.nombre}</li>`,
+                        )
+                        .join("")
+                    : "<li>Detalle no disponible</li>"
+                }
+              </ul>
             </div>
-          </div>`,
+            ${
+              p.pedido_estado === "Preparado"
+                ? `<div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;margin:6px 0;display:flex;align-items:center;gap:6px">
+                    🧑‍🍳 ¡Plato PREPARADO y listo para recoger!
+                   </div>`
+                : p.tiempo_preparacion
+                  ? `<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;margin:6px 0;display:flex;align-items:center;gap:6px">
+                      ⏱️ Tiempo prep: ~${p.minutos_restantes !== null && p.minutos_restantes > 0 ? p.minutos_restantes + " min restantes" : p.tiempo_preparacion + " min"}
+                     </div>`
+                  : ""
+            }
+            <div class="new-order-card__details">
+              <div class="new-order-card__detail">
+                <span class="new-order-card__detail-icon" aria-hidden="true">⌖</span>
+                <div>
+                  <span class="new-order-card__label">Entregar a</span>
+                  <strong>${p.cliente_nombre || ""} ${p.cliente_apellido || ""}</strong>
+                </div>
+              </div>
+              <div class="new-order-card__detail">
+                <span class="new-order-card__detail-icon" aria-hidden="true">↗</span>
+                <div>
+                  <span class="new-order-card__label">Dirección de entrega</span>
+                  <strong>${p.direccion_entrega || "Dirección por confirmar"}</strong>
+                </div>
+              </div>
+            </div>
+            <button class="new-order-card__accept btn-green" type="button"
+              ${lleno ? "disabled" : ""} onclick="aceptar('${p.id_entrega}')">
+              ${lleno ? "Cupo lleno" : "Aceptar pedido"}
+              <span aria-hidden="true">→</span>
+            </button>
+          </article>`,
                 )
                 .join("")
         }
@@ -225,7 +275,12 @@
       }
 
       async function aceptar(id) {
-        try { await actualizarEntrega("accept", id); await render(); } catch (error) { alert(error.message); }
+        try {
+          await actualizarEntrega("accept", id);
+          window.location.href = "activos.html";
+        } catch (error) {
+          alert(error.message);
+        }
       }
 
       render();
