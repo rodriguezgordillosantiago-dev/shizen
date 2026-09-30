@@ -7,7 +7,6 @@ require_auth();
 
 $user        = current_user();
 $currentPage = 'clientes';
-$isKitchen   = strtolower((string)($user['rol'] ?? '')) === 'cocina';
 $pageTitle   = 'Clientes';
 
 $clients = [];
@@ -18,7 +17,7 @@ try {
     $db = database();
     // Únicamente personas que han realizado compras en ESTE negocio
     $stmt = $db->prepare("
-        SELECT u.id_usuario, u.nombre, u.apellido, u.email, u.direccion, u.ciudad, u.fecha_registro,
+        SELECT u.id_usuario, u.nombre, u.apellido, u.email, u.direccion, u.localidad, u.fecha_registro,
                COUNT(DISTINCT p.id_pedido) as total_pedidos,
                COALESCE(SUM(d.valor * d.cantidad), 0) as total_gastado,
                MAX(p.fecha_creacion) as ultima_compra
@@ -26,7 +25,7 @@ try {
         INNER JOIN pedido p ON u.id_usuario = p.id_usuario
         INNER JOIN detalle_pedido d ON p.id_pedido = d.id_pedido
         WHERE p.id_negocio = :business_id
-        GROUP BY u.id_usuario, u.nombre, u.apellido, u.email, u.direccion, u.ciudad, u.fecha_registro
+        GROUP BY u.id_usuario, u.nombre, u.apellido, u.email, u.direccion, u.localidad, u.fecha_registro
         ORDER BY ultima_compra DESC
     ");
     $stmt->execute(['business_id' => $businessId]);
@@ -38,7 +37,7 @@ try {
 <!DOCTYPE html>
 <html lang="es">
 <?php require_once __DIR__ . '/../php/includes/head.php'; ?>
-<body class="layout <?= $isKitchen ? 'kitchen-layout' : '' ?>">
+<body class="layout">
 
 <?php require_once __DIR__ . '/../php/includes/sidebar.php'; ?>
 
@@ -54,7 +53,7 @@ try {
       <div class="search-wrap" style="max-width:280px">
         <i class="bx bx-search"></i>
         <input type="text" class="search-input" placeholder="Buscar cliente..."
-               oninput="filterClients(this.value)">
+               oninput="filterClients(this.value)"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
       </div>
     </div>
 

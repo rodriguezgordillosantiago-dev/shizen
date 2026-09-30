@@ -7,7 +7,6 @@ require_auth();
 
 $user        = current_user();
 $currentPage = 'dashboard';
-$isKitchen   = strtolower((string)($user['rol'] ?? '')) === 'cocina';
 $pageTitle   = 'Dashboard';
 
 $prodCount    = 0;
@@ -92,7 +91,7 @@ $statusBadges = [
 <!DOCTYPE html>
 <html lang="es">
 <?php require_once __DIR__ . '/../php/includes/head.php'; ?>
-<body class="layout <?= $isKitchen ? 'kitchen-layout' : '' ?>">
+<body class="layout">
 
 <?php require_once __DIR__ . '/../php/includes/sidebar.php'; ?>
 
@@ -149,7 +148,7 @@ $statusBadges = [
             <div class="card-title">Pedidos Recientes de Tu Negocio</div>
             <div class="card-subtitle">Últimos pedidos recibidos</div>
           </div>
-          <a href="../pages/pedidos.php" class="btn btn-secondary btn-sm">Ver Cocina / Pedidos</a>
+          <a href="../pages/pedidos.php" class="btn btn-secondary btn-sm">Ver pedidos</a>
         </div>
         <div class="table-wrap">
           <table>
@@ -198,16 +197,17 @@ $statusBadges = [
             <div style="padding:24px;text-align:center;color:#9ca3af">Sin registros de venta en tu negocio.</div>
           <?php else: ?>
             <?php foreach ($topProducts as $i => $tp):
-              $imgUrl = !empty($tp['imagen_url']) && !str_contains($tp['imagen_url'], '../Imagenes_prueba')
-                ? $tp['imagen_url']
-                : 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200';
+              $rawImg = trim((string)($tp['imagen_url'] ?? ''));
+              $imgUrl = str_contains($rawImg, 'Imagenes_prueba/')
+                ? '/shizennegocio/assets/Imagenes_prueba/' . rawurlencode(basename($rawImg))
+                : ($rawImg ?: '/shizennegocio/assets/logo.png');
             ?>
               <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:<?= $i < count($topProducts)-1 ? '1px solid #e5e7eb' : 'none' ?>">
                 <div style="width:40px;height:40px;border-radius:8px;overflow:hidden;background:#f3f4f6;flex-shrink:0">
                   <img src="<?= htmlspecialchars($imgUrl, ENT_QUOTES, 'UTF-8') ?>"
                        alt="<?= htmlspecialchars($tp['nombre'], ENT_QUOTES, 'UTF-8') ?>"
                        style="width:100%;height:100%;object-fit:cover"
-                       onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200'">
+                       onerror="this.onerror=null;this.src='/shizennegocio/assets/logo.png'">
                 </div>
                 <div style="flex:1">
                   <div style="font-size:14px;font-weight:600"><?= htmlspecialchars($tp['nombre'], ENT_QUOTES, 'UTF-8') ?></div>

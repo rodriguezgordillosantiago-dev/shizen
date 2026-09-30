@@ -7,24 +7,27 @@ require_auth();
 
 $user        = current_user();
 $currentPage = 'notificaciones';
-$isKitchen   = strtolower((string)($user['rol'] ?? '')) === 'cocina';
 $pageTitle   = 'Notificaciones';
+$db          = database();
 
-$notifications = [
-  ['icon'=>'bx bx-receipt',      'color'=>'#ffedd5','iconColor'=>'#f97316','title'=>'Nuevo pedido #1042',             'body'=>'Ana Martinez realizo un pedido por $28.000', 'time'=>'Hace 5 min',  'read'=>false],
-  ['icon'=>'bx bx-error',        'color'=>'#fee2e2','iconColor'=>'#ef4444','title'=>'Stock bajo: Pizza Vegana',        'body'=>'Solo quedan 8 unidades disponibles',         'time'=>'Hace 12 min', 'read'=>false],
-  ['icon'=>'bx bx-check-circle', 'color'=>'#d1fae5','iconColor'=>'#059669','title'=>'Pedido #1039 entregado',          'body'=>'Luis Perez recibio su pedido exitosamente',  'time'=>'Hace 28 min', 'read'=>false],
-  ['icon'=>'bx bx-user-plus',    'color'=>'#dbeafe','iconColor'=>'#3b82f6','title'=>'Nuevo cliente registrado',        'body'=>'Pedro Romero creo una cuenta nueva',         'time'=>'Hace 1 hora', 'read'=>true],
-  ['icon'=>'bx bx-star',         'color'=>'#fef3c7','iconColor'=>'#f59e0b','title'=>'Nueva resena recibida',           'body'=>'Carlos Lopez califico con 5 estrellas',      'time'=>'Hace 2 horas','read'=>true],
-  ['icon'=>'bx bx-receipt',      'color'=>'#ffedd5','iconColor'=>'#f97316','title'=>'Pedido #1036 cancelado',          'body'=>'Laura Mendez cancelo su pedido',              'time'=>'Hace 3 horas','read'=>true],
-  ['icon'=>'bx bx-check-circle', 'color'=>'#d1fae5','iconColor'=>'#059669','title'=>'Pedido #1035 entregado',          'body'=>'Pedro Romero recibio su orden',               'time'=>'Hace 4 horas','read'=>true],
-];
-$unread = count(array_filter($notifications, fn($n) => !$n['read']));
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $db->prepare('UPDATE notificacion SET leida = 1 WHERE id_usuario = :usuario AND audiencia = "negocio"')
+       ->execute(['usuario' => (int)$user['id_usuario']]);
+}
+$stmt = $db->prepare(
+    'SELECT id_notificacion, id_pedido, titulo, mensaje, leida, fecha_creacion
+       FROM notificacion
+      WHERE id_usuario = :usuario AND audiencia = "negocio"
+      ORDER BY fecha_creacion DESC LIMIT 50'
+);
+$stmt->execute(['usuario' => (int)$user['id_usuario']]);
+$notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$unread = count(array_filter($notifications, fn(array $n): bool => !(bool)$n['leida']));
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <?php require_once __DIR__ . '/../php/includes/head.php'; ?>
-<body class="layout <?= $isKitchen ? 'kitchen-layout' : '' ?>">
+<body class="layout">
 
 <?php require_once __DIR__ . '/../php/includes/sidebar.php'; ?>
 
@@ -40,34 +43,35 @@ $unread = count(array_filter($notifications, fn($n) => !$n['read']));
         </p>
       </div>
       <?php if ($unread > 0): ?>
-        <button class="btn btn-secondary" onclick="markAllRead()">
-          <i class="bx bx-check-double"></i> Marcar todas como leidas
-        </button>
+        <form method="post">
+          <button class="btn btn-secondary" type="submit"><i class="bx bx-check-double"></i> Marcar todas como leidas</button>
+        </form>
       <?php endif; ?>
     </div>
 
     <div class="card">
       <?php foreach ($notifications as $i => $n): ?>
-        <div class="notif-item <?= !$n['read'] ? 'unread' : '' ?>" id="notif-<?= $i ?>">
-          <div class="notif-dot <?= $n['read'] ? 'read' : '' ?>" id="dot-<?= $i ?>"></div>
-          <div class="notif-icon" style="background:<?= $n['color'] ?>;color:<?= $n['iconColor'] ?>">
-            <i class="<?= $n['icon'] ?>"></i>
+        <div class="notif-item <?= !$n['leida'] ? 'unread' : '' ?>" id="notif-<?= $i ?>">
+          <div class="notif-dot <?= $n['leida'] ? 'read' : '' ?>" id="dot-<?= $i ?>"></div>
+          <div class="notif-icon" style="background:#dbeafe;color:#2563eb">
+            <i class="bx bx-bell"></i>
           </div>
           <div style="flex:1">
-            <div class="notif-title"><?= htmlspecialchars($n['title'], ENT_QUOTES, 'UTF-8') ?></div>
-            <div class="notif-body"><?= htmlspecialchars($n['body'], ENT_QUOTES, 'UTF-8') ?></div>
+            <div class="notif-title"><?= htmlspecialchars($n['titulo'], ENT_QUOTES, 'UTF-8') ?></div>
+            <div class="notif-body"><?= htmlspecialchars($n['mensaje'], ENT_QUOTES, 'UTF-8') ?></div>
             <div class="notif-time">
               <i class="bx bx-time-five"></i>
-              <?= htmlspecialchars($n['time'], ENT_QUOTES, 'UTF-8') ?>
+              <?= htmlspecialchars($n['fecha_creacion'], ENT_QUOTES, 'UTF-8') ?>
             </div>
           </div>
-          <?php if (!$n['read']): ?>
+          <?php if (!$n['leida']): ?>
             <button class="btn btn-secondary btn-sm" onclick="markRead(<?= $i ?>)" style="flex-shrink:0">
               Marcar leida
             </button>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>
+      <?php if (!$notifications): ?><div style="padding:30px;text-align:center;color:#777">No hay notificaciones todavía.</div><?php endif; ?>
     </div>
 
   </main>

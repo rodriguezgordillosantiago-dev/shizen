@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../clases/Usuario.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_name('SHIZEN_NEGOCIO_SESSION');
     session_start();
 }
 
@@ -26,7 +27,7 @@ function verify_csrf(?string $token): bool
 function require_auth(): void
 {
     $rol = strtolower((string)($_SESSION['usuario_rol'] ?? ''));
-    if (empty($_SESSION['id_usuario']) || empty($_SESSION['business_id']) || !in_array($rol, ['negocio', 'cocina'], true)) {
+    if (empty($_SESSION['id_usuario']) || empty($_SESSION['business_id']) || $rol !== 'negocio') {
         header('Location: ../php/login.php');
         exit;
     }

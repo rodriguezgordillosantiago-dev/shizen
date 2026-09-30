@@ -20,15 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if (!verify_csrf($_POST['csrf_token'] ?? null)) {
         $error = 'La sesión del formulario expiró. Intenta nuevamente.';
     } else {
-        $action    = $_POST['action'];
+        $action    = (string)$_POST['action'];
         $id_pedido = (int)($_POST['id_pedido'] ?? 0);
 
         if ($id_pedido > 0) {
             $chkStmt = $db->prepare("
-                SELECT p.id_pedido, p.estado, e.codigo_entrega, e.id_entrega
+                SELECT p.id_pedido, p.id_usuario AS cliente_usuario_id, p.estado, p.tiempo_preparacion, p.hora_estimada_listo,
+                       e.codigo_entrega, e.id_entrega, r.id_usuario AS repartidor_usuario_id
                 FROM pedido p
                 LEFT JOIN compra c ON c.id_pedido = p.id_pedido
                 LEFT JOIN entrega e ON e.id_compra = c.id_compra
+                LEFT JOIN repartidor r ON r.id_repartidor = e.id_repartidor
                 WHERE p.id_pedido = :id AND (:business_filter = 0 OR p.id_negocio = :business_id)
             ");
             $chkStmt->execute(['id' => $id_pedido, 'business_filter' => $businessId, 'business_id' => $businessId]);
@@ -37,21 +39,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (!$pedInfo) {
                 $error = 'Pedido no encontrado o no pertenece a este negocio.';
             } else {
-                $expectedCode = !empty($pedInfo['codigo_entrega'])
-                    ? trim((string)$pedInfo['codigo_entrega'])
+                $expectedCode = !empty($pedInfo['id_entrega'])
+                    ? sprintf('%06d', ((int)$pedInfo['id_entrega'] * 265443) % 900000 + 100000)
                     : sprintf('%06d', ($id_pedido * 265443) % 900000 + 100000);
 
-                if ($action === 'mark_prepared' && $isKitchen) {
-                    // Exclusivo de Cocina: Marcar como preparado
+                if ($action === 'set_prep_time') {
+                    $minutos = max(1, (int)($_POST['minutos'] ?? 10));
+                    try {
+                        $horaEstimada = date('Y-m-d H:i:s', time() + ($minutos * 60));
+                        $db->prepare("UPDATE pedido SET tiempo_preparacion = :min, hora_estimada_listo = :hora, estado = CASE WHEN estado = 'Pendiente' OR estado = 'Recibido' THEN 'En preparacion' ELSE estado END WHERE id_pedido = :id")
+                           ->execute(['min' => $minutos, 'hora' => $horaEstimada, 'id' => $id_pedido]);
+
+                        // Notificar al repartidor si está asignado
+                        $repUserId = (int)($pedInfo['repartidor_usuario_id'] ?? 0);
+                        if ($repUserId > 0) {
+                            $db->prepare(
+                                'INSERT INTO notificacion (id_usuario, audiencia, id_pedido, tipo, titulo, mensaje)
+                                 VALUES (:uid, "repartidor", :pedido, "tiempo_preparacion", :titulo, :mensaje)'
+                            )->execute([
+                                'uid'     => $repUserId,
+                                'pedido'  => $id_pedido,
+                                'titulo'  => '⏱️ Preparación: ' . $minutos . ' min',
+                                'mensaje' => 'El pedido #' . $id_pedido . ' estará listo en aproximadamente ' . $minutos . ' minutos.',
+                            ]);
+                        }
+
+                        // Notificar al cliente
+                        $cliUserId = (int)($pedInfo['cliente_usuario_id'] ?? 0);
+                        if ($cliUserId > 0) {
+                            $db->prepare(
+                                'INSERT INTO notificacion (id_usuario, audiencia, id_pedido, tipo, titulo, mensaje)
+                                 VALUES (:uid, "cliente", :pedido, "tiempo_preparacion", :titulo, :mensaje)'
+                            )->execute([
+                                'uid'     => $cliUserId,
+                                'pedido'  => $id_pedido,
+                                'titulo'  => '⏱️ Pedido en preparación',
+                                'mensaje' => 'El restaurante estima que tu pedido #' . $id_pedido . ' estará listo en ' . $minutos . ' minutos.',
+                            ]);
+                        }
+
+                        $success = '⏱️ Tiempo de preparación fijado en ' . $minutos . ' minutos. ¡Notificación enviada al repartidor!';
+                    } catch (Throwable $e) {
+                        $error = 'Error al actualizar tiempo de preparación: ' . $e->getMessage();
+                    }
+                } elseif ($action === 'mark_prepared') {
                     try {
                         $db->prepare("UPDATE pedido SET estado = 'Preparado' WHERE id_pedido = :id")
                            ->execute(['id' => $id_pedido]);
-                        $success = '🧑‍🍳 Pedido #' . $id_pedido . ' marcado como PREPARADO por cocina.';
+                        $success = '🧑‍🍳 Pedido #' . $id_pedido . ' marcado como PREPARADO.';
+
+                        // Notificar al repartidor si está asignado
+                        $repUserId = (int)($pedInfo['repartidor_usuario_id'] ?? 0);
+                        if ($repUserId > 0) {
+                            $db->prepare(
+                                'INSERT INTO notificacion (id_usuario, audiencia, id_pedido, tipo, titulo, mensaje)
+                                 VALUES (:uid, "repartidor", :pedido, "pedido_preparado", :titulo, :mensaje)'
+                            )->execute([
+                                'uid'    => $repUserId,
+                                'pedido' => $id_pedido,
+                                'titulo' => '✅ ¡Pedido listo para recoger!',
+                                'mensaje'=> 'El pedido #' . $id_pedido . ' ya está preparado en el restaurante. ¡Puedes pasar a recogerlo!',
+                            ]);
+                        }
+
+                        // Notificar al cliente
+                        $cliUserId = (int)($pedInfo['cliente_usuario_id'] ?? 0);
+                        if ($cliUserId > 0) {
+                            $db->prepare(
+                                'INSERT INTO notificacion (id_usuario, audiencia, id_pedido, tipo, titulo, mensaje)
+                                 VALUES (:uid, "cliente", :pedido, "pedido_preparado", :titulo, :mensaje)'
+                            )->execute([
+                                'uid'    => $cliUserId,
+                                'pedido' => $id_pedido,
+                                'titulo' => '✅ Tu pedido está preparado',
+                                'mensaje'=> 'Tu pedido #' . $id_pedido . ' ya fue preparado y está listo para que el repartidor lo recoja.',
+                            ]);
+                        }
                     } catch (Throwable $e) {
                         $error = 'Error al actualizar estado: ' . $e->getMessage();
                     }
-                } elseif ($action === 'deliver_with_code' && !$isKitchen) {
-                    // Exclusivo de Negocio: Ingresar código del repartidor y cambiar a entregado
+                } elseif ($action === 'deliver_with_code') {
                     $codigoIngresado = trim((string)($_POST['codigo_repartidor'] ?? ''));
 
                     if ($codigoIngresado === '') {
@@ -60,17 +127,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $error = 'El código ingresado no coincide con el del repartidor. Código esperado: ' . $expectedCode;
                     } else {
                         try {
-                            $db->prepare("UPDATE pedido SET estado = 'Entregado' WHERE id_pedido = :id")
+                            $db->prepare("UPDATE pedido SET estado = 'Recogido en negocio' WHERE id_pedido = :id")
                                ->execute(['id' => $id_pedido]);
 
                             if (!empty($pedInfo['id_entrega'])) {
-                                $db->prepare("UPDATE entrega SET estado = 'Entregado', fecha_entrega = NOW(), fecha_confirmacion = NOW() WHERE id_entrega = :id_e")
+                                $db->prepare("UPDATE entrega SET estado = 'Recogido en negocio' WHERE id_entrega = :id_e")
                                    ->execute(['id_e' => $pedInfo['id_entrega']]);
                             }
 
-                            $success = '✅ ¡Código del repartidor validado con éxito! Pedido #' . $id_pedido . ' ENTREGADO.';
+                            $success = '✅ ¡Código validado! Pedido #' . $id_pedido . ' entregado al repartidor. El repartidor completará la entrega al cliente.';
                         } catch (Throwable $e) {
-                            $error = 'Error al entregar pedido: ' . $e->getMessage();
+                            $error = 'Error al confirmar recogida: ' . $e->getMessage();
                         }
                     }
                 } elseif ($action === 'cancel_order') {
@@ -92,6 +159,7 @@ $orders = [];
 try {
     $stmt = $db->prepare("
         SELECT p.id_pedido, p.estado, p.fecha_creacion, p.direccion_entrega, p.descripcion as nota_pedido,
+               p.tiempo_preparacion, p.hora_estimada_listo,
                u.nombre as user_nombre, u.apellido as user_apellido, u.email,
                e.codigo_entrega, e.id_entrega
         FROM pedido p
@@ -119,8 +187,8 @@ try {
             $totalOrder += (float)$item['valor'] * (int)$item['cantidad'];
         }
         $ord['total'] = $totalOrder;
-        $ord['expected_code'] = !empty($ord['codigo_entrega'])
-            ? trim((string)$ord['codigo_entrega'])
+        $ord['expected_code'] = !empty($ord['id_entrega'])
+            ? sprintf('%06d', ((int)$ord['id_entrega'] * 265443) % 900000 + 100000)
             : sprintf('%06d', ($ord['id_pedido'] * 265443) % 900000 + 100000);
     }
     unset($ord);
@@ -129,13 +197,14 @@ try {
 }
 
 $statusMap = [
-  'recibido'        => ['label'=>'Recibido',        'badge'=>'badge-orange'],
-  'pendiente'      => ['label'=>'Pendiente',       'badge'=>'badge-orange'],
-  'en preparacion' => ['label'=>'En preparación',  'badge'=>'badge-yellow'],
-  'preparado'      => ['label'=>'Plato Preparado',  'badge'=>'badge-blue'],
-  'en camino'      => ['label'=>'En camino',        'badge'=>'badge-blue'],
-  'entregado'      => ['label'=>'Entregado',        'badge'=>'badge-green'],
-  'cancelado'      => ['label'=>'Cancelado',        'badge'=>'badge-red'],
+  'recibido'           => ['label'=>'Recibido',             'badge'=>'badge-orange'],
+  'pendiente'          => ['label'=>'Pendiente',            'badge'=>'badge-orange'],
+  'en preparacion'     => ['label'=>'En preparación',       'badge'=>'badge-yellow'],
+  'preparado'          => ['label'=>'Plato Preparado',       'badge'=>'badge-blue'],
+  'recogido en negocio'=> ['label'=>'Recogido por repartidor','badge'=>'badge-blue'],
+  'en camino'          => ['label'=>'En camino',             'badge'=>'badge-blue'],
+  'entregado'          => ['label'=>'Entregado',             'badge'=>'badge-green'],
+  'cancelado'          => ['label'=>'Cancelado',             'badge'=>'badge-red'],
 ];
 $csrfToken = csrf_token();
 ?>
@@ -156,7 +225,7 @@ $csrfToken = csrf_token();
         <p class="page-header-sub">
           <?= $isKitchen
               ? 'Marca los platos preparados para que el negocio los entregue al repartidor.'
-              : count($orders) . ' pedidos en tu negocio. Haz clic en un pedido para ingresar el código del repartidor.' ?>
+              : count($orders) . ' pedidos en tu negocio. Haz clic en un pedido para gestionar tiempo y código.' ?>
         </p>
       </div>
       <?php if (!$isKitchen): ?>
@@ -223,9 +292,15 @@ $csrfToken = csrf_token();
               <div style="font-size:15px;font-weight:800;color:#111827;margin-bottom:2px">
                 <?= htmlspecialchars($cliente, ENT_QUOTES, 'UTF-8') ?>
               </div>
-              <div style="font-size:12px;color:#6b7280;margin-bottom:10px;display:flex;align-items:center;gap:4px">
+              <div style="font-size:12px;color:#6b7280;margin-bottom:8px;display:flex;align-items:center;gap:4px">
                 <i class="bx bx-map-pin" style="color:#ef4444"></i> <?= htmlspecialchars($o['direccion_entrega'], ENT_QUOTES, 'UTF-8') ?>
               </div>
+
+              <?php if (!empty($o['tiempo_preparacion'])): ?>
+                <div style="display:inline-flex;align-items:center;gap:4px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-bottom:8px">
+                  ⏱️ Prep: <?= (int)$o['tiempo_preparacion'] ?> min
+                </div>
+              <?php endif; ?>
 
               <div style="background:#f9fafb;border-radius:10px;padding:10px;margin-bottom:12px;font-size:12px;color:#374151">
                 <?php foreach (array_slice($o['items'], 0, 2) as $it): ?>
@@ -245,7 +320,7 @@ $csrfToken = csrf_token();
                   <div style="font-size:18px;font-weight:900;color:#059669"><?= format_cop($o['total']) ?></div>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm" style="font-weight:700;padding:8px 12px;border-radius:8px;justify-content:center;text-align:center;display:inline-flex;align-items:center">
-                  <?= $isKitchen ? '🧑‍🍳 Cocina' : '🔑 Código Repartidor' ?>
+                  Gestionar Pedido
                 </button>
               </div>
 
@@ -261,7 +336,7 @@ $csrfToken = csrf_token();
 
 <!-- MODAL DE GESTIÓN DE PEDIDO -->
 <div id="orderModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)">
-  <div class="card" style="width:100%;max-width:500px;max-height:90vh;overflow-y:auto;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.25)">
+  <div class="card" style="width:100%;max-width:540px;max-height:92vh;overflow-y:auto;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.25)">
     <div class="card-header" style="background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:16px 20px">
       <div class="card-title" id="mOrderTitle" style="font-size:18px;font-weight:800;color:#111827">Gestión de Pedido</div>
       <button type="button" onclick="closeOrderModal()" class="btn btn-secondary btn-sm" style="padding:4px 10px;border-radius:8px;font-weight:700">✕</button>
@@ -279,11 +354,15 @@ $csrfToken = csrf_token();
         <div id="mItemsList" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
 
-      <div style="display:flex;justify-space-between;align-items:center;padding:12px 14px;background:#ecfdf5;border-radius:10px;border:1px solid #a7f3d0;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#ecfdf5;border-radius:10px;border:1px solid #a7f3d0;margin-bottom:16px">
         <span style="font-size:13px;font-weight:700;color:#065f46">Total (COP):</span>
         <span style="font-size:20px;font-weight:900;color:#059669" id="mTotal"></span>
       </div>
 
+      <!-- SECCIÓN TIEMPO DE PREPARACIÓN -->
+      <div id="mPrepTimeArea" style="margin-bottom:16px"></div>
+
+      <!-- SECCIÓN ACCIÓN CÓDIGO REPARTIDOR / ESTADOS -->
       <div id="mActionArea"></div>
 
     </div>
@@ -293,6 +372,11 @@ $csrfToken = csrf_token();
 <script>
 const csrfToken = <?= json_encode($csrfToken) ?>;
 const isKitchenRole = <?= json_encode($isKitchen) ?>;
+
+function setPrepMinutes(val) {
+  const inp = document.getElementById('inputMinutosPrep');
+  if (inp) inp.value = val;
+}
 
 function openOrderModal(order) {
   document.getElementById('mOrderTitle').textContent = 'Pedido #' + order.id_pedido + ' — Estado: ' + order.estado;
@@ -311,37 +395,86 @@ function openOrderModal(order) {
   document.getElementById('mItemsList').innerHTML = itemsHtml || '<div style="color:#9ca3af;font-size:12px">Sin ítems</div>';
 
   const st = (order.estado || '').toLowerCase();
-  const area = document.getElementById('mActionArea');
+  const prepArea = document.getElementById('mPrepTimeArea');
+  const actionArea = document.getElementById('mActionArea');
 
+  // 1. Renderizar sección de tiempo de preparación
+  if (st !== 'entregado' && st !== 'cancelado') {
+    const currentPrep = order.tiempo_preparacion ? Number(order.tiempo_preparacion) : null;
+    const isPrep = (st === 'preparado');
+
+    prepArea.innerHTML = `
+      <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:14px;padding:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:#c2410c">⏱️ Tiempo Estimado de Preparación:</div>
+          ${currentPrep ? `<span style="background:#ea580c;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:12px">${currentPrep} min fijados</span>` : ''}
+        </div>
+        
+        <form method="post" style="display:flex;flex-direction:column;gap:8px">
+          <input type="hidden" name="csrf_token" value="${csrfToken}">
+          <input type="hidden" name="action" value="set_prep_time">
+          <input type="hidden" name="id_pedido" value="${order.id_pedido}">
+          
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setPrepMinutes(10)" style="font-size:12px;padding:4px 8px">10 min</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setPrepMinutes(15)" style="font-size:12px;padding:4px 8px">15 min</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setPrepMinutes(20)" style="font-size:12px;padding:4px 8px">20 min</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setPrepMinutes(30)" style="font-size:12px;padding:4px 8px">30 min</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="setPrepMinutes(45)" style="font-size:12px;padding:4px 8px">45 min</button>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <input type="number" id="inputMinutosPrep" name="minutos" min="1" max="180" value="${currentPrep || 15}" required
+                   placeholder="Minutos" class="form-control"
+                   style="width:90px;text-align:center;font-weight:800;font-size:15px;border:1.5px solid #fb923c;border-radius:8px">
+            <button type="submit" class="btn" style="flex:1;background:#ea580c;color:#fff;font-weight:800;font-size:13px;border-radius:8px;padding:8px">
+              ⏱️ Definir Tiempo y Notificar al Repartidor
+            </button>
+          </div>
+        </form>
+
+        <!-- Botón para marcar como preparado cuando el plato esté listo -->
+        <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #fed7aa">
+          ${isPrep ? `
+            <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;padding:8px 12px;border-radius:8px;font-weight:800;font-size:13px;text-align:center">
+              🧑‍🍳 ¡Plato marcado como PREPARADO y listo para recoger!
+            </div>
+          ` : `
+            <form method="post">
+              <input type="hidden" name="csrf_token" value="${csrfToken}">
+              <input type="hidden" name="action" value="mark_prepared">
+              <input type="hidden" name="id_pedido" value="${order.id_pedido}">
+              <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;text-align:center;display:flex;align-items:center;font-weight:800;padding:10px;font-size:14px;border-radius:8px">
+                🧑‍🍳 Marcar Plato como LISTO / PREPARADO (Notificar)
+              </button>
+            </form>
+          `}
+        </div>
+
+      </div>`;
+  } else {
+    prepArea.innerHTML = '';
+  }
+
+  // 2. Renderizar sección de entrega o estado final
   if (st === 'entregado') {
-    area.innerHTML = `
+    actionArea.innerHTML = `
       <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#059669;padding:12px;border-radius:10px;font-weight:800;text-align:center">
-        ✅ Pedido Entregado al Repartidor
+        ✅ Pedido Entregado al Cliente
       </div>`;
   } else if (st === 'cancelado') {
-    area.innerHTML = `
+    actionArea.innerHTML = `
       <div style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:12px;border-radius:10px;font-weight:800;text-align:center">
         ❌ Pedido Cancelado
       </div>`;
-  } else if (isKitchenRole) {
-    if (st === 'preparado' || st === 'en camino') {
-      area.innerHTML = `
-        <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;padding:12px;border-radius:10px;font-weight:800;text-align:center">
-          🧑‍🍳 Plato preparado por cocina. Esperando entrega por el negocio.
-        </div>`;
-    } else {
-      area.innerHTML = `
-        <form method="post">
-          <input type="hidden" name="csrf_token" value="${csrfToken}">
-          <input type="hidden" name="action" value="mark_prepared">
-          <input type="hidden" name="id_pedido" value="${order.id_pedido}">
-          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;text-align:center;display:flex;align-items:center;font-weight:800;padding:12px;font-size:15px;border-radius:10px">
-            🧑‍🍳 Marcar Plato Preparado
-          </button>
-        </form>`;
-    }
+  } else if (st === 'recogido en negocio' || st === 'en camino') {
+    actionArea.innerHTML = `
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:12px;border-radius:10px;font-weight:800;text-align:center">
+        🛵 Pedido recogido — el repartidor está en camino al cliente
+      </div>`;
   } else {
-    area.innerHTML = `
+    // Para Negocio y Cocina: Sección de validar código de recogida del repartidor
+    actionArea.innerHTML = `
       <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:12px;padding:14px">
         <div style="font-size:13px;color:#047857;font-weight:800;margin-bottom:8px">
           🛵 Ingresa el Código proporcionado por el Repartidor:
@@ -353,7 +486,7 @@ function openOrderModal(order) {
           <input type="text" name="codigo_repartidor" class="form-control" placeholder="Código repartidor" required maxlength="10"
                  style="font-weight:900;letter-spacing:3px;font-size:18px;text-align:center;padding:10px;border:2px solid #059669;border-radius:10px">
           <button type="submit" class="btn btn-primary" style="font-weight:800;padding:12px;font-size:15px;width:100%;justify-content:center;text-align:center;display:flex;align-items:center">
-            🛵 Validar Código y Entregar Pedido
+            🛵 Validar Código y Entregar al Repartidor
           </button>
         </form>
       </div>`;

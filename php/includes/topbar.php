@@ -1,10 +1,7 @@
 ﻿<?php
 $user = $user ?? current_user();
-if (strtolower((string) ($user['rol'] ?? '')) === 'cocina') {
-    return;
-}
 $initial = strtoupper(substr($user['nombre'] ?? 'U', 0, 1));
-$roleLabel = ($user['rol'] ?? 'negocio') === 'negocio' ? 'Negocio' : 'Cocina';
+$roleLabel = 'Negocio';
 $titles = [
   'dashboard'     => 'Dashboard',
   'productos'     => 'Productos',

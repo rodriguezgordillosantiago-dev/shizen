@@ -7,7 +7,6 @@ require_auth();
 
 $user        = current_user();
 $currentPage = 'productos';
-$isKitchen   = strtolower((string)($user['rol'] ?? '')) === 'cocina';
 $pageTitle   = 'Productos';
 
 $success = '';
@@ -65,8 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stock           = (int)($_POST['stock'] ?? 0);
         $imagen_url = trim((string)($_POST['imagen_url'] ?? ''));
 
-        // Procesar subida de imagen si se envio un archivo
-        $uploadDir = realpath(__DIR__ . '/../../shizen-home/public/images/catalogo/Imagenes_prueba') . DIRECTORY_SEPARATOR;
+        // Procesar subida de imagen directamente en shizenhome
+        $homeUploadPath = realpath(__DIR__ . '/../../shizenhome/assets/Imagenes_prueba') ?: ('C:/xampp/htdocs/shizenhome/assets/Imagenes_prueba');
+        if (!is_dir($homeUploadPath)) {
+            mkdir($homeUploadPath, 0755, true);
+        }
+        $uploadDir = rtrim($homeUploadPath, '/\\') . DIRECTORY_SEPARATOR;
         if (!empty($_FILES['imagen']['tmp_name']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
             $finfo    = finfo_open(FILEINFO_MIME_TYPE);
             $mimeType = finfo_file($finfo, $_FILES['imagen']['tmp_name']);
@@ -80,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $ext      = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
                 $filename = 'producto_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . strtolower($ext);
                 if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadDir . $filename)) {
-                    $imagen_url = '/shizen-home/public/images/catalogo/Imagenes_prueba/' . $filename;
+                    $imagen_url = 'assets/Imagenes_prueba/' . rawurlencode($filename);
                 } else {
                     $error = 'No se pudo guardar la imagen. Verifica permisos de la carpeta.';
                 }
@@ -103,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } else {
             try {
                 if ($action === 'create') {
-                    $finalImg = $imagen_url ?: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400';
+                    $finalImg = $imagen_url ?: '/shizennegocio/assets/logo.png';
                     $stmt = $db->prepare("
                         INSERT INTO menu_items (id_negocio, nombre, descripcion, precio, stock, imagen_url, id_categoria, on_promo, precio_promocion)
                         VALUES (:id_negocio, :nombre, :descripcion, :precio, :stock, :imagen_url, :categoria_id, :on_promo, :precio_promocion)
@@ -232,7 +235,7 @@ try {
 <!DOCTYPE html>
 <html lang="es">
 <?php require_once __DIR__ . '/../php/includes/head.php'; ?>
-<body class="layout <?= $isKitchen ? 'kitchen-layout' : '' ?>">
+<body class="layout">
 
 <?php require_once __DIR__ . '/../php/includes/sidebar.php'; ?>
 
@@ -269,19 +272,19 @@ try {
       <div class="search-wrap">
         <i class="bx bx-search"></i>
         <input type="text" class="search-input" placeholder="Buscar por nombre o descripcion..."
-               oninput="filterProducts(this.value)">
+               oninput="filterProducts(this.value)"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
       </div>
       <select class="form-control" style="width:auto;padding:9px 14px" onchange="filterCategory(this.value)">
         <option value="">Todas las categorias</option>
         <?php foreach ($categoriesList as $cat): ?>
           <option value="<?= htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8') ?></option>
         <?php endforeach; ?>
-      </select>
+      </select><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
       <select class="form-control" style="width:auto;padding:9px 14px" onchange="filterPromo(this.value)">
         <option value="">Todos los productos</option>
         <option value="promo">En Promocion 🔥</option>
         <option value="normal">Sin Promocion</option>
-      </select>
+      </select><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
     </div>
 
     <!-- Grid de productos -->
@@ -293,11 +296,11 @@ try {
           // Convertir rutas relativas de Imagenes_prueba a la URL publica correcta
           if (str_contains($rawImg, 'Imagenes_prueba/')) {
               $file   = basename($rawImg);
-              $imgUrl = '/shizen-home/public/images/catalogo/Imagenes_prueba/' . $file;
+              $imgUrl = '/shizenhome/assets/Imagenes_prueba/' . rawurlencode($file);
           } elseif (!empty($rawImg)) {
               $imgUrl = $rawImg;
           } else {
-              $imgUrl = 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400';
+              $imgUrl = '/shizenhome/assets/logo.png';
           }
         ?>
         <div class="product-card"
@@ -309,7 +312,7 @@ try {
             <img src="<?= htmlspecialchars($imgUrl, ENT_QUOTES, 'UTF-8') ?>"
                  alt="<?= htmlspecialchars($p['nombre'] ?? 'Producto', ENT_QUOTES, 'UTF-8') ?>"
                  style="width:100%;height:100%;object-fit:cover"
-                 onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400'">
+                 onerror="this.onerror=null;this.src='/shizennegocio/assets/logo.png'">
             <?php if ($hasPromo): ?>
               <span class="badge badge-orange" style="position:absolute;top:10px;right:10px;box-shadow:0 2px 6px rgba(249,115,22,.5)">
                 🔥 PROMOCION
@@ -387,12 +390,12 @@ try {
 
         <div class="form-group">
           <label class="form-label" for="prodNombre">Nombre del producto *</label>
-          <input type="text" id="prodNombre" name="nombre" class="form-control" placeholder="Ej: Hamburguesa Vegana" required>
+          <input type="text" id="prodNombre" name="nombre" class="form-control" placeholder="Ej: Hamburguesa Vegana" required><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="prodDescripcion">Descripcion</label>
-          <textarea id="prodDescripcion" name="descripcion" class="form-control" rows="2" placeholder="Descripcion del plato o ingrediente..."></textarea>
+          <textarea id="prodDescripcion" name="descripcion" class="form-control" rows="2" placeholder="Descripcion del plato o ingrediente..."></textarea><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
         </div>
 
         <div class="form-group">
@@ -402,16 +405,52 @@ try {
               <option value="<?= htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($cat['nombre'], ENT_QUOTES, 'UTF-8') ?></option>
             <?php endforeach; ?>
           </select>
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const valid = field.value !== '';
+    field.setCustomValidity(valid ? '' : 'Selecciona una categoría.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'Selecciona una categoría.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const valid = field.value.trim().length >= 2;
+    field.setCustomValidity(valid ? '' : 'Ingresa un nombre de producto válido.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'Ingresa un nombre de producto válido.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="form-group">
             <label class="form-label" for="prodPrecio">Precio Normal (COP $) *</label>
-            <input type="number" id="prodPrecio" name="precio" class="form-control" placeholder="18500" required min="1000" step="50" title="Mínimo $1.000 COP, en múltiplos de 50" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <input type="number" id="prodPrecio" name="precio" class="form-control" placeholder="18500" required min="1000" step="50" title="Mínimo $1.000 COP, en múltiplos de 50" oninput="this.value=this.value.replace(/[^0-9]/g,'')"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
           </div>
           <div class="form-group">
             <label class="form-label" for="prodStock">Stock disponible *</label>
-            <input type="number" id="prodStock" name="stock" class="form-control" value="10" required min="0">
+            <input type="number" id="prodStock" name="stock" class="form-control" value="10" required min="0"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
           </div>
         </div>
 
@@ -430,7 +469,7 @@ try {
               <div style="font-size:11px;color:#9ca3af">JPG, PNG, WebP o GIF · Máx. 5 MB</div>
             </div>
           </label>
-          <input type="file" id="prodImagen" name="imagen" accept="image/*" style="display:none" onchange="previewImg(this)">
+          <input type="file" id="prodImagen" name="imagen" accept="image/*" style="display:none" onchange="previewImg(this)"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
         </div>
 
         <!-- Seccion de Promocion -->
@@ -449,6 +488,60 @@ try {
               <option value="40">40% de descuento</option>
               <option value="50">50% de descuento</option>
             </select>
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const file = field.files && field.files[0]; const valid = !file || (['image/jpeg','image/png','image/webp','image/gif'].includes(file.type) && file.size <= 5 * 1024 * 1024);
+    field.setCustomValidity(valid ? '' : 'La imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 5 MB.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'La imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 5 MB.' : '';
+  }
+  field.addEventListener('change', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const value = Number(field.value); const valid = field.value !== '' && Number.isInteger(value) && value >= 0;
+    field.setCustomValidity(valid ? '' : 'El stock debe ser un número igual o mayor a 0.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'El stock debe ser un número igual o mayor a 0.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    
+    const value = Number(field.value); const valid = field.value !== '' && Number.isFinite(value) && value >= 1000 && value % 50 === 0;
+    field.setCustomValidity(valid ? '' : 'El precio debe ser mínimo $1.000 y múltiplo de 50.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'El precio debe ser mínimo $1.000 y múltiplo de 50.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
           </div>
           <div id="promoPricePreview" style="display:none;margin-top:10px;padding:8px 12px;background:#ea580c;color:#fff;border-radius:8px;font-size:13px;font-weight:600"></div>
         </div>
@@ -577,6 +670,134 @@ function filterPromo(promo) {
 // Recalcular al cambiar el precio normal tambien
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('prodPrecio').addEventListener('input', calcPromoPrice);
+
+  const form = document.getElementById('productForm');
+  if (!form) return;
+
+  const nombre = document.getElementById('prodNombre');
+  const categoria = document.getElementById('prodCategory');
+  const precio = document.getElementById('prodPrecio');
+  const stock = document.getElementById('prodStock');
+  const imagen = document.getElementById('prodImagen');
+
+  function ensureError(field) {
+    const wrapper = field.closest('.form-group');
+    if (!wrapper) return null;
+    let msg = wrapper.querySelector('.field-error');
+    if (!msg) {
+      msg = document.createElement('small');
+      msg.className = 'field-error';
+      msg.style.cssText = 'display:block;color:#c62828;font-size:12px;margin-top:6px';
+      wrapper.appendChild(msg);
+    }
+    return msg;
+  }
+
+  function validateNombre() {
+    const msg = ensureError(nombre);
+    const value = nombre.value.trim();
+    const valid = value.length >= 2;
+    nombre.setCustomValidity(valid ? '' : 'Ingresa un nombre de producto válido.');
+    if (msg) msg.textContent = nombre.dataset.touched === 'true' && !valid ? 'Ingresa un nombre de producto válido.' : '';
+    return valid;
+  }
+
+  function validateCategoria() {
+    const msg = ensureError(categoria);
+    const valid = categoria.value.trim() !== '';
+    categoria.setCustomValidity(valid ? '' : 'Selecciona una categoría.');
+    if (msg) msg.textContent = categoria.dataset.touched === 'true' && !valid ? 'Selecciona una categoría.' : '';
+    return valid;
+  }
+
+  function validatePrecio() {
+    const msg = ensureError(precio);
+    const value = Number(precio.value);
+    const valid = precio.value !== '' && Number.isFinite(value) && value >= 1000 && value % 50 === 0;
+    precio.setCustomValidity(valid ? '' : 'El precio debe ser mínimo $1.000 COP y múltiplo de 50.');
+    if (msg) msg.textContent = precio.dataset.touched === 'true' && !valid ? 'El precio debe ser mínimo $1.000 COP y múltiplo de 50.' : '';
+    return valid;
+  }
+
+  function validateStock() {
+    const msg = ensureError(stock);
+    const value = Number(stock.value);
+    const valid = stock.value !== '' && Number.isInteger(value) && value >= 0;
+    stock.setCustomValidity(valid ? '' : 'El stock debe ser un número igual o mayor a 0.');
+    if (msg) msg.textContent = stock.dataset.touched === 'true' && !valid ? 'El stock debe ser un número igual o mayor a 0.' : '';
+    return valid;
+  }
+
+  function validateImagen() {
+    const wrapper = imagen.closest('.form-group');
+    let msg = wrapper ? wrapper.querySelector('.field-error-imagen') : null;
+    if (!msg && wrapper) {
+      msg = document.createElement('small');
+      msg.className = 'field-error-imagen';
+      msg.style.cssText = 'display:block;color:#c62828;font-size:12px;margin-top:6px';
+      wrapper.appendChild(msg);
+    }
+
+    if (!imagen.files || !imagen.files[0]) {
+      if (msg) msg.textContent = '';
+      return true;
+    }
+
+    const file = imagen.files[0];
+    const validType = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type);
+    const validSize = file.size <= 5 * 1024 * 1024;
+    const valid = validType && validSize;
+    if (msg) {
+      msg.textContent = valid ? '' : 'La imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 5 MB.';
+    }
+    imagen.setCustomValidity(valid ? '' : 'La imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 5 MB.');
+    return valid;
+  }
+
+  function validateForm() {
+    return validateNombre() && validateCategoria() && validatePrecio() && validateStock() && validateImagen();
+  }
+
+  [nombre, categoria, precio, stock].forEach(function(field) {
+    field.addEventListener('input', function() {
+      field.dataset.touched = 'true';
+      if (field === nombre) validateNombre();
+      if (field === categoria) validateCategoria();
+      if (field === precio) validatePrecio();
+      if (field === stock) validateStock();
+    });
+    field.addEventListener('blur', function() {
+      field.dataset.touched = 'true';
+      if (field === nombre) validateNombre();
+      if (field === categoria) validateCategoria();
+      if (field === precio) validatePrecio();
+      if (field === stock) validateStock();
+    });
+    field.addEventListener('change', function() {
+      field.dataset.touched = 'true';
+      if (field === nombre) validateNombre();
+      if (field === categoria) validateCategoria();
+      if (field === precio) validatePrecio();
+      if (field === stock) validateStock();
+    });
+  });
+
+  imagen.addEventListener('change', function() {
+    imagen.dataset.touched = 'true';
+    validateImagen();
+  });
+
+  form.addEventListener('submit', function(event) {
+    nombre.dataset.touched = 'true';
+    categoria.dataset.touched = 'true';
+    precio.dataset.touched = 'true';
+    stock.dataset.touched = 'true';
+    if (!validateForm()) {
+      event.preventDefault();
+      const firstInvalid = form.querySelector(':invalid');
+      if (firstInvalid) firstInvalid.focus();
+    }
+  });
 });
 </script>
 </body>

@@ -7,7 +7,6 @@ require_auth();
 
 $user        = current_user();
 $currentPage = 'configuracion';
-$isKitchen   = strtolower((string)($user['rol'] ?? '')) === 'cocina';
 $pageTitle   = 'Configuración';
 
 $saved = false;
@@ -63,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="es">
 <?php require_once __DIR__ . '/../php/includes/head.php'; ?>
-<body class="layout <?= $isKitchen ? 'kitchen-layout' : '' ?>">
+<body class="layout">
 
 <?php require_once __DIR__ . '/../php/includes/sidebar.php'; ?>
 
@@ -96,20 +95,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="card-body">
             <div class="form-group">
               <label class="form-label">Moneda Oficial del Sistema</label>
-              <input type="text" class="form-control" value="Pesos Colombianos (COP - $)" disabled style="background:#f0fdf4;color:#047857;font-weight:700">
+              <input type="text" class="form-control" value="Pesos Colombianos (COP - $)" disabled style="background:#f0fdf4;color:#047857;font-weight:700"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
             </div>
             <div class="form-group">
               <label class="form-label">Valor mínimo de pedido en Pesos Colombianos (COP $)</label>
-              <input type="number" class="form-control" name="minOrder" value="<?= htmlspecialchars((string)$settings['min_order'], ENT_QUOTES, 'UTF-8') ?>" placeholder="15000 COP">
+              <input type="number" class="form-control" name="minOrder" value="<?= htmlspecialchars((string)$settings['min_order'], ENT_QUOTES, 'UTF-8') ?>" placeholder="15000 COP" min="0">
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo) return;
+                  c.dataset.validacionCampo = '1';
+                  var e = c.nextElementSibling && c.nextElementSibling.classList.contains('field-error-inline') ? c.nextElementSibling : document.createElement('small');
+                  e.className = 'field-error-inline';
+                  e.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px;';
+                  if (!e.parentNode) c.insertAdjacentElement('afterend', e);
+                  function v() {
+                    var val = Number(c.value);
+                    var inv = c.value === '' || !Number.isFinite(val) || val < 0;
+                    e.textContent = inv ? 'Ingresa un valor mínimo válido.' : '';
+                    c.setAttribute('aria-invalid', inv ? 'true' : 'false');
+                    return !inv;
+                  }
+                  ['input', 'change', 'blur'].forEach(function (t) { c.addEventListener(t, v); });
+                  if (c.form) c.form.addEventListener('submit', function (a) { if (!v()) a.preventDefault(); });
+                })(document.currentScript.previousElementSibling);
+              </script>
             </div>
             <div class="form-group" style="margin-bottom:0">
               <label class="form-label">Radio de domicilio (km)</label>
-              <input type="number" class="form-control" name="radius" value="<?= htmlspecialchars((string)$settings['radius'], ENT_QUOTES, 'UTF-8') ?>">
+              <input type="number" class="form-control" name="radius" value="<?= htmlspecialchars((string)$settings['radius'], ENT_QUOTES, 'UTF-8') ?>" min="0.1" step="0.1">
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo) return;
+                  c.dataset.validacionCampo = '1';
+                  var e = c.nextElementSibling && c.nextElementSibling.classList.contains('field-error-inline') ? c.nextElementSibling : document.createElement('small');
+                  e.className = 'field-error-inline';
+                  e.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px;';
+                  if (!e.parentNode) c.insertAdjacentElement('afterend', e);
+                  function v() {
+                    var val = Number(c.value);
+                    var inv = c.value === '' || !Number.isFinite(val) || val <= 0;
+                    e.textContent = inv ? 'Ingresa un radio válido.' : '';
+                    c.setAttribute('aria-invalid', inv ? 'true' : 'false');
+                    return !inv;
+                  }
+                  ['input', 'change', 'blur'].forEach(function (t) { c.addEventListener(t, v); });
+                  if (c.form) c.form.addEventListener('submit', function (a) { if (!v()) a.preventDefault(); });
+                })(document.currentScript.previousElementSibling);
+              </script>
             </div>
           </div>
         </div>
 
-        <!-- Parámetros de Cocina y Preparación -->
+        <!-- Parámetros de preparación y operación -->
         <div class="card">
           <div class="card-header">
             <div class="card-title"><i class="bx bx-dish"></i> Parámetros de Operación</div>
@@ -118,10 +155,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
               <label class="form-label">Tiempo estimado de preparación (minutos)</label>
               <input type="number" class="form-control" name="prepTime" value="<?= htmlspecialchars((string)$settings['prep_time'], ENT_QUOTES, 'UTF-8') ?>" min="5" max="120">
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo) return;
+                  c.dataset.validacionCampo = '1';
+                  var e = c.nextElementSibling && c.nextElementSibling.classList.contains('field-error-inline') ? c.nextElementSibling : document.createElement('small');
+                  e.className = 'field-error-inline';
+                  e.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px;';
+                  if (!e.parentNode) c.insertAdjacentElement('afterend', e);
+                  function v() {
+                    var val = Number(c.value);
+                    var inv = c.value === '' || !Number.isInteger(val) || val < 5 || val > 120;
+                    e.textContent = inv ? 'El tiempo debe estar entre 5 y 120 minutos.' : '';
+                    c.setAttribute('aria-invalid', inv ? 'true' : 'false');
+                    return !inv;
+                  }
+                  ['input', 'change', 'blur'].forEach(function (t) { c.addEventListener(t, v); });
+                  if (c.form) c.form.addEventListener('submit', function (a) { if (!v()) a.preventDefault(); });
+                })(document.currentScript.previousElementSibling);
+              </script>
             </div>
             <div class="form-group">
               <label class="form-label">Máximo de pedidos simultáneos</label>
               <input type="number" class="form-control" name="maxOrders" value="<?= htmlspecialchars((string)$settings['max_orders'], ENT_QUOTES, 'UTF-8') ?>" min="1">
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo) return;
+                  c.dataset.validacionCampo = '1';
+                  var e = c.nextElementSibling && c.nextElementSibling.classList.contains('field-error-inline') ? c.nextElementSibling : document.createElement('small');
+                  e.className = 'field-error-inline';
+                  e.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px;';
+                  if (!e.parentNode) c.insertAdjacentElement('afterend', e);
+                  function v() {
+                    var val = Number(c.value);
+                    var inv = c.value === '' || !Number.isInteger(val) || val < 1;
+                    e.textContent = inv ? 'Ingresa un máximo de pedidos válido.' : '';
+                    c.setAttribute('aria-invalid', inv ? 'true' : 'false');
+                    return !inv;
+                  }
+                  ['input', 'change', 'blur'].forEach(function (t) { c.addEventListener(t, v); });
+                  if (c.form) c.form.addEventListener('submit', function (a) { if (!v()) a.preventDefault(); });
+                })(document.currentScript.previousElementSibling);
+              </script>
             </div>
           </div>
         </div>

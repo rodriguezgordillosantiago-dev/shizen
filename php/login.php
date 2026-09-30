@@ -5,8 +5,8 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/auth.php';
 
 $currentRol = strtolower((string)($_SESSION['usuario_rol'] ?? ''));
-if (!empty($_SESSION['id_usuario']) && !empty($_SESSION['business_id']) && in_array($currentRol, ['negocio', 'cocina'], true)) {
-    header('Location: ' . ($currentRol === 'cocina' ? '../pages/pedidos.php' : '../pages/dashboard.php'));
+if (!empty($_SESSION['id_usuario']) && !empty($_SESSION['business_id']) && $currentRol === 'negocio') {
+    header('Location: ../pages/dashboard.php');
     exit;
 }
 
@@ -17,31 +17,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf($_POST['csrf_token'] ?? null)) {
         $error = 'La sesion del formulario expiro. Intenta nuevamente.';
     } else {
-        $email    = filter_var(trim((string)($_POST['email'] ?? '')), FILTER_VALIDATE_EMAIL);
+        $email = filter_var(trim((string)($_POST['email'] ?? '')), FILTER_VALIDATE_EMAIL);
         $password = (string)($_POST['password'] ?? '');
 
-        try {
-            $account = $email ? Usuario::autenticar($email, $password) : null;
-            $business = $account ? Usuario::negocio((int) $account['id_usuario']) : null;
+        if (!$email || strlen($password) < 8 || strlen($password) > 255) {
+            $error = 'Credenciales inválidas, inténtalo de nuevo';
+        } else {
+            try {
+                $account = Usuario::autenticar($email, $password);
+                $business = $account ? Usuario::negocio((int) $account['id_usuario']) : null;
 
-            if (!$account || !$business || !in_array(strtolower((string) $account['rol']), ['negocio', 'cocina'], true)) {
-                throw new RuntimeException('Credenciales no válidas.');
+                if (!$account || !$business || strtolower((string) $account['rol']) !== 'negocio') {
+                    throw new RuntimeException('Credenciales inválidas, inténtalo de nuevo');
+                }
+
+                session_regenerate_id(true);
+                $_SESSION['id_usuario'] = (int) $account['id_usuario'];
+                $_SESSION['usuario_nombre'] = (string) $account['nombre'];
+                $_SESSION['usuario_apellido'] = (string) ($account['apellido'] ?? '');
+                $_SESSION['usuario_email'] = (string) $account['email'];
+                $_SESSION['usuario_rol'] = strtolower((string) $account['rol']);
+                $_SESSION['business_id'] = (int) $business['id_negocio'];
+                header('Location: ../pages/dashboard.php');
+                exit;
+            } catch (Throwable $e) {
+                $error = 'Credenciales inválidas, inténtalo de nuevo';
             }
-
-            session_regenerate_id(true);
-            $_SESSION['id_usuario'] = (int) $account['id_usuario'];
-            $_SESSION['usuario_nombre'] = (string) $account['nombre'];
-            $_SESSION['usuario_apellido'] = (string) ($account['apellido'] ?? '');
-            $_SESSION['usuario_email'] = (string) $account['email'];
-            $_SESSION['usuario_rol'] = strtolower((string) $account['rol']);
-            $_SESSION['business_id'] = (int) $business['id_negocio'];
-            header('Location: ' . (strtolower((string) $account['rol']) === 'cocina' ? '../pages/pedidos.php' : '../pages/dashboard.php'));
-            exit;
-        } catch (Throwable $e) {
-            $error = 'No fue posible validar la cuenta en la base de datos.';
-        }
-        if ($error === '') {
-            $error = 'Correo o contrasena incorrectos.';
         }
     }
 }
@@ -94,7 +95,7 @@ $csrfToken = csrf_token();
           <div style="width:30px;height:30px;border-radius:8px;background:rgba(110,231,183,0.2);color:#6ee7b7;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
             <i class="bx bx-dish"></i>
           </div>
-          <span style="font-size:13.5px;color:#ffffff;font-weight:500">Seguimiento de pedidos de cocina</span>
+          <span style="font-size:13.5px;color:#ffffff;font-weight:500">Seguimiento de pedidos en tiempo real</span>
         </div>
 
         <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.08);padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08)">
@@ -118,8 +119,14 @@ $csrfToken = csrf_token();
   <!-- Panel derecho con formulario -->
   <div class="login-right">
     <div class="login-form-wrap">
-      <div style="margin-bottom:24px;text-align:center">
-        <img src="../assets/logo.png" alt="SHIZEN Negocio" style="height:52px;width:auto;display:inline-block;filter:brightness(0)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <a href="/shizenhome/index.php" style="display:inline-flex;align-items:center;gap:6px;color:#6b7280;font-size:13px;font-weight:600;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#2e7d32'" onmouseout="this.style.color='#6b7280'">
+          <i class="bx bx-left-arrow-alt" style="font-size:18px"></i> Volver a Shizen
+        </a>
+      </div>
+
+      <div style="margin-bottom:20px;text-align:center">
+        <img src="../assets/logo.png" alt="SHIZEN Negocio" style="height:48px;width:auto;display:inline-block;filter:brightness(0)">
       </div>
       <h2 class="login-form-title">Bienvenido de vuelta</h2>
       <p class="login-form-sub">Ingresa tus credenciales para continuar</p>
@@ -127,7 +134,7 @@ $csrfToken = csrf_token();
       <?php if ($registered): ?>
         <div class="alert alert-success">
           <i class="bx bx-check-circle" style="font-size:18px;flex-shrink:0;margin-top:1px"></i>
-          Cuenta creada exitosamente. Ya puedes iniciar sesion.
+          Cuenta creada exitosamente. Ya puedes iniciar sesión.
         </div>
       <?php endif; ?>
 
@@ -142,49 +149,73 @@ $csrfToken = csrf_token();
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8') ?>">
 
         <div class="form-group">
-          <label class="form-label" for="email">Correo electronico</label>
+          <label class="form-label" for="email">Correo electrónico</label>
           <div class="input-icon-wrap">
             <i class="bx bx-envelope"></i>
             <input type="email" id="email" name="email" class="form-control"
                    placeholder="tu@correo.com"
                    value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                    required>
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim());
+    field.setCustomValidity(valid ? '' : 'Ingresa un correo válido.');
+    message.textContent = field.dataset.touched === 'true' && !valid ? 'Ingresa un correo válido.' : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="password">Contrasena</label>
+          <label class="form-label" for="password">Contraseña</label>
           <div class="input-icon-wrap">
             <i class="bx bx-lock-alt"></i>
             <input type="password" id="password" name="password" class="form-control"
-                   placeholder="••••••••" required>
+                   placeholder="••••••••" required minlength="8">
+<script>
+(function () {
+  const field = document.currentScript.previousElementSibling;
+  const message = document.createElement('small');
+  message.className = 'field-error-inline';
+  message.style.cssText = 'display:block;color:#dc2626;font-size:12px;margin-top:6px';
+  field.insertAdjacentElement('afterend', message);
+  function validate() {
+    const empty = field.required && !field.value.trim();
+    const inv = empty || field.value.length < 8;
+    field.setCustomValidity(inv ? (empty ? 'Este campo es obligatorio.' : 'La contraseña debe tener al menos 8 caracteres.') : '');
+    message.textContent = field.dataset.touched === 'true' && inv ? (empty ? 'Este campo es obligatorio.' : 'La contraseña debe tener al menos 8 caracteres.') : '';
+  }
+  field.addEventListener('input', function () { field.dataset.touched = 'true'; validate(); });
+  field.addEventListener('blur', function () { field.dataset.touched = 'true'; validate(); });
+  field.form.addEventListener('submit', function () { field.dataset.touched = 'true'; validate(); });
+}());
+</script>
           </div>
         </div>
 
         <button type="submit" class="btn btn-primary btn-lg" style="margin-top:8px">
           <i class="bx bx-log-in"></i>
-          Iniciar sesion
+          Iniciar sesión
         </button>
       </form>
 
-      <p class="login-link">
-        No tienes cuenta?
-        <a href="../forms/registro_negocio.php">Registrate aqui</a>
-      </p>
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid #f3f4f6;text-align:center">
+        <p class="login-link" style="margin:0 0 8px">
+          ¿No tienes cuenta? <a href="/shizenhome/forms/registro_negocio.html" style="font-weight:700">Regístrate aquí</a>
+        </p>
 
-      <div style="margin-top:32px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb">
-        <p style="font-size:12px;color:#6b7280;font-weight:600;margin-bottom:8px">CUENTAS DE PRUEBA (CONTRASEÑA: 123456)</p>
-        <p style="font-size:13px;color:#374151;margin-bottom:4px">
-          <strong>Negocio 1:</strong> contacto@veganocentral.com
-        </p>
-        <p style="font-size:13px;color:#374151;margin-bottom:4px">
-          <strong>Negocio 2:</strong> contacto@ecomarketchapinero.com
-        </p>
-        <p style="font-size:13px;color:#374151;margin-bottom:4px">
-          <strong>Cocina 1:</strong> cocina1@shizen.com
-        </p>
-        <p style="font-size:13px;color:#374151">
-          <strong>Cocina 2:</strong> cocina2@shizen.com
+        <p style="font-size:11.5px;color:#9ca3af;margin:0;line-height:1.4">
+          Al iniciar sesión, aceptas nuestros <a href="/shizenhome/legal/terminos.html" target="_blank" rel="noopener noreferrer" style="color:#2e7d32;font-weight:600;text-decoration:underline">Términos y Condiciones</a>.
         </p>
       </div>
     </div>

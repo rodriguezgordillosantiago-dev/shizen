@@ -32,16 +32,6 @@ final class Usuario
             return $negocio;
         }
 
-        $statement = Database::getConnection()->prepare(
-            'SELECT n.id_negocio, n.nombre
-             FROM usuario u
-             JOIN negocios n ON n.id_negocio = u.id_cocina_negocio_asociado
-             WHERE u.id_usuario = :id_usuario
-             LIMIT 1'
-        );
-        $statement->execute(['id_usuario' => $userId]);
-        $kitchenBusiness = $statement->fetch();
-
-        return $kitchenBusiness ?: null;
+        return null;
     }
 }
