@@ -19,7 +19,7 @@ class Usuario {
     protected string $rol;
     protected ?string $direccion = null;
     protected ?string $telefono = null;
-    protected ?string $ciudad = null;
+    protected ?string $localidad = null;
 
     public function __construct(
         string $nombre,
@@ -29,7 +29,7 @@ class Usuario {
         string $rol = 'usuario',
         ?string $direccion = null,
         ?string $telefono = null,
-        ?string $ciudad = null
+        ?string $localidad = null
     ) {
         $this->nombre = $nombre;
         $this->apellido = $apellido;
@@ -38,14 +38,14 @@ class Usuario {
         $this->rol = $rol;
         $this->direccion = $direccion;
         $this->telefono = $telefono;
-        $this->ciudad = $ciudad;
+        $this->localidad = $localidad;
     }
 
     /** Registra un nuevo usuario en la base de datos y retorna su ID */
     public function registrar(?PDO $conexion = null): int {
         $pdo = $conexion ?? Database::getConnection();
-        $sql = 'INSERT INTO usuario (nombre, apellido, email, password_hash, rol, direccion, telefono, ciudad)
-                VALUES (:nombre, :apellido, :email, :password_hash, :rol, :direccion, :telefono, :ciudad)';
+        $sql = 'INSERT INTO usuario (nombre, apellido, email, password_hash, rol, direccion, localidad)
+                VALUES (:nombre, :apellido, :email, :password_hash, :rol, :direccion, :localidad)';
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -55,8 +55,7 @@ class Usuario {
             ':password_hash' => password_hash($this->password, PASSWORD_DEFAULT),
             ':rol'           => $this->rol,
             ':direccion'     => $this->direccion,
-            ':telefono'      => $this->telefono,
-            ':ciudad'        => $this->ciudad,
+            ':localidad'      => $this->localidad,
         ]);
 
         $this->id = (int)$pdo->lastInsertId();
@@ -92,16 +91,7 @@ class Usuario {
             return $negocio;
         }
 
-        $stmt = $pdo->prepare(
-            'SELECT n.id_negocio, n.nombre
-             FROM usuario u
-             JOIN negocios n ON n.id_negocio = u.id_cocina_negocio_asociado
-             WHERE u.id_usuario = ?
-             LIMIT 1'
-        );
-        $stmt->execute([$userId]);
-
-        return $stmt->fetch() ?: null;
+        return null;
     }
 
     /** Comprueba si un correo ya se encuentra registrado */

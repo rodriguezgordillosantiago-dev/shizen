@@ -1,8 +1,15 @@
 .search-page { max-width: 1000px; margin: 0 auto; padding: 55px 22px; }
+.search-back { margin-bottom: 22px; cursor: pointer; }
 .search-page h1 { color: #1b3a1d; font-size: 2rem; }
 .search-page-sub { color: #68756a; margin: 10px 0 28px; }
 .search-section-title { color: #2d6a31; font-size: 1.15rem; margin: 24px 0 12px; }
 .search-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.search-results--businesses { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: stretch; }
+.search-business-card { min-width: 0; }
+.search-results--dishes { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); align-items: stretch; }
+.search-dish-card { display: block; min-width: 0; color: inherit; text-decoration: none; }
+.search-dish-card .dish-img { height: 180px; }
+.search-dish-card .dish-promo-badge { position: absolute; top: 10px; left: 10px; padding: 4px 8px; border-radius: 6px; background: #ea580c; color: #fff; font-size: 11px; font-weight: 700; }
 .search-result-card { display: flex; align-items: center; gap: 14px; padding: 20px; color: #1b3a1d; text-decoration: none; border: 1px solid #dceedd; border-radius: 16px; background: #fff; box-shadow: 0 5px 18px rgba(45,106,49,.08); }
 .search-result-card:hover { border-color: #72b875; transform: translateY(-2px); }
 .search-result-icon { font-size: 2rem; }

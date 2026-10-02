@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../clases/Validador.php';
 require_once __DIR__ . '/../clases/Usuario.php';
+session_name('SHIZEN_CLIENTE_SESSION');
 session_start();
 
 $errores = [];

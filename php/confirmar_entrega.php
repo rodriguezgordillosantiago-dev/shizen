@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../BD/conexion.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) { session_name('SHIZEN_CLIENTE_SESSION'); session_start(); }
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 $code = trim((string)($_POST['codigo'] ?? ''));
 if (empty($_SESSION['id_usuario']) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string)($_POST['csrf_token'] ?? '')) || !$id || !preg_match('/^\d{6}$/', $code)) { http_response_code(422); exit('Código no válido.'); }

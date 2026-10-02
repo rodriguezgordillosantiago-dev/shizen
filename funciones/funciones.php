@@ -58,7 +58,7 @@ function redirigirConEstado(string $url, string $estado): void {
 function resolverImagenUrl(?string $ruta): string {
     $ruta = trim((string) $ruta);
     if ($ruta === '') {
-        return 'assets/image-6.png';
+        return '/shizenhome/assets/logo.png';
     }
     if (preg_match('#^https?://#i', $ruta)) {
         return $ruta;
@@ -66,24 +66,37 @@ function resolverImagenUrl(?string $ruta): string {
 
     $normalizada = str_replace('\\', '/', $ruta);
 
-    // Si ya apunta a shizen-home
-    if (preg_match('#^/?shizen-home/#i', $normalizada)) {
-        return '/' . ltrim($normalizada, '/');
+    // Si ya apunta a una ruta web absoluta
+    if (preg_match('#^/(shizenhome|shizennegocio|shizen_repartidor)/#i', $normalizada)) {
+        return $normalizada;
     }
 
-    // Si hace referencia a Imagenes_prueba
-    if (str_contains($normalizada, 'Imagenes_prueba')) {
-        $basename = basename($normalizada);
-        $sharedDir = realpath(__DIR__ . '/../../shizen-home/public/images/catalogo/Imagenes_prueba');
-        if ($sharedDir && is_file($sharedDir . DIRECTORY_SEPARATOR . $basename)) {
-            return '/shizen-home/public/images/catalogo/Imagenes_prueba/' . $basename;
+    $basename = basename($normalizada);
+    $limpia = ltrim(preg_replace('#^(\.\.?/)+#', '', $normalizada), '/');
+
+    // 1. Buscar en shizenhome
+    $homeDir = realpath(__DIR__ . '/../');
+    if ($homeDir) {
+        if (is_file($homeDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $limpia))) {
+            return '/shizenhome/' . $limpia;
+        }
+        $homePrueba = realpath($homeDir . '/assets/Imagenes_prueba');
+        if ($homePrueba && is_file($homePrueba . DIRECTORY_SEPARATOR . $basename)) {
+            return '/shizenhome/assets/Imagenes_prueba/' . rawurlencode($basename);
         }
     }
 
-    $limpia = ltrim(preg_replace('#^(\.\.?/)+#', '', $normalizada), '/');
-    if (is_file(__DIR__ . '/../' . $limpia)) {
-        return $limpia;
+    // 2. Buscar en shizennegocio (por si se subió desde el panel de negocio)
+    $negocioDir = realpath(__DIR__ . '/../../shizennegocio');
+    if ($negocioDir) {
+        if (is_file($negocioDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $limpia))) {
+            return '/shizennegocio/' . $limpia;
+        }
+        $negocioPrueba = realpath($negocioDir . '/assets/Imagenes_prueba');
+        if ($negocioPrueba && is_file($negocioPrueba . DIRECTORY_SEPARATOR . $basename)) {
+            return '/shizennegocio/assets/Imagenes_prueba/' . rawurlencode($basename);
+        }
     }
 
-    return 'assets/image-6.png';
+    return '/shizenhome/assets/logo.png';
 }

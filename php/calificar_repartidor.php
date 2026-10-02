@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../BD/conexion.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) { session_name('SHIZEN_CLIENTE_SESSION'); session_start(); }
 $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 $score = filter_input(INPUT_POST, 'puntuacion', FILTER_VALIDATE_INT);
 $comment = trim((string)($_POST['comentario'] ?? ''));
@@ -12,7 +12,7 @@ $stmt = $pdo->prepare(
      FROM pedido p
      JOIN compra c ON c.id_pedido = p.id_pedido
      JOIN entrega e ON e.id_compra = c.id_compra
-     WHERE p.id_pedido=? AND p.id_usuario=? AND p.estado='Recibido'
+     WHERE p.id_pedido=? AND p.id_usuario=? AND p.estado IN ('Recibido', 'Entregado')
        AND e.fecha_confirmacion IS NOT NULL"
 );
 $stmt->execute([$id, (int)$_SESSION['id_usuario']]);
@@ -40,4 +40,4 @@ $pdo->prepare(
     date('Y-m-d H:i:s'),
     $score,
 ]);
-header('Location: pedido.php?id=' . $id); exit;
+header('Location: ../index.php'); exit;

@@ -22,14 +22,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/nav.css" />
+    <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1" />
     <link
       rel="stylesheet"
       href="css/pages.css?v=20260816-1"
     />
     <link
       rel="stylesheet"
-      href="css/modals.css?v=20260816-2"
+      href="css/modals.css?v=20260930-cart-clear-1"
     />
   </head>
   <body>
@@ -37,13 +37,12 @@
     <main id="app-content">
       <section class="promos-page">
         <div class="page-header">
-          <button
-            class="btn-back"
-            onclick="window.location.href = 'index.php'"
-            aria-label="Volver"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
+          <button class="vol" type="button" onclick="history.back()" aria-label="Volver" title="Volver">
+            <svg viewBox="0 0 32 32" width="38" height="38" fill="none" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <g stroke="currentColor" stroke-width="4">
+                <path d="m15 22-6-6 6-6"/><path d="M24 16H9"/>
+              </g>
             </svg>
           </button>
           <div>
@@ -63,8 +62,7 @@
       </section>
     </main>
     <div id="overlays"></div>
-    <script src="js/data.js"></script>
     <script src="js/layout.js?v=20260816-2"></script>
-    <script src="js/app.js?v=20260816-4"></script>
+    <script src="js/app.js?v=20260930-cart-clear-1"></script>
   </body>
 </html>

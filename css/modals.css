@@ -12,6 +12,9 @@
   justify-content: center;
   padding: 20px;
 }
+#cartModal {
+  z-index: 300;
+}
 .modal-overlay.open {
   display: flex;
 }
@@ -57,6 +60,15 @@
   object-fit: contain;
   margin: 0 auto 16px;
 }
+.login-modal-card {
+  max-width: 480px;
+  padding: 40px 42px 34px;
+}
+.login-modal-logo {
+  width: 180px;
+  height: 82px;
+  margin-bottom: 22px;
+}
 .modal-icon {
   font-size: 2.5rem;
   text-align: center;
@@ -76,12 +88,50 @@
   margin-bottom: 22px;
   line-height: 1.5;
 }
+
+.notification-modal-card { max-width: 460px; }
+.notification-modal-list { display: grid; gap: 8px; max-height: 340px; overflow-y: auto; }
+.notification-modal-item {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f7faf7;
+  border: 1px solid #e5eee5;
+}
+.notification-modal-item.unread { background: #eef8ee; border-left: 3px solid #4c9540; }
+.notification-modal-item strong { color: #1b3a1d; font-size: .9rem; }
+.notification-modal-item span { color: #555; font-size: .82rem; line-height: 1.4; }
+.notification-modal-item time { color: #888; font-size: .72rem; }
+.notification-modal-empty { color: #777; text-align: center; font-size: .9rem; }
+.notification-modal-link { display: block; margin-top: 16px; text-align: center; text-decoration: none; }
 .login-error {
   color: #dc2626;
   font-size: 0.82rem;
   font-weight: 600;
   text-align: center;
   margin: -10px 0 14px;
+}
+.login-modal-card .login-terms {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  margin-top: 12px;
+}
+.login-register-prompt {
+  color: #6b7280;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  text-align: center;
+  margin: 14px 0 0;
+}
+.login-register-prompt a {
+  color: #3a8c3f;
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-register-prompt a:hover,
+.login-register-prompt a:focus-visible {
+  text-decoration: underline;
 }
 .modal-register-link {
   display: block;
@@ -210,19 +260,6 @@
 }
 .btn-modal-secondary:hover {
   background: #f0faf0;
-}
-.offer-warning {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff8e1;
-  border: 1px solid #ffe082;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 13px;
-  color: #f57f17;
-  font-weight: 600;
-  margin-top: 14px;
 }
 .cart-card,
 .checkout-card {
@@ -384,18 +421,66 @@
   opacity: 0.9;
 }
 .btn-cart-clear {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #f87171;
-  background: #fef2f2;
-  color: #dc2626;
-  font-size: 0.85rem;
+  position: relative;
+  display: flex;
+  flex: 0 0 50px;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 50%;
+  background-color: rgb(20, 20, 20);
+  color: #fff;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.164);
+  transition: flex-basis .3s, width .3s, border-radius .3s, background-color .3s;
 }
-.btn-cart-clear:hover {
-  background: #fee2e2;
+.btn-cart-clear .svgIcon {
+  width: 12px;
+  fill: #fff;
+  transition: width .3s, transform .3s;
+}
+.btn-cart-clear-label {
+  position: absolute;
+  top: -20px;
+  color: #fff;
+  font-size: 2px;
+  opacity: 0;
+  white-space: nowrap;
+  transition: transform .3s, font-size .3s, opacity .3s;
+}
+.btn-cart-clear:hover,
+.btn-cart-clear:focus-visible {
+  flex-basis: 140px;
+  width: 140px;
+  border-radius: 50px;
+  background-color: rgb(255, 69, 69);
+}
+.btn-cart-clear:hover .svgIcon,
+.btn-cart-clear:focus-visible .svgIcon {
+  width: 50px;
+  transform: translateY(60%);
+}
+.btn-cart-clear:hover .btn-cart-clear-label,
+.btn-cart-clear:focus-visible .btn-cart-clear-label {
+  font-size: 13px;
+  opacity: 1;
+  transform: translateY(30px);
+}
+.btn-cart-clear:focus-visible {
+  outline: 2px solid #7db381;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-cart-clear,
+  .btn-cart-clear .svgIcon,
+  .btn-cart-clear-label {
+    transition-duration: .01ms;
+  }
 }
 
 /* Estilo estándar de cada plato (.cart-item) dentro de un carrito */

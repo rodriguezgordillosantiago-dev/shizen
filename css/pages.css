@@ -44,6 +44,41 @@
   background: #e5f4e6;
   color: #2d6a31;
 }
+
+/* ── Botón "Volver" reutilizable (.vol) ──────────────────────────────── */
+.vol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-right: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  background: #e8f5e9;
+  color: #3a8c3f;
+  flex-shrink: 0;
+}
+.vol:hover {
+  background: #c8e6c9;
+  color: #3a8c3f;
+}
+.vol:active {
+  transform: scale(0.95);
+}
+.vol:focus-visible {
+  outline: 3px solid #3a8c3f;
+  outline-offset: 3px;
+}
+.vol svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
 .page-header h2 {
   font-size: 1.7rem;
   font-weight: 800;
@@ -253,6 +288,9 @@
   position: absolute;
   top: 18px;
   left: 20px;
+  z-index: 2;
+}
+.btn-back.cat-hero-back {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -267,15 +305,8 @@
   backdrop-filter: blur(4px);
   transition: background 0.15s;
 }
-.cat-hero-back:hover {
+.btn-back.cat-hero-back:hover {
   background: rgba(0, 0, 0, 0.55);
-}
-.cat-hero-back.back-link {
-  backdrop-filter: none;
-}
-.cat-hero-back.back-link:hover {
-  background: #e5f4e6;
-  color: #2d6a31;
 }
 .cat-hero-info {
   position: absolute;

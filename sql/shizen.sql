@@ -13,9 +13,8 @@ CREATE TABLE IF NOT EXISTS usuario (
   password_hash VARCHAR(255) NOT NULL,
   fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   rol VARCHAR(20) NOT NULL DEFAULT 'usuario',
-  ciudad VARCHAR(100) NULL DEFAULT 'Chapinero',
+  localidad VARCHAR(100) NULL DEFAULT 'Chapinero',
   telefono VARCHAR(50) NULL DEFAULT '+57 300 123 4567',
-  id_cocina_negocio_asociado INT NULL,
   CONSTRAINT uq_usuario_email UNIQUE (email)
 ) ENGINE=InnoDB;
 
@@ -57,10 +56,6 @@ CREATE TABLE IF NOT EXISTS repartidor (
   CONSTRAINT uq_repartidor_telefono UNIQUE (num_telefono),
   CONSTRAINT fk_repartidor_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 ) ENGINE=InnoDB;
-
-ALTER TABLE usuario
-  ADD CONSTRAINT fk_usuario_cocina_negocio
-  FOREIGN KEY (id_cocina_negocio_asociado) REFERENCES negocios(id);
 
 CREATE TABLE IF NOT EXISTS pedidos (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -136,6 +131,22 @@ ALTER TABLE entrega
   ADD COLUMN IF NOT EXISTS codigo_entrega VARCHAR(6) NULL AFTER estado,
   ADD COLUMN IF NOT EXISTS fecha_confirmacion DATETIME NULL AFTER codigo_entrega;
 
+CREATE TABLE IF NOT EXISTS notificacion (
+  id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  audiencia VARCHAR(20) NOT NULL,
+  id_pedido INT NULL,
+  tipo VARCHAR(60) NOT NULL,
+  titulo VARCHAR(180) NOT NULL,
+  mensaje TEXT NOT NULL,
+  leida TINYINT(1) NOT NULL DEFAULT 0,
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_notificacion_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+  CONSTRAINT fk_notificacion_pedido FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido) ON DELETE CASCADE,
+  INDEX idx_notificacion_usuario_fecha (id_usuario, fecha_creacion),
+  INDEX idx_notificacion_audiencia_fecha (audiencia, fecha_creacion)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS carrito (
   id_carrito INT AUTO_INCREMENT PRIMARY KEY,
   id_usuario INT NOT NULL,
@@ -152,7 +163,7 @@ CREATE TABLE IF NOT EXISTS carrito (
 ) ENGINE=InnoDB;
 
 -- === SEED DATA FOR 2 BUSINESSES AND 46 DISHES ===
-INSERT INTO usuario (id_usuario, nombre, apellido, direccion, email, password_hash, rol, ciudad) VALUES
+INSERT INTO usuario (id_usuario, nombre, apellido, direccion, email, password_hash, rol, localidad) VALUES
 (1, 'Carlos', 'Mendoza', 'Calle 45 #7-12, Bogotá', 'contacto@veganocentral.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'negocio', 'Chapinero'),
 (2, 'Laura', 'Gómez', 'Carrera 13 #58-30, Bogotá', 'contacto@ecomarket.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'negocio', 'Chapinero')
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), email=VALUES(email);
@@ -163,11 +174,11 @@ INSERT INTO negocios (id_negocio, id_usuario, gmail_negocio, nombre, direccion, 
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), id_usuario=VALUES(id_usuario);
 
 INSERT INTO menu_items (id_menu_item, id_negocio, id_categoria, nombre, descripcion, precio, imagen_url, on_promo, precio_promocion) VALUES
-(1, 1, 3, 'Bowl Saludable', 'Bowl saludable con quinoa, aguacate, vegetales frescos, semillas, jugo de lim¾n y aderezo de hierbas. Una opci¾n equilibrada, colorida y llena de sabor para quienes buscan una comida nutritiva, ligera y satisfactoria a cualquier hora del dÝa.', 10000, 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400', 0, NULL),
-(2, 1, 3, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo césar', 15000, 'https://images.unsplash.com/photo-1707603571504-86c1ea50903e?w=400', 0, NULL),
-(3, 1, 1, 'Hamburguesa Vegana', 'Deliciosa Hamburguesa (Plant-Bassed)', 25000, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', 0, NULL),
-(4, 1, 3, 'Bowl de Quinoa', 'Descripción pendiente por definir', 18000, 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', 0, NULL),
-(5, 1, 1, 'Tacos de Jackfruit', 'Deliciosos Tacos a base de frutas', 22500, 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400', 0, NULL),
+(1, 1, 3, 'Bowl Saludable', 'Bowl saludable con quinoa, aguacate, vegetales frescos, semillas, jugo de lim¾n y aderezo de hierbas. Una opci¾n equilibrada, colorida y llena de sabor para quienes buscan una comida nutritiva, ligera y satisfactoria a cualquier hora del dÝa.', 10000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(2, 1, 3, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo césar', 15000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(3, 1, 1, 'Hamburguesa Vegana', 'Deliciosa Hamburguesa (Plant-Bassed)', 25000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(4, 1, 3, 'Bowl de Quinoa', 'Descripción pendiente por definir', 18000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(5, 1, 1, 'Tacos de Jackfruit', 'Deliciosos Tacos a base de frutas', 22500, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
 (6, 1, 1, '2x1 en pizza mediana', 'Válido solo los martes, no acumulable con otras promociones', 15000, '../Imagenes_prueba/pizzavegana.jpg', 0, NULL),
 (7, 1, 1, 'Wrap de Falafel', 'Falafel casero con vegetales y salsa tahini', 18000, '../Imagenes_prueba/plato1.jpg', 0, NULL),
 (8, 1, 2, 'Lasaña de Berenjena', 'Capas de berenjena, salsa napolitana y queso vegano', 28000, '../Imagenes_prueba/plato6.jpg', 0, NULL),
@@ -212,11 +223,9 @@ INSERT INTO menu_items (id_menu_item, id_negocio, id_categoria, nombre, descripc
 ON DUPLICATE KEY UPDATE id_negocio=VALUES(id_negocio), nombre=VALUES(nombre), precio=VALUES(precio);
 
 -- === SEED DATA FOR 2 BUSINESSES AND 46 DISHES ===
-INSERT INTO usuario (id_usuario, nombre, apellido, direccion, email, password_hash, rol, ciudad, id_cocina_negocio_asociado) VALUES
-(4, 'Carlos', 'Mendoza', 'Calle 45 #7-12, Bogotá', 'contacto@veganocentral.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'Negocio', 'Chapinero', NULL),
-(5, 'Laura', 'Gómez', 'Carrera 13 #58-30, Bogotá', 'contacto@ecomarketchapinero.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'Negocio', 'Chapinero', NULL),
-(15, 'Andrés', 'Molina', 'Calle 45 #7-12, Bogotá', 'cocina1@shizen.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'Cocina', 'Chapinero', 1),
-(16, 'Laura', 'Vega', 'Carrera 13 #58-30, Bogotá', 'cocina2@shizen.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'Cocina', 'Chapinero', 2)
+INSERT INTO usuario (id_usuario, nombre, apellido, direccion, email, password_hash, rol, localidad) VALUES
+(4, 'Carlos', 'Mendoza', 'Calle 45 #7-12, Bogotá', 'contacto@veganocentral.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'Negocio', 'Chapinero'),
+(5, 'Laura', 'Gómez', 'Carrera 13 #58-30, Bogotá', 'contacto@ecomarketchapinero.com', '$2y$10$h7V/7V0m764hR1aHkS4MGeB17Jd5o1A1l/06.f4e4W/m.g4s.m.l.', 'Negocio', 'Chapinero')
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), email=VALUES(email);
 
 INSERT INTO negocios (id_negocio, id_usuario, gmail_negocio, nombre, direccion, cedula, hora_apertura, hora_cierre, logo_url, rut_url, documento_identidad_representante_url, certificado_bancario_url, certificado_camara_comercio_url) VALUES
@@ -225,11 +234,11 @@ INSERT INTO negocios (id_negocio, id_usuario, gmail_negocio, nombre, direccion, 
 ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), id_usuario=VALUES(id_usuario);
 
 INSERT INTO menu_items (id_menu_item, id_negocio, id_categoria, nombre, descripcion, precio, imagen_url, on_promo, precio_promocion) VALUES
-(1, 1, 3, 'Bowl Saludable', 'Bowl saludable con quinoa, aguacate, vegetales frescos, semillas, jugo de lim¾n y aderezo de hierbas. Una opci¾n equilibrada, colorida y llena de sabor para quienes buscan una comida nutritiva, ligera y satisfactoria a cualquier hora del dÝa.', 10000, 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400', 0, NULL),
-(2, 1, 3, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo césar', 15000, 'https://images.unsplash.com/photo-1707603571504-86c1ea50903e?w=400', 0, NULL),
-(3, 1, 1, 'Hamburguesa Vegana', 'Deliciosa Hamburguesa (Plant-Bassed)', 25000, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', 0, NULL),
-(4, 1, 3, 'Bowl de Quinoa', 'Descripción pendiente por definir', 18000, 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', 0, NULL),
-(5, 1, 1, 'Tacos de Jackfruit', 'Deliciosos Tacos a base de frutas', 22500, 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400', 0, NULL),
+(1, 1, 3, 'Bowl Saludable', 'Bowl saludable con quinoa, aguacate, vegetales frescos, semillas, jugo de lim¾n y aderezo de hierbas. Una opci¾n equilibrada, colorida y llena de sabor para quienes buscan una comida nutritiva, ligera y satisfactoria a cualquier hora del dÝa.', 10000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(2, 1, 3, 'Ensalada César', 'Lechuga, pollo, crutones y aderezo césar', 15000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(3, 1, 1, 'Hamburguesa Vegana', 'Deliciosa Hamburguesa (Plant-Bassed)', 25000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(4, 1, 3, 'Bowl de Quinoa', 'Descripción pendiente por definir', 18000, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
+(5, 1, 1, 'Tacos de Jackfruit', 'Deliciosos Tacos a base de frutas', 22500, '../assets/Imagenes_prueba/plato1.jpg', 0, NULL),
 (6, 1, 1, '2x1 en pizza mediana', 'Válido solo los martes, no acumulable con otras promociones', 15000, '../Imagenes_prueba/pizzavegana.jpg', 0, NULL),
 (7, 1, 1, 'Wrap de Falafel', 'Falafel casero con vegetales y salsa tahini', 18000, '../Imagenes_prueba/plato1.jpg', 0, NULL),
 (8, 1, 2, 'Lasaña de Berenjena', 'Capas de berenjena, salsa napolitana y queso vegano', 28000, '../Imagenes_prueba/plato6.jpg', 0, NULL),

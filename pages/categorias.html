@@ -22,7 +22,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/nav.css" />
+    <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1" />
     <link rel="stylesheet" href="css/home.css" />
     <link
       rel="stylesheet"
@@ -30,7 +30,7 @@
     />
     <link
       rel="stylesheet"
-      href="css/modals.css?v=20260816-2"
+      href="css/modals.css?v=20260930-cart-clear-1"
     />
   </head>
   <body>
@@ -39,13 +39,12 @@
       <section class="cat-page">
         <div class="cat-hero" id="catHero">
           <div class="cat-hero-overlay"></div>
-          <button
-            class="cat-hero-back"
-            onclick="window.location.href = '../index.php'"
-            aria-label="Volver"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
+          <button class="vol cat-hero-back" type="button" onclick="history.back()" aria-label="Volver" title="Volver">
+            <svg viewBox="0 0 32 32" width="38" height="38" fill="none" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+              <g stroke="currentColor" stroke-width="4">
+                <path d="m15 22-6-6 6-6"/><path d="M24 16H9"/>
+              </g>
             </svg>
           </button>
           <div class="cat-hero-info">
@@ -70,7 +69,7 @@
             <option>Precio: mayor</option>
             <option>Calificación</option>
             <option>Tiempo</option>
-          </select>
+          </select><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
         </div>
         <div class="cat-items-inner">
           <div class="items-grid" id="itemsGrid"></div>
@@ -78,8 +77,7 @@
       </section>
     </main>
     <div id="overlays"></div>
-    <script src="js/data.js"></script>
     <script src="js/layout.js?v=20260816-2"></script>
-    <script src="js/app.js?v=20260816-4"></script>
+    <script src="js/app.js?v=20260930-cart-clear-1"></script>
   </body>
 </html>

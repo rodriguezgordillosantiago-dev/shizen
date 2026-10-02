@@ -1,58 +1,60 @@
 <div class="view" id="view-join-restaurant">
   <div class="join-page">
-    <div class="join-left" style="background:linear-gradient(135deg,#1a3a2a,#2a7a50)">
-      <div class="join-left-bg" style="background-image:url('https://images.unsplash.com/photo-1572715376701-98568319fd0b?w=800&fit=crop&auto=format')">
-      </div>
+    <div
+      class="join-left"
+      style="
+        background: linear-gradient(
+          135deg,
+          #1a3a2a,
+          #2a7a50
+        );
+      "
+    >
+      <div
+        class="join-left-bg"
+        style="
+          background-image: url(&quot;https://images.unsplash.com/photo-1572715376701-98568319fd0b?w=800&fit=crop&auto=format&quot;);
+        "
+      ></div>
       <div class="join-left-content">
-        <img src="../assets/logo.png" alt="Shizen" class="join-left-logo" />
-        <span class="join-left-badge">
-          Para usuarios
-        </span>
-        <h2>
-          Conoce miles de negocios veganos
-        </h2>
+        <img
+          src="../assets/logo_blanco.png"
+          alt="Shizen"
+          class="join-left-logo"
+        />
+        <span class="join-left-badge"> Para usuarios </span>
+        <h2>Conoce miles de negocios veganos</h2>
         <p>
-          Compra y haz parte de la red de personas conscientes más grande de Colombia.
+          Compra y haz parte de la red de personas
+          conscientes más grande de Colombia.
         </p>
-        <br>
+        <br />
         <div class="benefit-grid">
           <div class="benefit-card">
-            <div class="b-icon">
-            📖
-            </div>
-            <div class="b-title">
-            Gran catálogo
-            </div>
+            <div class="b-icon">📖</div>
+            <div class="b-title">Gran catálogo</div>
             <div class="b-desc">
-              Accede a miles de platillos veganos al instante
+              Accede a miles de platillos veganos al
+              instante
             </div>
           </div>
           <div class="benefit-card">
-            <div class="b-icon">
-              🚵
-            </div>
+            <div class="b-icon">🚵</div>
             <div class="b-desc">
               Domicilios en toda la ciudad
             </div>
           </div>
           <div class="benefit-card">
-            <div class="b-icon">
-              🏷️
-            </div>
-            <div class="b-title">
-              Miles de descuentos
-            </div>
+            <div class="b-icon">🏷️</div>
+            <div class="b-title">Miles de descuentos</div>
             <div class="b-desc">
-              Contribuye al cuidado del planeta y de tu bolsillo
+              Contribuye al cuidado del planeta y de tu
+              bolsillo
             </div>
           </div>
           <div class="benefit-card">
-            <div class="b-icon">
-              💚
-            </div>
-            <div class="b-title">
-              Marca sostenible
-            </div>
+            <div class="b-icon"><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5C9.5 20 2 16 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2zm-3.566 15.604c.881-.556 1.676-1.109 2.42-1.701C18.335 14.533 20 11.943 20 9c0-2.36-1.537-4-3.5-4-1.076 0-2.24.57-3.086 1.414L12 7.828l-1.414-1.414C9.74 5.57 8.576 5 7.5 5 5.56 5 4 6.656 4 9c0 2.944 1.666 5.533 4.645 7.903.745.592 1.54 1.145 2.421 1.7.299.189.595.37.934.572.339-.202.635-.383.934-.571z"/></svg></div>
+            <div class="b-title">Marca sostenible</div>
             <div class="b-desc">
               Productos veganos y ecológicos
             </div>
@@ -61,87 +63,411 @@
       </div>
     </div>
     <div class="join-right">
-      <div class="join-form-wrap">
-        <a class="join-back" href="../index.php">
-          ← Volver al inicio
-        </a>
+    <div class="join-form-wrap">
+       <div class="form-header-nav">
+        <a class="vol" href="../index.php" aria-label="Volver al inicio" title="Volver al inicio">
+          <svg viewBox="0 0 32 32" width="38" height="38" fill="none" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <g stroke="currentColor" stroke-width="4">
+              <path d="m15 22-6-6 6-6"/><path d="M24 16H9"/>
+            </g>
+          </svg>
+        </a>      
         <div class="progress-steps">
-          <div class="step-dot active" id="joinRest-dot-1">
-            1
-          </div>
-          <div class="step-line" id="joinRest-line-1">
-          </div>
-          <div class="step-dot" id="joinRest-dot-2">
-            2
-          </div>
-        </div>
+  <div class="step-dot active" id="joinRest-dot-1">
+    1
+  </div>
+
+  <div class="step-line" id="joinRest-line-1"></div>
+
+  <div class="step-dot" id="joinRest-dot-2">
+    2
+  </div>
+</div>
+</div>
         <form method="post" action="registro_usuario.php">
-          <input type="hidden" name="csrf_token" value="{{CSRF_TOKEN}}" />
-          <h2>
-            ¡Regístrate ahora y empieza a comprar!
-          </h2>
+          <input
+            type="hidden"
+            name="csrf_token"
+            value="{{CSRF_TOKEN}}"
+          />
+          <h2>¡Regístrate ahora y empieza a comprar!</h2>
           <p class="form-sub">
             Completa tus datos para comenzar.
           </p>
-          <br>
+          <br />
           <div class="form-group">
-            <label>
-              Nombre
-            </label>
-            <input class="form-input" type="text" name="nombre" placeholder="Tu nombre" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}" title="Ingresa tu nombre." required />
+            <label> Nombre </label>
+            <input
+              class="form-input"
+              type="text"
+              name="nombre"
+              placeholder="Tu nombre"
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}"
+              title="Ingresa tu nombre."
+              required
+            />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
-            <label>
-              Apellido
-            </label>
-            <input class="form-input" type="text" name="apellido" placeholder="Tu apellido" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}" title="Ingresa tu apellido." required />
+            <label> Apellido </label>
+            <input
+              class="form-input"
+              type="text"
+              name="apellido"
+              placeholder="Tu apellido"
+              pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ .'-]{2,}"
+              title="Ingresa tu apellido."
+              required
+            />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
-            <label>
-              Email
-            </label>
-            <input class="form-input" type="email" name="email" placeholder="tu@email.com" required />
+            <label> Email </label>
+            <input
+              id="email"
+              class="form-input"
+              type="email"
+              name="email"
+              placeholder="tu@email.com"
+              required
+            />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label for="password">Contraseña</label>
-            <input class="form-input" id="password" type="password" name="password" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres" required />
+            <input
+              class="form-input"
+              id="password"
+              type="password"
+              name="password"
+              autocomplete="new-password"
+              minlength="8"
+              placeholder="Mínimo 8 caracteres"
+              required
+            />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
-            <label for="password-confirmation">Confirmar contraseña</label>
-            <input class="form-input" id="password-confirmation" type="password" name="password_confirmation" autocomplete="new-password" minlength="8" required />
+            <label for="password-confirmation"
+              >Confirmar contraseña</label
+            >
+            <input
+              class="form-input"
+              id="password-confirmation"
+              type="password"
+              name="password_confirmation"
+              autocomplete="new-password"
+              minlength="8"
+              placeholder="Confirma tu contraseña"
+              required
+            />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                var pass =
+                  document.getElementById("password");
+                function v() {
+                  var match = pass
+                    ? c.value === pass.value
+                    : true;
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid || !match;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : !match
+                        ? "Las contraseñas no coinciden."
+                        : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (pass) pass.addEventListener("input", v);
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
-        <div id="joinRest-step2">
-          <br>
-          <br>
-          <h2>
-            Casi listo
-          </h2>
-          <br>
-          <div class="terms-check">
-            <input type="checkbox" id="termsRest" name="terminos" value="aceptado" required />
-            <label for="termsRest">
-              Acepto los términos y condiciones de Shizen y la política de privacidad.
-            </label>
+          <div id="joinRest-step2">
+            <br />
+            <br />
+            <h2>Casi listo</h2>
+            <br />
+            <div class="terms-check">
+              <input
+                type="checkbox"
+                id="termsRest"
+                name="terminos"
+                value="aceptado"
+                required
+              />
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo)
+                    return;
+                  c.dataset.validacionCampo = "1";
+                  var e =
+                    c.nextElementSibling &&
+                    c.nextElementSibling.classList.contains(
+                      "field-error-inline",
+                    )
+                      ? c.nextElementSibling
+                      : document.createElement("small");
+                  e.className = "field-error-inline";
+                  e.style.cssText =
+                    "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                  if (!e.parentNode)
+                    c.insertAdjacentElement("afterend", e);
+                  function v() {
+                    var x = c.required && !c.checked;
+                    e.textContent = x
+                      ? "Debes aceptar los términos y condiciones."
+                      : "";
+                    c.setAttribute(
+                      "aria-invalid",
+                      x ? "true" : "false",
+                    );
+                    return !x;
+                  }
+                  ["change"].forEach(function (t) {
+                    c.addEventListener(t, v);
+                  });
+                  if (c.form)
+                    c.form.addEventListener(
+                      "submit",
+                      function (a) {
+                        if (!v()) a.preventDefault();
+                      },
+                    );
+                })(
+                  document.currentScript
+                    .previousElementSibling,
+                );
+              </script>
+              <label for="terms">
+                Acepto los <a href="../legal/terminos.html" target="_blank" rel="noopener">términos, condiciones y política de privacidad de Shizen</a>.
+              </label>
+            </div>
+            <br />
+            <button class="btn-primary-full" type="submit">
+              Enviar solicitud 🚀
+            </button>
           </div>
-          <button class="btn-primary-full" type="submit">
-            Enviar solicitud 🚀
-          </button>
-        </div>
         </form>
-        <div id="joinRest-success" class="success-state hidden">
-          <div class="success-icon">
-            🎉
-          </div>
-          <h3>
-            Registro completado
-          </h3>
-          <p>
-            Bienvenido a la familia Shizen
-          </p>
-          <a class="btn-primary-full" href="../index.php">
-            Volver al inicio
-          </a>
-        </div>
       </div>
     </div>
   </div>

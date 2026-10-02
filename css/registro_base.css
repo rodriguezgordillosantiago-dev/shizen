@@ -97,6 +97,48 @@
   width: 100%;
   max-width: 440px;
 }
+/* ── Botón "Volver" reutilizable (.vol) ──────────────────────────────── */
+.vol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-right: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.1s;
+  background: #e8f5e9;
+  color: #3a8c3f;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.vol:hover {
+  background: #c8e6c9;
+  color: #3a8c3f;
+}
+.vol:active {
+  transform: scale(0.95);
+}
+.vol:focus-visible {
+  outline: 3px solid #3a8c3f;
+  outline-offset: 3px;
+}
+.vol svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.join-form-wrap > .vol,
+.join-form-wrap a.vol {
+  margin-bottom: 24px;
+}
+
 .join-back {
   display: flex;
   align-items: center;
@@ -497,13 +539,22 @@ a.btn-join {
   max-width: 520px;
 }
 .photo-upload-box {
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto 24px;
+  text-align: center;
 }
 .photo-upload-wrapper {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+  text-align: center;
 }
 .upload-hidden-input {
   position: absolute;
@@ -513,30 +564,104 @@ a.btn-join {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-.photo-upload-button {
-  width: 130px;
-  height: 130px;
-  min-height: 130px;
-  border: 2px dashed #2d6a31;
-  border-radius: 12px;
-  background: #edf8ee;
-  color: #1f5a27;
-  cursor: pointer;
+.custum-file-upload {
   position: relative;
+  height: 200px;
+  width: 300px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #3a8c3f;
+  background-color: #f0faf0;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0px 24px 32px -20px rgba(58, 140, 63, 0.25);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
   overflow: hidden;
-  padding: 6px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+.custum-file-upload:hover {
+  background-color: #e5f6e8;
+  border-color: #2d6a31;
+  box-shadow: 0 12px 28px rgba(45, 106, 49, 0.22);
+  transform: translateY(-2px);
+}
+
+.custum-file-upload .custum-file-upload-content,
+.custum-file-upload .photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  text-align: center;
+}
+
+.custum-file-upload .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .icon svg {
+  height: 76px;
+  width: 76px;
+  fill: #3a8c3f;
+  color: #3a8c3f;
+  transition:
+    fill 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.custum-file-upload:hover .icon svg {
+  fill: #2d6a31;
+  color: #2d6a31;
+  transform: scale(1.05);
+}
+
+.custum-file-upload .text {
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
 }
-.photo-upload-button:hover {
-  background: #e2f3e4;
-  border-color: #1f5a27;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(45, 106, 49, 0.15);
+
+.custum-file-upload .text span {
+  font-weight: 600;
+  color: #2d6a31;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  transition: color 0.2s ease;
+}
+
+.custum-file-upload:hover .text span {
+  color: #1f5324;
+}
+
+.custum-file-upload input {
+  display: none;
+}
+
+.custum-file-upload .photo-preview-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
 }
 .photo-placeholder {
   display: flex;
@@ -564,9 +689,11 @@ a.btn-join {
   font-size: 0.88rem;
   color: #666;
   font-weight: 500;
-  max-width: 280px;
+  max-width: 300px;
   word-break: break-all;
   line-height: 1.4;
+  text-align: center;
+  margin: 10px auto 0;
 }
 .photo-filename.selected {
   color: #2d6a31;
@@ -576,22 +703,35 @@ a.btn-join {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 46px;
-  padding: 10px 14px;
+  gap: 7px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+  padding: 7px 11px;
   border: 1px solid #2d6a31;
   border-radius: 10px;
   background: #2d6a31;
   color: #fff;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  word-break: break-word;
+  overflow: hidden;
   transition:
     transform 0.2s,
     background 0.2s,
     color 0.2s;
+}
+.upload-pdf-button svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+.upload-pdf-button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .upload-pdf-button:hover {
   background: #1f5324;
@@ -618,10 +758,14 @@ a.btn-join {
 }
 .document-upload-item {
   display: grid;
+  grid-template-rows: 34px 40px;
   gap: 7px;
+  align-content: start;
 }
 .document-upload-item > span {
-  min-height: 34px;
+  display: flex;
+  align-items: flex-end;
+  height: 34px;
   color: #2b5430;
   font-size: 0.8rem;
   font-weight: 700;
@@ -631,4 +775,23 @@ a.btn-join {
   .document-upload-grid {
     grid-template-columns: 1fr;
   }
+}
+/* Cabecera que alinea el botón volver y la barra de pasos juntos */
+.form-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.form-header-nav .vol,
+.form-header-nav a.vol {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.form-header-nav .progress-steps {
+  flex: 1; /* La barra de pasos toma todo el ancho disponible */
+  margin: 0; /* Quita el margin-bottom de 32px */
 }

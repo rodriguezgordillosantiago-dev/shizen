@@ -70,13 +70,33 @@
     </div>
     <div class="join-right">
       <div class="join-form-wrap document-form-wrap">
-        <a class="join-back" href="registro_negocio.php"
-          >← Volver a los datos del negocio</a
-        >
-        <div class="progress-steps">
-          <div class="step-dot done">✓</div>
-          <div class="step-line done"></div>
-          <div class="step-dot active">2</div>
+        <div class="form-header-nav">
+          <a
+            class="vol"
+            href="registro_negocio.php"
+            aria-label="Volver a los datos del negocio"
+            title="Volver a los datos del negocio"
+          >
+            <svg
+              viewBox="0 0 32 32"
+              width="38"
+              height="38"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <g stroke="currentColor" stroke-width="4">
+                <path d="m15 22-6-6 6-6" />
+                <path d="M24 16H9" />
+              </g>
+            </svg>
+          </a>
+          <div class="progress-steps">
+            <div class="step-dot done">✓</div>
+            <div class="step-line done"></div>
+            <div class="step-dot active">2</div>
+          </div>
         </div>
         <form
           method="post"
@@ -101,6 +121,53 @@
               placeholder="Número de identificación"
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="photo-upload-box">
             <input
@@ -111,10 +178,57 @@
               accept="image/jpeg,image/png,image/webp"
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
             <div class="photo-upload-wrapper">
               <label
                 for="logo-negocio"
-                class="photo-upload-button"
+                class="custum-file-upload"
                 id="logo-negocio-btn"
               >
                 <img
@@ -124,11 +238,40 @@
                   alt="Vista previa del logo"
                 />
                 <div
-                  class="photo-placeholder"
+                  class="custum-file-upload-content"
                   id="logo-negocio-placeholder"
                 >
-                  <span class="photo-icon">🖼️</span>
-                  <span>Logo <b>(obligatorio)</b></span>
+                  <div class="icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <g
+                        id="SVGRepo_bgCarrier"
+                        stroke-width="0"
+                      ></g>
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      ></g>
+                      <g id="SVGRepo_iconCarrier">
+                        <path
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z"
+                          fill="currentColor"
+                        ></path>
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="text">
+                    <span
+                      >Subir logo del negocio
+                      <b>(obligatorio)</b></span
+                    >
+                  </div>
                 </div>
               </label>
               <div
@@ -150,8 +293,69 @@
                 accept="application/pdf"
                 required
               />
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo)
+                    return;
+                  c.dataset.validacionCampo = "1";
+                  var e =
+                    c.nextElementSibling &&
+                    c.nextElementSibling.classList.contains(
+                      "field-error-inline",
+                    )
+                      ? c.nextElementSibling
+                      : document.createElement("small");
+                  e.className = "field-error-inline";
+                  e.style.cssText =
+                    "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                  if (!e.parentNode)
+                    c.insertAdjacentElement("afterend", e);
+                  function v() {
+                    var x = c.required && !c.value.trim(),
+                      i = x || !c.validity.valid;
+                    e.textContent = i
+                      ? x
+                        ? "Este campo es obligatorio."
+                        : c.validationMessage
+                      : "";
+                    c.setAttribute(
+                      "aria-invalid",
+                      i ? "true" : "false",
+                    );
+                    return !i;
+                  }
+                  ["input", "change", "blur"].forEach(
+                    function (t) {
+                      c.addEventListener(t, v);
+                    },
+                  );
+                  if (c.form)
+                    c.form.addEventListener(
+                      "submit",
+                      function (a) {
+                        if (!v()) a.preventDefault();
+                      },
+                    );
+                })(
+                  document.currentScript
+                    .previousElementSibling,
+                );
+              </script>
               <label class="upload-pdf-button" for="rut"
-                >📄 RUT</label
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                ><span>RUT</span></label
               >
             </div>
             <div class="document-upload-item">
@@ -164,10 +368,71 @@
                 accept="application/pdf"
                 required
               />
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo)
+                    return;
+                  c.dataset.validacionCampo = "1";
+                  var e =
+                    c.nextElementSibling &&
+                    c.nextElementSibling.classList.contains(
+                      "field-error-inline",
+                    )
+                      ? c.nextElementSibling
+                      : document.createElement("small");
+                  e.className = "field-error-inline";
+                  e.style.cssText =
+                    "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                  if (!e.parentNode)
+                    c.insertAdjacentElement("afterend", e);
+                  function v() {
+                    var x = c.required && !c.value.trim(),
+                      i = x || !c.validity.valid;
+                    e.textContent = i
+                      ? x
+                        ? "Este campo es obligatorio."
+                        : c.validationMessage
+                      : "";
+                    c.setAttribute(
+                      "aria-invalid",
+                      i ? "true" : "false",
+                    );
+                    return !i;
+                  }
+                  ["input", "change", "blur"].forEach(
+                    function (t) {
+                      c.addEventListener(t, v);
+                    },
+                  );
+                  if (c.form)
+                    c.form.addEventListener(
+                      "submit",
+                      function (a) {
+                        if (!v()) a.preventDefault();
+                      },
+                    );
+                })(
+                  document.currentScript
+                    .previousElementSibling,
+                );
+              </script>
               <label
                 class="upload-pdf-button"
                 for="representante"
-                >📄 Identidad</label
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                ><span>Identidad</span></label
               >
             </div>
             <div class="document-upload-item">
@@ -180,10 +445,71 @@
                 accept="application/pdf"
                 required
               />
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo)
+                    return;
+                  c.dataset.validacionCampo = "1";
+                  var e =
+                    c.nextElementSibling &&
+                    c.nextElementSibling.classList.contains(
+                      "field-error-inline",
+                    )
+                      ? c.nextElementSibling
+                      : document.createElement("small");
+                  e.className = "field-error-inline";
+                  e.style.cssText =
+                    "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                  if (!e.parentNode)
+                    c.insertAdjacentElement("afterend", e);
+                  function v() {
+                    var x = c.required && !c.value.trim(),
+                      i = x || !c.validity.valid;
+                    e.textContent = i
+                      ? x
+                        ? "Este campo es obligatorio."
+                        : c.validationMessage
+                      : "";
+                    c.setAttribute(
+                      "aria-invalid",
+                      i ? "true" : "false",
+                    );
+                    return !i;
+                  }
+                  ["input", "change", "blur"].forEach(
+                    function (t) {
+                      c.addEventListener(t, v);
+                    },
+                  );
+                  if (c.form)
+                    c.form.addEventListener(
+                      "submit",
+                      function (a) {
+                        if (!v()) a.preventDefault();
+                      },
+                    );
+                })(
+                  document.currentScript
+                    .previousElementSibling,
+                );
+              </script>
               <label
                 class="upload-pdf-button"
                 for="bancario"
-                >📄 Certificado</label
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                ><span>Certificado</span></label
               >
             </div>
             <div class="document-upload-item">
@@ -195,8 +521,69 @@
                 name="certificado_camara_comercio"
                 accept="application/pdf"
               />
+              <script>
+                (function (c) {
+                  if (!c || c.dataset.validacionCampo)
+                    return;
+                  c.dataset.validacionCampo = "1";
+                  var e =
+                    c.nextElementSibling &&
+                    c.nextElementSibling.classList.contains(
+                      "field-error-inline",
+                    )
+                      ? c.nextElementSibling
+                      : document.createElement("small");
+                  e.className = "field-error-inline";
+                  e.style.cssText =
+                    "display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";
+                  if (!e.parentNode)
+                    c.insertAdjacentElement("afterend", e);
+                  function v() {
+                    var x = c.required && !c.value.trim(),
+                      i = x || !c.validity.valid;
+                    e.textContent = i
+                      ? x
+                        ? "Este campo es obligatorio."
+                        : c.validationMessage
+                      : "";
+                    c.setAttribute(
+                      "aria-invalid",
+                      i ? "true" : "false",
+                    );
+                    return !i;
+                  }
+                  ["input", "change", "blur"].forEach(
+                    function (t) {
+                      c.addEventListener(t, v);
+                    },
+                  );
+                  if (c.form)
+                    c.form.addEventListener(
+                      "submit",
+                      function (a) {
+                        if (!v()) a.preventDefault();
+                      },
+                    );
+                })(
+                  document.currentScript
+                    .previousElementSibling,
+                );
+              </script>
               <label class="upload-pdf-button" for="camara"
-                >📄 Cámara</label
+                ><svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                ><span>Cámara</span></label
               >
             </div>
           </div>
@@ -221,11 +608,67 @@
     var filename = document.getElementById(
       "logo-negocio-filename",
     );
+    var cedulaInput = document.getElementById("cedula");
+
+    function ensureError(input, messageText) {
+      var error =
+        input.parentElement.querySelector(".field-error");
+      if (!error) {
+        error = document.createElement("p");
+        error.className = "field-error";
+        error.style.cssText =
+          "color: #dc2626; font-size: 12px; margin: 8px 0 0;";
+        input.parentElement.appendChild(error);
+      }
+      error.textContent = messageText || "";
+      return error;
+    }
+
+    function validateCedula() {
+      if (!cedulaInput) return;
+      var value = cedulaInput.value.trim();
+      var valid = /^\d{6,12}$/.test(value);
+      cedulaInput.setCustomValidity(
+        valid ? "" : "Ingresa una cédula válida.",
+      );
+      ensureError(
+        cedulaInput,
+        cedulaInput.dataset.touched === "true" && !valid
+          ? "Ingresa una cédula válida."
+          : "",
+      );
+    }
+
+    if (cedulaInput) {
+      cedulaInput.addEventListener("input", function () {
+        cedulaInput.dataset.touched = "true";
+        validateCedula();
+      });
+      cedulaInput.addEventListener("blur", function () {
+        cedulaInput.dataset.touched = "true";
+        validateCedula();
+      });
+    }
 
     if (inputLogo) {
       inputLogo.addEventListener("change", function () {
         if (this.files && this.files[0]) {
           var file = this.files[0];
+          var isValid = /\.(jpe?g|png|webp)$/i.test(
+            file.name,
+          );
+          this.setCustomValidity(
+            isValid
+              ? ""
+              : "El logo debe ser una imagen JPG, PNG o WEBP.",
+          );
+          ensureError(
+            this,
+            isValid
+              ? ""
+              : "El logo debe ser una imagen JPG, PNG o WEBP.",
+          );
+          if (!isValid) return;
           preview.src = URL.createObjectURL(file);
           preview.style.display = "block";
           if (placeholder)
@@ -238,7 +681,6 @@
       });
     }
 
-    // PDF files listener to show filename on button
     var pdfInputs = document.querySelectorAll(
       ".document-upload-item input[type='file']",
     );
@@ -247,11 +689,43 @@
         var label = this.parentElement.querySelector(
           ".upload-pdf-button",
         );
-        if (label && this.files && this.files[0]) {
-          label.textContent = "✓ " + this.files[0].name;
-          label.classList.add("uploaded");
+        var file = this.files && this.files[0];
+        var valid = !file || /\.pdf$/i.test(file.name);
+        this.setCustomValidity(
+          valid ? "" : "El archivo debe ser PDF.",
+        );
+        ensureError(
+          this,
+          this.dataset.touched === "true" && !valid
+            ? "El archivo debe ser PDF."
+            : "",
+        );
+        if (label && file) {
+          label.textContent = valid
+            ? "✓ " + file.name
+            : label.dataset.defaultText ||
+              label.textContent;
+          label.classList.toggle("uploaded", valid);
         }
       });
+      input.addEventListener("blur", function () {
+        this.dataset.touched = "true";
+        input.dispatchEvent(new Event("change"));
+      });
+      if (
+        input.parentElement.querySelector(
+          ".upload-pdf-button",
+        )
+      ) {
+        input.parentElement.querySelector(
+          ".upload-pdf-button",
+        ).dataset.defaultText =
+          input.parentElement.querySelector(
+            ".upload-pdf-button",
+          ).textContent;
+      }
     });
+
+    validateCedula();
   })();
 </script>

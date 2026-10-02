@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../clases/Negocio.php';
 require_once __DIR__ . '/../clases/FileManager.php';
 require_once __DIR__ . '/../clases/Validador.php';
+session_name('SHIZEN_CLIENTE_SESSION');
 session_start();
 
 $registro = $_SESSION['registro_negocio'] ?? null;

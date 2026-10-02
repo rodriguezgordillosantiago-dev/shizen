@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../BD/conexion.php';
 require_once __DIR__ . '/../funciones/funciones.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) { session_name('SHIZEN_CLIENTE_SESSION'); session_start(); }
 if (empty($_SESSION['id_usuario']) || $_SERVER['REQUEST_METHOD'] !== 'POST' ||
     empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string)($_POST['csrf_token'] ?? ''))) {
     http_response_code(403); exit('Solicitud no válida.');
@@ -10,12 +10,34 @@ if (empty($_SESSION['id_usuario']) || $_SERVER['REQUEST_METHOD'] !== 'POST' ||
 $nombre = limpiarTexto($_POST['nombre'] ?? '');
 $apellido = limpiarTexto($_POST['apellido'] ?? '');
 $direccion = limpiarTexto($_POST['direccion'] ?? '');
-$ciudad = limpiarTexto($_POST['ciudad'] ?? '');
+$localidad = limpiarTexto($_POST['localidad'] ?? '');
 if ($nombre === '' || $apellido === '') { http_response_code(422); exit('Nombre y apellido son obligatorios.'); }
-$stmt = obtenerConexion()->prepare('UPDATE usuario SET nombre=?, apellido=?, direccion=?, ciudad=? WHERE id_usuario=?');
-$stmt->execute([$nombre, $apellido, $direccion ?: null, $ciudad ?: null, (int)$_SESSION['id_usuario']]);
+$avatar = (string)($_POST['avatar'] ?? '');
+$avatarFiles = glob(__DIR__ . '/../assets/Perfil/*.{png,jpg,jpeg,webp}', GLOB_BRACE) ?: [];
+$avatarPaths = array_map(static fn(string $file): string => 'assets/Perfil/' . basename($file), $avatarFiles);
+if ($avatar !== '' && !in_array($avatar, $avatarPaths, true)) {
+    http_response_code(422);
+    exit('El avatar seleccionado no es válido.');
+}
+$pdo = obtenerConexion();
+$columns = $pdo->query('SHOW COLUMNS FROM usuario')->fetchAll(PDO::FETCH_COLUMN);
+$locationColumn = in_array('localidad', $columns, true)
+    ? 'localidad'
+    : (in_array('ciudad', $columns, true) ? 'ciudad' : null);
+$updates = 'nombre=?, apellido=?, direccion=?';
+$values = [$nombre, $apellido, $direccion ?: null];
+if ($locationColumn !== null) {
+    $updates .= ', ' . $locationColumn . '=?';
+    $values[] = $localidad ?: null;
+}
+$values[] = (int) $_SESSION['id_usuario'];
+$stmt = $pdo->prepare('UPDATE usuario SET ' . $updates . ' WHERE id_usuario=?');
+$stmt->execute($values);
 $_SESSION['usuario_nombre'] = $nombre;
 $_SESSION['usuario_apellido'] = $apellido;
 $_SESSION['usuario_direccion'] = $direccion;
-$_SESSION['usuario_ciudad'] = $ciudad;
+$_SESSION['usuario_localidad'] = $localidad;
+if ($avatar !== '') {
+    $_SESSION['usuario_avatar'] = $avatar;
+}
 header('Location: ../index.php'); exit;

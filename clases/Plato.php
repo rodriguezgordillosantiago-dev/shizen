@@ -43,18 +43,25 @@ class Plato {
             SELECT 
                 p.id_promocion AS id,
                 p.id_menu_item,
-                p.id_negocio,
+                COALESCE(p.id_negocio, m.id_negocio) AS id_negocio,
                 COALESCE(p.nombre, m.nombre) AS promo_nombre,
                 COALESCE(p.descripcion, m.descripcion) AS promo_desc,
                 COALESCE(p.imagen_url, m.imagen_url) AS imagen_url,
                 m.precio,
-                m.precio_promocion,
+                COALESCE(m.precio_promocion, m.precio) AS precio_promocion,
                 m.id_categoria,
+                c.nombre AS categoria_nombre,
+                c.icon AS categoria_icono,
+                p.fecha_inicio,
+                p.fecha_fin,
                 COALESCE(n.nombre, \'Restaurante Shizen\') AS negocio_nombre
             FROM promociones p
-            JOIN menu_items m ON p.id_menu_item = m.id_menu_item
-            LEFT JOIN negocios n ON p.id_negocio = n.id_negocio
+            LEFT JOIN menu_items m ON p.id_menu_item = m.id_menu_item
+            LEFT JOIN negocios n ON n.id_negocio = COALESCE(p.id_negocio, m.id_negocio)
+            LEFT JOIN categorias c ON m.id_categoria = c.id_categoria
             WHERE p.activo = 1
+              AND (p.fecha_inicio IS NULL OR p.fecha_inicio <= CURDATE())
+              AND (p.fecha_fin IS NULL OR p.fecha_fin >= CURDATE())
             ORDER BY p.id_promocion DESC
         ');
         return $stmt->fetchAll();

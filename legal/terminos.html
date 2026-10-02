@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Términos y Condiciones | Shizen</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/styles.css" />
+    <style>
+      :root {
+        --primary: #2e7d32;
+        --primary-dark: #1b5e20;
+        --primary-light: #e8f5e9;
+        --accent: #6ee7b7;
+        --text-main: #1f2937;
+        --text-muted: #4b5563;
+        --bg-grad: linear-gradient(
+          135deg,
+          #f0fdf4 0%,
+          #dcfce7 50%,
+          #f0fdf4 100%
+        );
+        --card-bg: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg-grad);
+        color: var(--text-main);
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Barra superior de navegación */
+      .top-navbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(46, 125, 50, 0.12);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      }
+
+      .top-navbar-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .vol {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 54px;
+        height: 54px;
+        margin-right: 12px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, transform 0.1s;
+        background: #e8f5e9;
+        color: #2d6a31;
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+      .vol:hover {
+        background: #c8e6c9;
+        color: #1e4a22;
+      }
+      .vol:active {
+        transform: scale(0.95);
+      }
+      .vol:focus-visible {
+        outline: 3px solid #2d6a31;
+        outline-offset: 3px;
+      }
+      .vol svg {
+        display: block;
+      }
+
+      .brand-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-logo {
+        height: 32px;
+        width: auto;
+        object-fit: contain;
+      }
+
+      .brand-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-dark);
+        background: var(--primary-light);
+        padding: 4px 10px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Contenedor principal */
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 36px 20px 80px;
+      }
+
+      .legal-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 48px 44px;
+        box-shadow:
+          0 20px 45px rgba(0, 0, 0, 0.06),
+          0 1px 3px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(229, 231, 235, 0.8);
+      }
+
+      /* Encabezado del documento */
+      .legal-header {
+        border-bottom: 2px solid #f0fdf4;
+        padding-bottom: 28px;
+        margin-bottom: 32px;
+      }
+
+      .legal-header h1 {
+        color: #14532d;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1.3;
+        margin: 0 0 12px;
+        letter-spacing: -0.5px;
+      }
+
+      .legal-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #059669;
+        font-size: 13.5px;
+        font-weight: 600;
+        background: #ecfdf5;
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid #d1fae5;
+      }
+
+      .lead-text {
+        font-size: 15.5px;
+        color: #374151;
+        margin-top: 18px;
+        line-height: 1.8;
+      }
+
+      /* Secciones y contenido */
+      h2 {
+        color: #166534;
+        font-size: 18px;
+        font-weight: 700;
+        margin-top: 36px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+
+      p {
+        color: var(--text-muted);
+        font-size: 15px;
+        margin: 0 0 16px;
+        line-height: 1.75;
+      }
+
+      ul {
+        margin: 12px 0 20px 20px;
+        padding: 0;
+        color: var(--text-muted);
+      }
+
+      li {
+        margin: 10px 0;
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+      li strong {
+        color: #1f2937;
+      }
+
+      .contact-box {
+        background: #f8fafc;
+        border-left: 4px solid #10b981;
+        border-radius: 0 12px 12px 0;
+        padding: 18px 24px;
+        margin: 24px 0;
+      }
+
+      .contact-box ul {
+        margin: 8px 0 0 16px;
+      }
+
+      .contact-box a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .contact-box a:hover {
+        text-decoration: underline;
+      }
+
+      /* Footer legal */
+      .legal-footer {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+        color: #9ca3af;
+        font-size: 13.5px;
+      }
+
+      @media (max-width: 640px) {
+        .legal-card {
+          padding: 28px 20px;
+          border-radius: 18px;
+        }
+
+        .legal-header h1 {
+          font-size: 22px;
+        }
+
+        .top-navbar-inner {
+          padding: 10px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Barra superior fija con UN SOLO botón Volver y el branding de Shizen -->
+    <header class="top-navbar">
+      <div class="top-navbar-inner">
+        <button
+          class="vol"
+          id="btn-volver"
+          type="button"
+          aria-label="Volver a la pantalla anterior"
+          title="Volver"
+        >
+          <svg viewBox="0 0 32 32" width="38" height="38" fill="none" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <g stroke="currentColor" stroke-width="4">
+              <path d="m15 22-6-6 6-6"/><path d="M24 16H9"/>
+            </g>
+          </svg>
+        </button>
+        <div class="brand-badge">
+          <img
+            src="../assets/logo.png"
+            alt="Shizen"
+            class="brand-logo"
+          />
+          <span class="brand-label">Legal</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <article class="legal-card">
+        <header class="legal-header">
+          <h1>Términos y Condiciones de Uso de Shizen</h1>
+          <div class="legal-date">
+            <span
+              >📅 Última actualización: 23 de septiembre de
+              2026</span
+            >
+          </div>
+          <p class="lead-text">
+            Bienvenido(a) a <strong>Shizen</strong>, una
+            plataforma digital dedicada a facilitar la
+            búsqueda, selección, compra y entrega de
+            alimentos y productos de establecimientos
+            especializados o con oferta de alimentación
+            vegana.
+          </p>
+          <p class="lead-text">
+            Los presentes Términos y Condiciones regulan el
+            acceso y uso de la página web, aplicación,
+            plataforma y demás servicios digitales ofrecidos
+            por <strong>SHIZEN</strong>, identificada con
+            NIT <strong>12345678</strong>, con domicilio en
+            <strong>BOGOTÁ</strong>, en adelante “Shizen”.
+          </p>
+          <p class="lead-text">
+            Al registrarse, navegar, realizar una compra o
+            utilizar cualquier servicio de Shizen, el
+            usuario declara haber leído, comprendido y
+            aceptado estos Términos y Condiciones. Si el
+            usuario no está de acuerdo con alguna de las
+            disposiciones aquí establecidas, deberá
+            abstenerse de utilizar la plataforma.
+          </p>
+        </header>
+
+        <h2>1. DEFINICIONES</h2>
+        <p>Para efectos de estos Términos:</p>
+        <ul>
+          <li>
+            <strong>Shizen:</strong> Plataforma tecnológica
+            que permite a los usuarios consultar
+            establecimientos, productos y servicios de
+            alimentación y realizar pedidos a través de
+            medios electrónicos.
+          </li>
+          <li>
+            <strong>Usuario:</strong> Persona natural o
+            jurídica que accede, se registra o utiliza los
+            servicios de Shizen.
+          </li>
+          <li>
+            <strong>Cliente:</strong> Usuario que realiza un
+            pedido a través de la plataforma.
+          </li>
+          <li>
+            <strong>Establecimiento:</strong> Restaurante,
+            tienda, emprendimiento o proveedor de alimentos
+            que ofrece sus productos mediante Shizen.
+          </li>
+          <li>
+            <strong>Repartidor:</strong> Persona encargada
+            de realizar la entrega del pedido cuando este
+            servicio sea ofrecido mediante Shizen o alguno
+            de sus aliados logísticos.
+          </li>
+          <li>
+            <strong>Pedido:</strong> Solicitud de compra
+            realizada por un usuario a través de la
+            plataforma.
+          </li>
+          <li>
+            <strong>Plataforma:</strong> Página web,
+            aplicación móvil, sistemas, interfaces, software
+            y demás canales digitales asociados a Shizen.
+          </li>
+        </ul>
+
+        <h2>2. OBJETO DEL SERVICIO</h2>
+        <p>
+          Shizen funciona como una plataforma tecnológica
+          que conecta a usuarios con establecimientos que
+          ofrecen alimentos y productos compatibles con la
+          propuesta gastronómica de la plataforma.
+        </p>
+        <p>A través de Shizen, los usuarios podrán:</p>
+        <ul>
+          <li>Crear una cuenta personal o corporativa.</li>
+          <li>
+            Consultar establecimientos y productos
+            veganos/vegetarianos disponibles.
+          </li>
+          <li>
+            Revisar precios, características y
+            disponibilidad en tiempo real.
+          </li>
+          <li>
+            Realizar pedidos a domicilio o para recoger.
+          </li>
+          <li>
+            Seleccionar medios de pago disponibles y
+            seguros.
+          </li>
+          <li>
+            Consultar el estado de sus pedidos en tiempo
+            real.
+          </li>
+          <li>
+            Recibir productos en la dirección suministrada.
+          </li>
+          <li>
+            Comunicarse con Shizen y, cuando corresponda,
+            con el establecimiento o repartidor respecto de
+            un pedido.
+          </li>
+        </ul>
+        <p>
+          Dependiendo del modelo comercial adoptado por
+          Shizen, la plataforma podrá actuar como
+          intermediaria tecnológica entre el usuario y el
+          establecimiento, o como proveedor directo respecto
+          de determinados productos o servicios.
+        </p>
+        <p>
+          Cuando un establecimiento sea responsable de la
+          preparación y venta del producto, dicha
+          circunstancia será informada al usuario cuando
+          resulte aplicable.
+        </p>
+
+        <h2>3. REGISTRO Y CUENTA DE USUARIO</h2>
+        <p>
+          Para utilizar determinadas funcionalidades de
+          Shizen, el usuario deberá crear una cuenta
+          proporcionando información verdadera, completa y
+          actualizada.
+        </p>
+        <p>El usuario será responsable de:</p>
+        <ul>
+          <li>
+            Proporcionar información veraz y comprobable.
+          </li>
+          <li>
+            Mantener actualizados sus datos de contacto y
+            entrega.
+          </li>
+          <li>
+            Mantener la confidencialidad de sus credenciales
+            y contraseñas.
+          </li>
+          <li>
+            No compartir sus contraseñas o mecanismos de
+            acceso con terceros.
+          </li>
+          <li>
+            Informar a Shizen inmediatamente ante cualquier
+            uso no autorizado de su cuenta.
+          </li>
+        </ul>
+        <p>
+          Shizen podrá solicitar información adicional
+          cuando sea necesaria para verificar la identidad
+          del usuario, prevenir fraudes o cumplir
+          obligaciones legales.
+        </p>
+        <p>
+          Cada usuario deberá utilizar únicamente su propia
+          cuenta y no podrá crear cuentas utilizando la
+          identidad de terceros.
+        </p>
+
+        <h2>4. USO DE LA PLATAFORMA</h2>
+        <p>
+          El usuario se compromete a utilizar Shizen de
+          manera lícita y de acuerdo con estos Términos y
+          Condiciones.
+        </p>
+        <p>Está expresamente prohibido:</p>
+        <ul>
+          <li>
+            Utilizar la plataforma para actividades
+            fraudulentas o ilegales.
+          </li>
+          <li>
+            Suplantar la identidad de otra persona o
+            entidad.
+          </li>
+          <li>
+            Crear cuentas falsas o múltiples con fines de
+            abuso de promociones.
+          </li>
+          <li>
+            Manipular precios, pedidos, promociones o
+            sistemas de recompensa.
+          </li>
+          <li>
+            Intentar acceder sin autorización a sistemas,
+            servidores o cuentas de terceros.
+          </li>
+          <li>
+            Introducir código malicioso, virus o cualquier
+            mecanismo que pueda afectar la plataforma.
+          </li>
+          <li>
+            Utilizar sistemas automatizados (scrapers, bots)
+            para extraer información de Shizen sin
+            autorización escrita.
+          </li>
+          <li>
+            Utilizar la plataforma para actividades
+            contrarias a la legislación colombiana.
+          </li>
+        </ul>
+        <p>
+          Shizen podrá suspender o cancelar cuentas cuando
+          existan razones objetivas para considerar que se
+          ha producido un incumplimiento de estos Términos,
+          un fraude o un uso indebido de la plataforma,
+          respetando los derechos que correspondan al
+          usuario conforme a la legislación aplicable.
+        </p>
+
+        <h2>5. INFORMACIÓN DE LOS PRODUCTOS</h2>
+        <p>
+          Los establecimientos son responsables de
+          proporcionar información veraz sobre sus
+          productos, incluyendo, cuando corresponda: nombre
+          del producto, descripción, ingredientes, precio,
+          tamaño o cantidad, disponibilidad, información
+          relevante sobre alérgenos y características
+          relacionadas con su preparación.
+        </p>
+        <p>
+          Shizen procurará que la información publicada sea
+          clara y esté actualizada; sin embargo,
+          determinados datos dependen directamente de los
+          establecimientos aliados.
+        </p>
+        <p>
+          El hecho de que un producto aparezca en Shizen no
+          significa necesariamente que haya sido elaborado
+          exclusivamente en instalaciones libres de
+          ingredientes de origen animal, contaminación
+          cruzada o determinados alérgenos. Los usuarios que
+          presenten alergias, intolerancias o restricciones
+          alimentarias deberán verificar directamente la
+          información correspondiente antes de realizar un
+          pedido.
+        </p>
+
+        <h2>6. NATURALEZA VEGANA DE LA PLATAFORMA</h2>
+        <p>
+          Shizen está orientada a establecimientos y
+          productos dirigidos al público vegano. Los
+          establecimientos serán responsables de la
+          composición, preparación y características de los
+          alimentos que comercialicen.
+        </p>
+        <p>
+          Cuando Shizen utilice categorías, etiquetas o
+          distintivos como “vegano”, estos deberán
+          corresponder a información proporcionada o
+          validada conforme a los criterios establecidos por
+          Shizen.
+        </p>
+        <p>
+          La clasificación de un establecimiento o producto
+          como vegano no sustituye la obligación del usuario
+          de revisar los ingredientes o consultar al
+          establecimiento cuando tenga dudas sobre la
+          composición del producto.
+        </p>
+
+        <h2>7. REALIZACIÓN DE PEDIDOS</h2>
+        <p>
+          Para realizar un pedido, el usuario deberá
+          seleccionar los productos disponibles, indicar la
+          dirección de entrega, escoger el medio de pago
+          disponible y confirmar la compra.
+        </p>
+        <p>
+          Antes de finalizar la transacción, Shizen mostrará
+          al usuario la información relevante del pedido,
+          incluyendo los productos seleccionados,
+          cantidades, precios unitarios, costos adicionales
+          y el valor total a pagar.
+        </p>
+        <p>
+          La recepción de una solicitud de pedido no implica
+          automáticamente su aceptación definitiva; el
+          pedido podrá quedar sujeto a confirmación de
+          disponibilidad por parte del establecimiento. Una
+          vez confirmado, el usuario podrá dar seguimiento
+          en tiempo real a través de la plataforma.
+        </p>
+
+        <h2>8. PRECIOS, IMPUESTOS Y COSTOS DE ENTREGA</h2>
+        <p>
+          Los precios publicados en Shizen serán expresados
+          en pesos colombianos (COP), salvo que se indique
+          expresamente otra moneda.
+        </p>
+        <p>
+          El valor final de una compra podrá incluir: precio
+          de los productos, impuestos aplicables, tarifa de
+          servicio (cuando corresponda), costo de domicilio
+          o entrega y otros cargos previamente informados al
+          usuario. Antes de finalizar el pedido, Shizen
+          mostrará al usuario el desglose y valor total
+          correspondiente.
+        </p>
+        <p>
+          Los establecimientos podrán modificar sus precios
+          y disponibilidad, pero dichos cambios no afectarán
+          un pedido que ya haya sido confirmado, salvo que
+          exista una circunstancia justificada por fuerza
+          mayor o falta imprevista de inventario notificada
+          al usuario.
+        </p>
+
+        <h2>9. MEDIOS DE PAGO</h2>
+        <p>
+          Shizen ofrece diferentes medios de pago integrados
+          y seguros, incluyendo tarjetas débito, tarjetas
+          crédito, transferencias, billeteras digitales u
+          otros mecanismos disponibles.
+        </p>
+        <p>
+          Los pagos podrán ser procesados mediante pasarelas
+          y entidades financieras autorizadas. Shizen jamás
+          solicitará claves bancarias secretas, contraseñas
+          de banca virtual ni códigos token por canales no
+          cifrados.
+        </p>
+        <p>
+          Shizen no almacena directamente números completos
+          de tarjetas ni códigos CVV, cumpliendo los
+          estándares de la industria para proteger la
+          información financiera del usuario.
+        </p>
+
+        <h2>10. TRATAMIENTO DE DATOS PERSONALES</h2>
+        <p>
+          El tratamiento de datos personales realizado por
+          Shizen se efectúa con estricto apego a la
+          legislación colombiana vigente (Ley 1581 de 2012 y
+          Decreto 1377 de 2013).
+        </p>
+        <p>
+          Los datos recopilados (nombre, teléfono, correo
+          electrónico, dirección de entrega e historial de
+          pedidos) son tratados exclusivamente para la
+          gestión de cuentas, tramitación de pedidos,
+          logística de entrega, soporte al usuario y
+          prevención de fraude.
+        </p>
+        <p>
+          El titular de los datos podrá ejercer en cualquier
+          momento sus derechos de consulta, actualización,
+          rectificación y supresión enviando su solicitud a
+          nuestros canales oficiales de contacto.
+        </p>
+
+        <h2>11. DATOS BANCARIOS Y DE PAGO</h2>
+        <p>
+          Determinados datos de las transacciones son
+          procesados directamente por pasarelas de pago y
+          entidades financieras autorizadas que cuentan con
+          certificación de seguridad PCI-DSS. Shizen adopta
+          medidas técnicas y organizativas para proteger la
+          información frente a accesos no autorizados,
+          pérdida o alteración.
+        </p>
+
+        <h2>12. COMPARTICIÓN DE INFORMACIÓN</h2>
+        <p>
+          Para la correcta ejecución del servicio, Shizen
+          compartirá únicamente la información estrictamente
+          necesaria con establecimientos aliados,
+          repartidores y procesadores de pago.
+        </p>
+        <p>
+          <strong
+            >Shizen bajo ninguna circunstancia
+            comercializará, venderá ni cederá datos
+            personales de sus usuarios a terceros con fines
+            publicitarios no autorizados.</strong
+          >
+        </p>
+
+        <h2>13. DIRECCIONES Y GEOLOCALIZACIÓN</h2>
+        <p>
+          El usuario es responsable de suministrar una
+          dirección de entrega exacta, completa y con las
+          indicaciones necesarias (apartamento, torre,
+          código postal o referencias). Shizen no será
+          responsable por retrasos o entregas fallidas
+          derivadas de inconsistencias en los datos
+          proporcionados por el cliente.
+        </p>
+
+        <h2>14. ENTREGA DE PEDIDOS</h2>
+        <p>
+          Los pedidos son entregados por repartidores
+          afiliados a la plataforma o personal de logística
+          del establecimiento. Los tiempos estimados de
+          entrega son orientativos y pueden presentar
+          variaciones por factores climáticos, congestión
+          vial o alta demanda en la preparación.
+        </p>
+
+        <h2>15. CANCELACIONES</h2>
+        <p>
+          El usuario podrá solicitar la cancelación de un
+          pedido a través de la plataforma. La aceptación de
+          la cancelación y sus eventuales reembolsos
+          dependerán de si el establecimiento ya ha iniciado
+          la preparación de los alimentos perecederos o si
+          el repartidor ya se encuentra en ruta.
+        </p>
+
+        <h2>
+          16. DERECHO DE RETRACTO, REVERSIÓN DEL PAGO Y
+          GARANTÍAS
+        </h2>
+        <p>
+          De conformidad con la Ley 1480 de 2011 (Estatuto
+          del Consumidor de Colombia), y dada la naturaleza
+          perecedera de los alimentos preparados para
+          consumo inmediato, aplican las excepciones legales
+          al retracto. No obstante, en casos de pedidos no
+          entregados, cobros indebidos o productos en mal
+          estado, el usuario tendrá derecho a la revisión y
+          reversión correspondiente conforme a la ley.
+        </p>
+
+        <h2>17. RECLAMOS SOBRE PRODUCTOS</h2>
+        <p>
+          Ante inconsistencias en el pedido (productos
+          faltantes, ítems erróneos o problemas de calidad),
+          el usuario podrá comunicarse a través del canal de
+          soporte dentro de los plazos razonables tras la
+          entrega, adjuntando la evidencia correspondiente
+          para gestionar la reposición o devolución
+          económica.
+        </p>
+
+        <h2>18. RESPONSABILIDAD DE LOS ESTABLECIMIENTOS</h2>
+        <p>
+          Cada establecimiento aliado es responsable directo
+          por la manipulación higiénica, preparación,
+          calidad, frescura y etiquetado de los productos y
+          platos ofrecidos en Shizen.
+        </p>
+
+        <h2>19. PROPIEDAD INTELECTUAL</h2>
+        <p>
+          Todos los signos distintivos, marcas, logotipos,
+          interfaces gráficas, código fuente y contenidos de
+          Shizen son de titularidad exclusiva o cuentan con
+          autorización de uso. Queda prohibida su
+          reproducción o distribución sin consentimiento
+          expreso previo.
+        </p>
+
+        <h2>20. CONTENIDO DE LOS USUARIOS</h2>
+        <p>
+          Las opiniones, valoraciones y comentarios
+          publicados por los usuarios deben reflejar
+          experiencias reales y mantener un trato
+          respetuoso. Shizen se reserva el derecho de
+          retirar comentarios que vulneren normas
+          comunitarias o derechos de terceros.
+        </p>
+
+        <h2>21. DISPONIBILIDAD DE LA PLATAFORMA</h2>
+        <p>
+          Shizen trabaja continuamente para asegurar la
+          operatividad ininterrumpida de sus servicios, pero
+          no se responsabiliza por suspensiones temporales
+          debidas a mantenimientos técnicos requeridos o
+          eventos de fuerza mayor fuera de su control
+          razonable.
+        </p>
+
+        <h2>22. COMUNICACIONES</h2>
+        <p>
+          El usuario acepta recibir notificaciones
+          transaccionales relacionadas con sus pedidos,
+          pagos y actualizaciones de seguridad a través de
+          correo electrónico, SMS o notificaciones dentro de
+          la aplicación.
+        </p>
+
+        <h2>23. PROMOCIONES Y CUPONES</h2>
+        <p>
+          Los cupones de descuento y promociones están
+          sujetos a condiciones de vigencia, límites de
+          canje, pedidos mínimos y términos específicos
+          publicados en cada campaña.
+        </p>
+
+        <h2>24. PREVENCIÓN DEL FRAUDE</h2>
+        <p>
+          Shizen implementa controles continuos de seguridad
+          y podrá bloquear transacciones o cuentas asociadas
+          a actividades sospechosas para proteger a la
+          comunidad de usuarios y comercios aliados.
+        </p>
+
+        <h2>25. ENLACES Y SERVICIOS DE TERCEROS</h2>
+        <p>
+          La plataforma puede contener enlaces a servicios
+          externos. Shizen no controla ni se hace
+          responsable por el contenido o las políticas de
+          privacidad de sitios ajenos a su dominio.
+        </p>
+
+        <h2>26. MODIFICACIÓN DE LOS TÉRMINOS</h2>
+        <p>
+          Shizen podrá modificar estos Términos y
+          Condiciones para adecuarse a nuevas regulaciones o
+          mejoras de servicio. Las modificaciones entrarán
+          en vigencia tras su publicación en este mismo
+          medio.
+        </p>
+
+        <h2>27. SUSPENSIÓN O TERMINACIÓN DE LA CUENTA</h2>
+        <p>
+          El usuario podrá dar de baja su cuenta cuando lo
+          desee. Shizen se reserva el derecho de suspender
+          accesos a usuarios que incumplan las disposiciones
+          de este documento legal.
+        </p>
+
+        <h2>28. LEGISLACIÓN APLICABLE</h2>
+        <p>
+          Los presentes Términos se rigen e interpretan
+          conforme a las leyes de la República de Colombia.
+          Cualquier controversia será sometida ante las
+          autoridades y jurisdicciones competentes.
+        </p>
+
+        <h2>
+          29. MECANISMOS DE CONTACTO Y ATENCIÓN AL USUARIO
+        </h2>
+        <div class="contact-box">
+          <p>
+            Para consultas, peticiones, quejas o reclamos
+            (PQR), Shizen pone a disposición los siguientes
+            canales:
+          </p>
+          <ul>
+            <li>
+              <strong
+                >Correo electrónico de soporte:</strong
+              >
+              <a href="mailto:soporte@shizen.com.co"
+                >soporte@shizen.com.co</a
+              >
+            </li>
+            <li>
+              <strong>Domicilio y ciudad:</strong> Bogotá
+              D.C., Colombia
+            </li>
+            <li>
+              <strong>Canal de ayuda en línea:</strong>
+              Asistente y centro de ayuda integrado en la
+              plataforma.
+            </li>
+          </ul>
+        </div>
+
+        <h2>30. ACEPTACIÓN</h2>
+        <p>
+          Al registrarse, realizar pedidos o hacer uso
+          activo de cualquiera de las aplicaciones y
+          servicios de Shizen, el usuario manifiesta haber
+          leído, comprendido y aceptado en su totalidad los
+          presentes Términos y Condiciones de Uso.
+        </p>
+
+        <footer class="legal-footer">
+          <p>
+            © 2026 Shizen. Todos los derechos reservados.
+            Plataforma de alimentación vegana y sostenible.
+          </p>
+        </footer>
+      </article>
+    </main>
+
+    <script>
+      (function () {
+        function volver(e) {
+          if (e) e.preventDefault();
+          // Navegar inteligentemente hacia la página anterior o a la página de inicio
+          if (
+            document.referrer &&
+            document.referrer.indexOf(
+              window.location.host,
+            ) !== -1
+          ) {
+            window.location.href = document.referrer;
+          } else if (window.history.length > 1) {
+            window.history.back();
+          } else if (window.opener) {
+            window.close();
+          } else {
+            window.location.href = "../index.php";
+          }
+        }
+        var backBtn = document.getElementById("btn-volver");
+        if (backBtn) {
+          backBtn.addEventListener("click", volver);
+        }
+      })();
+    </script>
+  </body>
+</html>

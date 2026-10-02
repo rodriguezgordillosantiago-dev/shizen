@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
 }
 
@@ -19,14 +20,14 @@ if (empty($_SESSION['csrf_token'])) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/nav.css?v=20260905-2" />
-    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/nav.css?v=20261001-orders-icon-1" />
+    <link rel="stylesheet" href="css/home.css?v=20261001-promo-green-1" />
     <link rel="stylesheet" href="css/pages.css?v=20260816-1" />
     <link rel="stylesheet" href="css/registro_base.css" />
     <link rel="stylesheet" href="css/registro_usuario.css" />
     <link rel="stylesheet" href="css/registro_negocio.css" />
     <link rel="stylesheet" href="css/registro_repartidor.css" />
-    <link rel="stylesheet" href="css/modals.css?v=20260816-2" />
+    <link rel="stylesheet" href="css/modals.css?v=20260930-cart-clear-1" />
   </head>
   <body>
     <header id="navigation">
@@ -41,8 +42,7 @@ if (empty($_SESSION['csrf_token'])) {
     <script>
       window.shizenCategoryUrl = 'php/categorias.php';
     </script>
-    <script src="js/data.js?v=20260827-1"></script>
     <script src="js/layout.js?v=20260912-1"></script>
-    <script src="js/app.js?v=20260912-1"></script>
+    <script src="js/app.js?v=20260930-cart-clear-1"></script>
   </body>
 </html>

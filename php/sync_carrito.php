@@ -5,6 +5,7 @@ require_once __DIR__ . '/../BD/conexion.php';
 require_once __DIR__ . '/../funciones/funciones.php';
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
 }
 
@@ -101,4 +102,3 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Error al cargar carrito: ' . $e->getMessage()]);
 }
-

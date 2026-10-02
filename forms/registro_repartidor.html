@@ -69,18 +69,30 @@
         </div>
       </div>
     </div>
-    <div class="join-right">
-      <div class="join-form-wrap">
-        <a class="join-back" href="../index.php">
-          ← Volver al inicio
-        </a>
+        <div class="join-right">
+    <div class="join-form-wrap">
+       <div class="form-header-nav">
+        <a class="vol" href="../index.php" aria-label="Volver al inicio" title="Volver al inicio">
+          <svg viewBox="0 0 32 32" width="38" height="38" fill="none" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <g stroke="currentColor" stroke-width="4">
+              <path d="m15 22-6-6 6-6"/><path d="M24 16H9"/>
+            </g>
+          </svg>
+        </a>      
         <div class="progress-steps">
-          <div class="step-dot active" id="joinDel-dot-1">
-            1
-          </div>
-          <div class="step-line" id="joinDel-line-1"></div>
-          <div class="step-dot" id="joinDel-dot-2">2</div>
-        </div>
+  <div class="step-dot active" id="joinRest-dot-1">
+    1
+  </div>
+
+  <div class="step-line" id="joinRest-line-1"></div>
+
+  <div class="step-dot" id="joinRest-dot-2">
+    2
+  </div>
+</div>
+</div>
+
         <form
           method="post"
           action="registro_repartidor.php"
@@ -102,6 +114,53 @@
               title="Ingresa tu nombre completo."
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label> Apellido </label>
@@ -114,6 +173,53 @@
               title="Ingresa tu apellido completo."
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label> Vehículo </label>
@@ -132,6 +238,53 @@
               </option>
               <option value="Carro">Carro</option>
             </select>
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label> Dirección </label>
@@ -143,6 +296,53 @@
               maxlength="150"
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label> Email </label>
@@ -153,26 +353,180 @@
               placeholder="tu@email.com"
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label>Contraseña</label>
             <input
               class="form-input"
+              id="password_repartidor"
               type="password"
               name="password"
               autocomplete="new-password"
               minlength="8"
+              required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div class="form-group">
             <label>Confirmar contraseña</label>
             <input
               class="form-input"
+              id="password-confirmation_repartidor"
               type="password"
               name="password_confirmation"
               autocomplete="new-password"
               minlength="8"
+              required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                var pass = document.getElementById(
+                  "password_repartidor",
+                );
+                function v() {
+                  var match = pass
+                    ? c.value === pass.value
+                    : true;
+                  var x = c.required && !c.value.trim(),
+                    i = x || !c.validity.valid || !match;
+                  e.textContent = i
+                    ? x
+                      ? "Este campo es obligatorio."
+                      : !match
+                        ? "Las contraseñas no coinciden."
+                        : c.validationMessage
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    i ? "true" : "false",
+                  );
+                  return !i;
+                }
+                ["input", "change", "blur"].forEach(
+                  function (t) {
+                    c.addEventListener(t, v);
+                  },
+                );
+                if (pass) pass.addEventListener("input", v);
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
           </div>
           <div id="joinDel-step2">
             <h2>Casi listo</h2>
@@ -192,30 +546,57 @@
               value="aceptado"
               required
             />
+            <script>
+              (function (c) {
+                if (!c || c.dataset.validacionCampo) return;
+                c.dataset.validacionCampo = "1";
+                var e =
+                  c.nextElementSibling &&
+                  c.nextElementSibling.classList.contains(
+                    "field-error-inline",
+                  )
+                    ? c.nextElementSibling
+                    : document.createElement("small");
+                e.className = "field-error-inline";
+                e.style.cssText =
+                  "display:block;color:#dc2626;font-size:12px;margin-top:4px;font-weight:500;";
+                if (!e.parentNode)
+                  c.insertAdjacentElement("afterend", e);
+                function v() {
+                  var x = c.required && !c.checked;
+                  e.textContent = x
+                    ? "Debes aceptar los términos y condiciones."
+                    : "";
+                  c.setAttribute(
+                    "aria-invalid",
+                    x ? "true" : "false",
+                  );
+                  return !x;
+                }
+                ["change"].forEach(function (t) {
+                  c.addEventListener(t, v);
+                });
+                if (c.form)
+                  c.form.addEventListener(
+                    "submit",
+                    function (a) {
+                      if (!v()) a.preventDefault();
+                    },
+                  );
+              })(
+                document.currentScript
+                  .previousElementSibling,
+              );
+            </script>
             <label for="termsDel">
-              Acepto los términos y condiciones de Shizen y
-              la política de privacidad.
+              Acepto los <a href="../legal/terminos.html" target="_blank" rel="noopener">términos, condiciones y política de privacidad de Shizen</a>.
             </label>
           </div>
+          <br />
           <button class="btn-primary-full" type="submit">
             Continuar
           </button>
         </form>
-        <div
-          id="joinDel-success"
-          class="success-state hidden"
-        >
-          <div class="success-icon" aria-hidden="true">
-            &#127881;
-          </div>
-          <h3>
-            Ya eres parte del equipo de repartidores Shizen
-          </h3>
-          <p>¡Bienvenido a la familia Shizen!</p>
-          <a class="btn-primary-full" href="../index.php">
-            Volver al inicio
-          </a>
-        </div>
       </div>
     </div>
   </div>

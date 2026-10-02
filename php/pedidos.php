@@ -2,9 +2,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../BD/conexion.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) { session_name('SHIZEN_CLIENTE_SESSION'); session_start(); }
 if (empty($_SESSION['id_usuario'])) {
-    header('Location: login.php?redirect=php%2Fpedidos.php');
+    header('Location: ../index.php?login_redirect=php%2Fpedidos.php#login');
     exit;
 }
 
@@ -27,12 +27,12 @@ $orders = $stmt->fetchAll();
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../">
   <title>Mis pedidos | Shizen</title>
-  <link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/nav.css"><link rel="stylesheet" href="css/modals.css"><link rel="stylesheet" href="css/orders.css">
+  <link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1"><link rel="stylesheet" href="css/modals.css?v=20260930-cart-clear-1"><link rel="stylesheet" href="css/orders.css">
 </head>
 <body>
 <?php include __DIR__ . '/../forms/navegacion.php'; ?>
 <main class="orders-page">
-  <a class="back-link" href="index.php" aria-label="Volver al inicio" title="Volver al inicio">← Volver al inicio</a>
+  <?php $volverHref = 'index.php'; $volverLabel = 'Volver al inicio'; include __DIR__ . '/../forms/boton_volver.php'; ?>
   <h1>Mis pedidos</h1>
   <div class="orders-list">
     <?php foreach ($orders as $order): ?>
@@ -47,6 +47,6 @@ $orders = $stmt->fetchAll();
   </div>
 </main>
 <div id="overlays"><?php include __DIR__ . '/../forms/modales.php'; ?></div>
-<script src="js/app.js"></script>
+<script src="js/app.js?v=20260930-cart-clear-1"></script>
 </body>
 </html>

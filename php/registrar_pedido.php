@@ -5,6 +5,7 @@ require_once __DIR__ . '/../clases/Pedido.php';
 require_once __DIR__ . '/../clases/Validador.php';
 
 if (session_status() === PHP_SESSION_NONE) {
+    session_name('SHIZEN_CLIENTE_SESSION');
     session_start();
 }
 
