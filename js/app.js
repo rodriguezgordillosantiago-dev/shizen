@@ -194,6 +194,17 @@ function addToCart(product) {
   }
   saveCart();
   renderCart();
+
+  if (typeof Swal !== "undefined") {
+    Swal.fire({
+      title: "¡Añadido!",
+      text: "El producto se agregó a tu carrito.",
+      icon: "success",
+      showConfirmButton: false,
+      timer: 1800,
+      timerProgressBar: true
+    });
+  }
 }
 
 function renderCart() {
@@ -400,6 +411,7 @@ function openCart(event) {
     "profileModal",
     "notificationModal",
     "checkoutModal",
+    "ratingModal",
   ].forEach(function (id) {
     var overlay = document.getElementById(id);
     if (overlay) overlay.classList.remove("open");
@@ -539,7 +551,7 @@ function handleNotificationOverlayClick(event) {
 function openProfileModal() {
   var modal = document.getElementById("profileModal");
   if (!modal) return;
-  ["loginModal", "notificationModal", "cartModal", "checkoutModal"].forEach(function (id) {
+  ["loginModal", "notificationModal", "cartModal", "checkoutModal", "ratingModal"].forEach(function (id) {
     var other = document.getElementById(id);
     if (other) other.classList.remove("open");
   });
@@ -685,6 +697,223 @@ Promise.resolve(window.shizenLayoutReady).then(
   initializeApp,
 );
 
+/* ── Modal de Calificación (Negocio y Repartidor) ────────────────── */
+var ratingState = {
+  negocio: 0,
+  repartidor: 0,
+  negocioRated: false,
+  repartidorRated: false,
+};
+
+function setRatingValue(target, score) {
+  ratingState[target] = Number(score);
+  var container = document.getElementById(target === "negocio" ? "ratingStarsNegocio" : "ratingStarsRepartidor");
+  if (container) {
+    var stars = container.querySelectorAll(".star");
+    stars.forEach(function (star) {
+      var val = Number(star.getAttribute("data-value"));
+      var poly = star.querySelector("polygon");
+      if (val <= score) {
+        star.classList.add("active");
+        if (poly) {
+          poly.classList.remove("star-empty");
+          poly.classList.add("star-filled");
+        }
+      } else {
+        star.classList.remove("active");
+        if (poly) {
+          poly.classList.remove("star-filled");
+          poly.classList.add("star-empty");
+        }
+      }
+    });
+  }
+
+  var badge = document.getElementById(target === "negocio" ? "ratingBadgeNegocio" : "ratingBadgeRepartidor");
+  if (badge) {
+    var labels = { 5: "Excelente", 4: "Muy bueno", 3: "Bueno", 2: "Regular", 1: "Malo" };
+    var classes = { 5: "badge-excellent", 4: "badge-good", 3: "badge-regular", 2: "badge-poor", 1: "badge-poor" };
+    badge.textContent = labels[score] || "";
+    badge.className = "badge " + (classes[score] || "badge-good");
+    badge.style.display = score > 0 ? "inline-block" : "none";
+  }
+}
+
+function setAvatarContent(elementId, imgUrl, fallbackText) {
+  var el = document.getElementById(elementId);
+  if (!el) return;
+  if (imgUrl && String(imgUrl).trim() !== "") {
+    el.innerHTML = "";
+    var img = document.createElement("img");
+    img.src = imgUrl;
+    img.alt = fallbackText || "Avatar";
+    img.onerror = function () {
+      this.onerror = null;
+      el.textContent = fallbackText || "•";
+    };
+    el.appendChild(img);
+  } else {
+    el.textContent = fallbackText || "•";
+  }
+}
+
+function openRatingModal(data) {
+  var modal = document.getElementById("ratingModal");
+  if (!modal) return;
+
+  ["loginModal", "profileModal", "notificationModal", "cartModal", "checkoutModal"].forEach(function (id) {
+    var other = document.getElementById(id);
+    if (other) other.classList.remove("open");
+  });
+
+  if (data) {
+    if (data.id) {
+      var idInput = document.getElementById("ratingOrderId");
+      if (idInput) idInput.value = data.id;
+    }
+    if (data.negocioNombre) {
+      var nameEl = document.getElementById("ratingSecNombreNegocio");
+      if (nameEl) nameEl.textContent = data.negocioNombre;
+      var initNeg = data.negocioNombre.trim().charAt(0).toUpperCase() || "S";
+      setAvatarContent("ratingHeroNegocio", data.negocioLogo, initNeg);
+      setAvatarContent("ratingSecAvatarNegocio", data.negocioLogo, initNeg);
+    }
+    if (data.repartidorNombre) {
+      var repNameEl = document.getElementById("ratingSecNombreRepartidor");
+      if (repNameEl) repNameEl.textContent = data.repartidorNombre;
+      var initRep = data.repartidorNombre.trim().charAt(0).toUpperCase() || "R";
+      setAvatarContent("ratingHeroRepartidor", data.repartidorFoto, initRep);
+      setAvatarContent("ratingSecAvatarRepartidor", data.repartidorFoto, initRep);
+    }
+    if (data.negocioRated) {
+      ratingState.negocioRated = true;
+      var secNeg = document.getElementById("ratingSecNegocio");
+      if (secNeg) secNeg.style.display = "none";
+    } else {
+      ratingState.negocioRated = false;
+      var secNeg2 = document.getElementById("ratingSecNegocio");
+      if (secNeg2) secNeg2.style.display = "";
+    }
+    if (data.repartidorRated) {
+      ratingState.repartidorRated = true;
+      var secRep = document.getElementById("ratingSecRepartidor");
+      if (secRep) secRep.style.display = "none";
+    } else {
+      ratingState.repartidorRated = false;
+      var secRep2 = document.getElementById("ratingSecRepartidor");
+      if (secRep2) secRep2.style.display = "";
+    }
+  }
+
+  // Reiniciar estrellas visuales
+  setRatingValue("negocio", 0);
+  setRatingValue("repartidor", 0);
+
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeRatingModal() {
+  var modal = document.getElementById("ratingModal");
+  if (modal) {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+}
+
+function handleRatingOverlayClick(event) {
+  if (event.target === document.getElementById("ratingModal")) {
+    closeRatingModal();
+  }
+}
+
+function submitRatingModal() {
+  var orderId = document.getElementById("ratingOrderId") ? document.getElementById("ratingOrderId").value : "";
+  var csrfToken = document.getElementById("ratingCsrfToken") ? document.getElementById("ratingCsrfToken").value : "";
+  var commentNegocio = document.getElementById("ratingCommentNegocio") ? document.getElementById("ratingCommentNegocio").value : "";
+  var commentRepartidor = document.getElementById("ratingCommentRepartidor") ? document.getElementById("ratingCommentRepartidor").value : "";
+
+  if (!orderId) {
+    alert("No se especificó el número de pedido.");
+    return;
+  }
+
+  if (!ratingState.negocioRated && ratingState.negocio === 0 && !ratingState.repartidorRated && ratingState.repartidor === 0) {
+    if (typeof Swal !== "undefined") {
+      Swal.fire({ icon: "warning", title: "Atención", text: "Por favor califica con estrellas al negocio o al repartidor." });
+    } else {
+      alert("Por favor califica con estrellas al negocio o al repartidor.");
+    }
+    return;
+  }
+
+  var submitBtn = document.getElementById("btnSubmitRating");
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando...";
+  }
+
+  var formData = new FormData();
+  formData.append("id", orderId);
+  formData.append("csrf_token", csrfToken);
+  if (!ratingState.negocioRated && ratingState.negocio > 0) {
+    formData.append("puntuacion_negocio", ratingState.negocio);
+    formData.append("comentario_negocio", commentNegocio);
+  }
+  if (!ratingState.repartidorRated && ratingState.repartidor > 0) {
+    formData.append("puntuacion_repartidor", ratingState.repartidor);
+    formData.append("comentario_repartidor", commentRepartidor);
+  }
+
+  fetch("php/calificar_pedido.php", {
+    method: "POST",
+    headers: { Accept: "application/json" },
+    body: formData,
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar";
+      }
+      if (data && data.success) {
+        closeRatingModal();
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            icon: "success",
+            title: "¡Muchas gracias!",
+            text: data.mensaje || "Tu calificación ha sido registrada.",
+            timer: 2000,
+            showConfirmButton: false,
+          }).then(function () {
+            window.location.reload();
+          });
+        } else {
+          alert(data.mensaje || "¡Muchas gracias por calificar!");
+          window.location.reload();
+        }
+      } else {
+        if (typeof Swal !== "undefined") {
+          Swal.fire({ icon: "error", title: "Error", text: (data && data.mensaje) || "No se pudo registrar la calificación." });
+        } else {
+          alert((data && data.mensaje) || "No se pudo registrar la calificación.");
+        }
+      }
+    })
+    .catch(function (err) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar";
+      }
+      console.error("Error al enviar calificación:", err);
+      alert("Hubo un inconveniente al enviar la calificación. Intenta de nuevo.");
+    });
+}
+
 document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") closeLoginModal();
+  if (e.key === "Escape") {
+    closeLoginModal();
+    closeRatingModal();
+  }
 });
+

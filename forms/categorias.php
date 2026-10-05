@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/pages.css" />
   <link rel="stylesheet" href="css/modals.css?v=20260930-cart-clear-1" />
   <link rel="stylesheet" href="css/business-menu.css?v=20260927-1" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <header id="navigation">
@@ -88,10 +89,10 @@
 
       <div class="cat-filter-bar">
         <span>Ordenar por:</span>
-        <select class="sort-select" id="sortSelect">
-          <option value="relevance">Relevancia</option>
-          <option value="low">Precio: menor</option>
-          <option value="high">Precio: mayor</option>
+        <select class="sort-select" id="sortSelect" onchange="location.href='php/categorias.php?categoria=<?= (int)$catId ?>&orden=' + encodeURIComponent(this.value)">
+          <option value="relevance" <?= ($orden ?? '') === 'relevance' ? 'selected' : '' ?>>Relevancia</option>
+          <option value="low" <?= ($orden ?? '') === 'low' ? 'selected' : '' ?>>Precio: menor</option>
+          <option value="high" <?= ($orden ?? '') === 'high' ? 'selected' : '' ?>>Precio: mayor</option>
         </select><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo='1';var e=c.nextElementSibling&&c.nextElementSibling.classList.contains('field-error-inline')?c.nextElementSibling:document.createElement('small');e.className='field-error-inline';e.style.cssText='display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;';if(!e.parentNode)c.insertAdjacentElement('afterend',e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?'Este campo es obligatorio.':c.validationMessage):'';c.setAttribute('aria-invalid',i?'true':'false');return!i}['input','change','blur'].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener('submit',function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>
       </div>
       <div class="cat-items-inner">
@@ -106,59 +107,28 @@
                 $dishBusinessId = (int)($plato['negocio_id'] ?? 0);
                 $dishIsFavorite = $dishId > 0 && in_array($dishId, $favoriteItemIds, true);
                 $rawImg = trim($plato['imagen_url'] ?? '');
-                $imgUrl = htmlspecialchars(function_exists('resolverImagenUrl') ? resolverImagenUrl($rawImg) : ($rawImg ?: '../assets/Imagenes_prueba/plato1.jpg'));
+                $imgUrl = function_exists('resolverImagenUrl') ? resolverImagenUrl($rawImg) : ($rawImg ?: '../assets/Imagenes_prueba/plato1.jpg');
                 $hasPromo = !empty($plato['on_promo']) && !empty($plato['precio_promocion']);
-                $precioReal = $hasPromo ? (float)$plato['precio_promocion'] : (float)$plato['precio'];
                 $ratingNegocio = !empty($plato['negocio_calificacion']) ? number_format((float)$plato['negocio_calificacion'], 1) : null;
+
+                $tarjeta = [
+                  'id' => $dishId,
+                  'nombre' => $plato['plato_nombre'],
+                  'descripcion' => $plato['plato_desc'] ?? '',
+                  'imagen_url' => $imgUrl,
+                  'negocio_nombre' => $plato['negocio_nombre'] ?? '',
+                  'negocio_id' => $dishBusinessId,
+                  'precio' => (float)$plato['precio'],
+                  'precio_promocion' => $hasPromo ? (float)$plato['precio_promocion'] : null,
+                  'has_promo' => $hasPromo,
+                  'rating' => $ratingNegocio ?: 'Nuevo',
+                  'show_favorite' => true,
+                  'is_favorite' => $dishIsFavorite,
+                  'csrf_token' => (string)($_SESSION['csrf_token'] ?? ''),
+                  'redirect_url' => 'categorias.php?categoria=' . (int)$catId,
+                ];
+                include __DIR__ . '/tarjeta_plato.php';
               ?>
-              <div class="dish-card">
-                <div class="dish-img" style="background-image: url('<?= $imgUrl ?>')">
-                  <?php if ($hasPromo): ?>
-                    <span class="dish-promo-badge" style="position:absolute;top:10px;left:10px;background:#ea580c;color:#fff;font-weight:700;padding:4px 8px;border-radius:6px;font-size:11px;box-shadow:0 2px 6px rgba(234,88,12,.5)">🔥 PROMOCIÓN</span>
-                  <?php endif; ?>
-                  <?php if (!empty($_SESSION['id_usuario']) && $dishId > 0): ?>
-                    <form method="post" action="php/favorito.php" class="dish-favorite-form">
-                      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)($_SESSION['csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-                      <input type="hidden" name="id_menu_item" value="<?= $dishId ?>">
-                      <input type="hidden" name="id_negocio" value="<?= $dishBusinessId ?>">
-                      <input type="hidden" name="redirect" value="categorias.php?categoria=<?= $catId ?>">
-                      <button class="favorite-button dish-favorite-button <?= $dishIsFavorite ? 'is-favorite' : '' ?>" type="submit" aria-label="<?= $dishIsFavorite ? 'Quitar plato de favoritos' : 'Agregar plato a favoritos' ?>"><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5C9.5 20 2 16 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2zm-3.566 15.604c.881-.556 1.676-1.109 2.42-1.701C18.335 14.533 20 11.943 20 9c0-2.36-1.537-4-3.5-4-1.076 0-2.24.57-3.086 1.414L12 7.828l-1.414-1.414C9.74 5.57 8.576 5 7.5 5 5.56 5 4 6.656 4 9c0 2.944 1.666 5.533 4.645 7.903.745.592 1.54 1.145 2.421 1.7.299.189.595.37.934.572.339-.202.635-.383.934-.571z"/></svg></button>
-                    </form>
-                  <?php elseif ($dishId > 0): ?>
-                    <a class="favorite-button dish-favorite-button" href="#login" onclick="openAccessModal('php/categorias.php?categoria=<?= (int) $catId ?>'); return false;" aria-label="Inicia sesión para agregar el plato a favoritos" title="Inicia sesión para agregar el plato a favoritos"><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5C9.5 20 2 16 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2zm-3.566 15.604c.881-.556 1.676-1.109 2.42-1.701C18.335 14.533 20 11.943 20 9c0-2.36-1.537-4-3.5-4-1.076 0-2.24.57-3.086 1.414L12 7.828l-1.414-1.414C9.74 5.57 8.576 5 7.5 5 5.56 5 4 6.656 4 9c0 2.944 1.666 5.533 4.645 7.903.745.592 1.54 1.145 2.421 1.7.299.189.595.37.934.572.339-.202.635-.383.934-.571z"/></svg></a>
-                  <?php endif; ?>
-                </div>
-                <div class="dish-body">
-                  <div class="dish-name"><?= htmlspecialchars($plato['plato_nombre']) ?></div>
-                  <div class="dish-restaurant">🏪 <?= htmlspecialchars($plato['negocio_nombre']) ?></div>
-                  <p class="dish-description"><?= htmlspecialchars($plato['plato_desc'] ?? '') ?></p>
-                  <div class="dish-meta">
-                    <span>⭐ <?= $ratingNegocio ? $ratingNegocio : 'Nuevo' ?></span>
-                  </div>
-                  <div class="dish-price-row">
-                    <div class="dish-prices">
-                      <?php if ($hasPromo): ?>
-                        <span class="dish-price" style="color:#ea580c">$<?= number_format((float)$plato['precio_promocion'], 0, ',', '.') ?></span>
-                        <span style="font-size:12px;color:#9ca3af;text-decoration:line-through;margin-left:6px">$<?= number_format((float)$plato['precio'], 0, ',', '.') ?></span>
-                      <?php else: ?>
-                        <span class="dish-price">$<?= number_format((float)$plato['precio'], 0, ',', '.') ?></span>
-                      <?php endif; ?>
-                    </div>
-                    <button
-                      class="btn-add-cart"
-                      type="button"
-                      onclick='addToCart(<?= json_encode([
-                        "id" => (int) $plato["id"],
-                        "name" => $plato["plato_nombre"],
-                        "price" => $precioReal,
-                        "restaurant" => $plato["negocio_nombre"],
-                        "businessId" => (int) ($plato["id_negocio"] ?? 0),
-                        "image" => $imgUrl
-                      ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)'
-                    >Añadir al carrito</button>
-                  </div>
-                </div>
-              </div>
             <?php endforeach; ?>
           <?php endif; ?>
 
@@ -174,21 +144,6 @@
 
   <script>
     window.shizenLayoutReady = Promise.resolve();
-    document.addEventListener('DOMContentLoaded', function () {
-      var select = document.getElementById('sortSelect');
-      var grid = document.getElementById('itemsGrid');
-      if (!select || !grid) return;
-      select.addEventListener('change', function () {
-        var cards = Array.prototype.slice.call(grid.querySelectorAll('.dish-card'));
-        cards.sort(function (a, b) {
-          var price = function (card) {
-            return parseFloat(card.querySelector('.dish-price').textContent.replace(/[^\d]/g, '')) || 0;
-          };
-          return select.value === 'low' ? price(a) - price(b) : select.value === 'high' ? price(b) - price(a) : 0;
-        });
-        cards.forEach(function (card) { grid.appendChild(card); });
-      });
-    });
   </script>
   <script src="js/app.js?v=20260930-cart-clear-1"></script>
 </body>

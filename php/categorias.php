@@ -14,6 +14,10 @@ require_once __DIR__ . '/../clases/Plato.php';
 require_once __DIR__ . '/../funciones/funciones.php';
 
 $rawCategoria = $_GET['categoria'] ?? '';
+$orden = trim((string)($_GET['orden'] ?? 'relevance'));
+if (!in_array($orden, ['relevance', 'low', 'high'], true)) {
+    $orden = 'relevance';
+}
 $categoria = null;
 $platos = [];
 
@@ -22,7 +26,7 @@ try {
     $categoriaId = (int)($categoria['id'] ?? 0);
 
     if ($categoriaId > 0) {
-        $platos = Plato::obtenerPorCategoria($categoriaId);
+        $platos = Plato::obtenerPorCategoria($categoriaId, $orden);
     }
 } catch (Throwable $e) {
     error_log('Error al cargar categoría en POO: ' . $e->getMessage());

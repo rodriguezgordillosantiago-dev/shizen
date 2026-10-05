@@ -34,27 +34,7 @@
    <div class="join-right">
       <div class="join-form-wrap document-form-wrap">
         <div class="form-header-nav">
-          <a
-            class="vol"
-            href="registro_repartidor.php"
-            aria-label="Volver a los datos del repartidor"
-            title="Volver a los datos del repartidor"
-          >
-            <svg
-              viewBox="0 0 32 32"
-              width="38"
-              height="38"
-              fill="none"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <g stroke="currentColor" stroke-width="4">
-                <path d="m15 22-6-6 6-6" />
-                <path d="M24 16H9" />
-              </g>
-            </svg>
-          </a>
+          <?php $volverHref = 'registro_repartidor.php'; $volverLabel = 'Volver a los datos del repartidor'; include __DIR__ . '/boton_volver.php'; ?>
           <div class="progress-steps">
             <div class="step-dot done">✓</div>
             <div class="step-line done"></div>

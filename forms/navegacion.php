@@ -23,12 +23,12 @@ $avatarUsuario = (string)($_SESSION['usuario_avatar'] ?? $avatarDefault);
 
     <form class="nav-search" method="get" action="php/buscar.php" role="search">
       <label class="sr-only" for="navSearch">Buscar en Shizen</label>
+            <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
       <input id="navSearch" name="q" type="search" placeholder="¿Qué quieres comer?" value="<?= htmlspecialchars((string)($_GET['q'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-      <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></button>
     </form>
 
     <div class="nav-right">
-      <?php if ($logueado): ?>
+      <?php /* ── USUARIO LOGUEADO ────────────────────── */ if ($logueado): ?>
         <div class="nav-user-menu">
           <div class="nav-user-actions" id="navUserActions" aria-hidden="true">
             <button class="nav-tool-button" type="button" onclick="openCart(event)" aria-label="Abrir carrito" title="Carrito">
@@ -58,10 +58,10 @@ $avatarUsuario = (string)($_SESSION['usuario_avatar'] ?? $avatarDefault);
             <span class="nav-notification-dot" id="notifBadge" aria-label="Tienes notificaciones sin leer" title="Tienes notificaciones sin leer" hidden></span>
           </a>
         </div>
-      <?php else: ?>
+      <?php /* ── VISITANTE (SIN SESIÓN) ──────────────── */ else: ?>
         <a class="nav-orders-button orders-button" href="#login" onclick="openAccessModal('php/pedidos.php'); return false;" aria-label="Inicia sesión para ver tus pedidos" title="Mis pedidos"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></a>
         <a class="btn-ingreso btn-ingreso--user" id="ingresoBtn" href="#login" onclick="event.preventDefault(); openAccessModal()"><svg xmlns="http://www.w3.org/2000/svg" class="ingreso-icon w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>Ingreso</a>
-      <?php endif; ?>
+      <?php endif; /* ── FIN CONDICIONAL SESIÓN ──────────────── */ ?>
       <button class="btn-hamburger" id="hamburgerBtn" type="button" onclick="toggleNavMobileMenu()" aria-label="Abrir menú" aria-controls="mobileMenu" aria-expanded="false">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>

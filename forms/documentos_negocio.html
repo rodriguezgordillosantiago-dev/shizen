@@ -1,4 +1,4 @@
-<div class="view document-page">
+<div class="view document-page active">
   <div class="join-page">
     <div
       class="join-left"
@@ -624,17 +624,22 @@
       return error;
     }
 
-    function validateCedula() {
+    function validateCedula(forceShow) {
       if (!cedulaInput) return;
       var value = cedulaInput.value.trim();
       var valid = /^\d{6,12}$/.test(value);
+      if (!value && !forceShow && cedulaInput.dataset.touched !== "true") {
+        cedulaInput.setCustomValidity("");
+        ensureError(cedulaInput, "");
+        return;
+      }
       cedulaInput.setCustomValidity(
-        valid ? "" : "Ingresa una cédula válida.",
+        valid ? "" : "Ingresa una cédula válida (6 a 12 dígitos).",
       );
       ensureError(
         cedulaInput,
-        cedulaInput.dataset.touched === "true" && !valid
-          ? "Ingresa una cédula válida."
+        (forceShow || cedulaInput.dataset.touched === "true") && !valid
+          ? "Ingresa una cédula válida (6 a 12 dígitos)."
           : "",
       );
     }
@@ -654,21 +659,17 @@
       inputLogo.addEventListener("change", function () {
         if (this.files && this.files[0]) {
           var file = this.files[0];
-          var isValid = /\.(jpe?g|png|webp)$/i.test(
-            file.name,
-          );
-          this.setCustomValidity(
-            isValid
-              ? ""
-              : "El logo debe ser una imagen JPG, PNG o WEBP.",
-          );
-          ensureError(
-            this,
-            isValid
-              ? ""
-              : "El logo debe ser una imagen JPG, PNG o WEBP.",
-          );
-          if (!isValid) return;
+          var isExtValid = /\.(jpe?g|png|webp)$/i.test(file.name);
+          var isSizeValid = file.size <= 5 * 1024 * 1024;
+          var msg = "";
+          if (!isExtValid) {
+            msg = "El logo debe ser una imagen JPG, PNG o WEBP.";
+          } else if (!isSizeValid) {
+            msg = "El logo no debe superar los 5MB.";
+          }
+          this.setCustomValidity(msg);
+          ensureError(this, msg);
+          if (msg) return;
           preview.src = URL.createObjectURL(file);
           preview.style.display = "block";
           if (placeholder)
@@ -690,42 +691,53 @@
           ".upload-pdf-button",
         );
         var file = this.files && this.files[0];
-        var valid = !file || /\.pdf$/i.test(file.name);
-        this.setCustomValidity(
-          valid ? "" : "El archivo debe ser PDF.",
-        );
+        var isPdf = !file || /\.pdf$/i.test(file.name);
+        var isSizeValid = !file || file.size <= 15 * 1024 * 1024;
+        var msg = "";
+        if (!isPdf) {
+          msg = "El archivo debe ser PDF.";
+        } else if (!isSizeValid) {
+          msg = "El archivo supera el tamaño máximo permitido (15MB).";
+        }
+        this.setCustomValidity(msg);
         ensureError(
           this,
-          this.dataset.touched === "true" && !valid
-            ? "El archivo debe ser PDF."
+          (this.dataset.touched === "true" || !!file) && msg
+            ? msg
             : "",
         );
-        if (label && file) {
-          label.textContent = valid
-            ? "✓ " + file.name
-            : label.dataset.defaultText ||
-              label.textContent;
-          label.classList.toggle("uploaded", valid);
+        if (label) {
+          var span = label.querySelector("span") || label;
+          if (!span.dataset.defaultText) {
+            span.dataset.defaultText = span.textContent;
+          }
+          if (file && !msg) {
+            span.textContent = "✓ " + file.name;
+            label.classList.add("uploaded");
+          } else {
+            span.textContent = span.dataset.defaultText;
+            label.classList.remove("uploaded");
+          }
         }
       });
       input.addEventListener("blur", function () {
         this.dataset.touched = "true";
-        input.dispatchEvent(new Event("change"));
       });
-      if (
-        input.parentElement.querySelector(
-          ".upload-pdf-button",
-        )
-      ) {
-        input.parentElement.querySelector(
-          ".upload-pdf-button",
-        ).dataset.defaultText =
-          input.parentElement.querySelector(
-            ".upload-pdf-button",
-          ).textContent;
+      var btnLabel = input.parentElement.querySelector(".upload-pdf-button");
+      if (btnLabel) {
+        var s = btnLabel.querySelector("span") || btnLabel;
+        s.dataset.defaultText = s.textContent;
       }
     });
 
-    validateCedula();
+    var form = document.querySelector(".document-form-wrap form");
+    if (form) {
+      form.addEventListener("submit", function (e) {
+        if (cedulaInput) {
+          cedulaInput.dataset.touched = "true";
+          validateCedula(true);
+        }
+      });
+    }
   })();
 </script>

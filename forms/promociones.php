@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1" />
   <link rel="stylesheet" href="css/pages.css" />
   <link rel="stylesheet" href="css/modals.css?v=20260930-cart-clear-1" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -33,12 +34,15 @@
 
       <div class="promos-inner">
         <div class="filter-tabs" id="promoFilterTabs">
-          <button type="button" class="filter-tab active" data-cat="all">Todas</button>
+          <a href="php/promociones.php" class="filter-tab <?= $categoriaFiltro === 0 ? 'active' : '' ?>">Todas</a>
           <?php if (!empty($categorias)): ?>
             <?php foreach ($categorias as $cat): ?>
-              <button type="button" class="filter-tab" data-cat="<?= (int)$cat['id_categoria'] ?>">
+              <a
+                href="php/promociones.php?categoria=<?= (int)$cat['id_categoria'] ?>"
+                class="filter-tab <?= $categoriaFiltro === (int)$cat['id_categoria'] ? 'active' : '' ?>"
+              >
                 <?= htmlspecialchars($cat['icon'] ?? '🌱') ?> <?= htmlspecialchars($cat['nombre']) ?>
-              </button>
+              </a>
             <?php endforeach; ?>
           <?php endif; ?>
         </div>
@@ -52,61 +56,38 @@
             <?php foreach ($promociones as $promo): ?>
               <?php
                 $rawImg = trim($promo['imagen_url'] ?? '');
-                $imgUrl = htmlspecialchars(function_exists('resolverImagenUrl') ? resolverImagenUrl($rawImg) : ($rawImg ?: 'assets/Imagenes_prueba/plato1.jpg'));
+                $imgUrl = function_exists('resolverImagenUrl') ? resolverImagenUrl($rawImg) : ($rawImg ?: 'assets/Imagenes_prueba/plato1.jpg');
                 $precioOriginal = (float)($promo['precio'] ?? 0);
                 $precioPromo = !empty($promo['precio_promocion']) ? (float)$promo['precio_promocion'] : $precioOriginal;
-                $descuentoPct = ($precioOriginal > 0 && $precioPromo < $precioOriginal) 
-                    ? (int)round((($precioOriginal - $precioPromo) / $precioOriginal) * 100) 
-                    : 0;
                 $catId = (int)($promo['id_categoria'] ?? 0);
                 $catNombre = !empty($promo['categoria_nombre']) ? $promo['categoria_nombre'] : 'Vegano';
+                $metaExtra = !empty($promo['fecha_fin']) ? '⏱️ Vence: ' . date('d/m/Y', strtotime($promo['fecha_fin'])) : null;
+
+                $tarjeta = [
+                  'id' => (int)($promo['id_menu_item'] ?: $promo['id']),
+                  'nombre' => $promo['promo_nombre'],
+                  'descripcion' => $promo['promo_desc'] ?? '',
+                  'imagen_url' => $imgUrl,
+                  'negocio_nombre' => $promo['negocio_nombre'] ?? '',
+                  'negocio_id' => (int)($promo['id_negocio'] ?? 0),
+                  'precio' => $precioOriginal,
+                  'precio_promocion' => $precioPromo,
+                  'has_promo' => true,
+                  'tag' => $catNombre,
+                  'meta_extra' => $metaExtra,
+                  'data_cat' => $catId,
+                  'extra_class' => 'promo-card',
+                  'button_text' => 'Añadir al carrito',
+                ];
+                include __DIR__ . '/tarjeta_plato.php';
               ?>
-              <div class="promo-card" data-cat="<?= $catId ?>">
-                <div class="promo-card-img" style="background-image: url('<?= $imgUrl ?>')">
-                  <span class="promo-badge" style="background: linear-gradient(135deg, #ea580c, #f97316);">
-                    <?= $descuentoPct > 0 ? $descuentoPct . '% OFF' : '🔥 OFERTA' ?>
-                  </span>
-                  <span class="promo-tag-top"><?= htmlspecialchars($catNombre) ?></span>
-                </div>
-                <div class="promo-card-body">
-                  <h3><?= htmlspecialchars($promo['promo_nombre']) ?></h3>
-                  <div class="promo-restaurant">🏬 <?= htmlspecialchars($promo['negocio_nombre']) ?></div>
-                  <?php if (!empty($promo['promo_desc'])): ?>
-                    <p class="promo-desc"><?= htmlspecialchars($promo['promo_desc']) ?></p>
-                  <?php endif; ?>
-                  <?php if (!empty($promo['fecha_fin'])): ?>
-                    <div class="promo-timer">⏱️ Vence: <?= htmlspecialchars(date('d/m/Y', strtotime($promo['fecha_fin']))) ?></div>
-                  <?php endif; ?>
-                  <div class="promo-prices">
-                    <span class="promo-price-new">$<?= number_format($precioPromo, 0, ',', '.') ?></span>
-                    <?php if ($precioOriginal > $precioPromo): ?>
-                      <span class="promo-price-old">$<?= number_format($precioOriginal, 0, ',', '.') ?></span>
-                      <?php if ($descuentoPct > 0): ?>
-                        <span class="promo-discount">-<?= $descuentoPct ?>%</span>
-                      <?php endif; ?>
-                    <?php endif; ?>
-                  </div>
-                  <button
-                    class="btn-promo-cart"
-                    type="button"
-                    onclick='addToCart(<?= json_encode([
-                      "id" => (int) ($promo["id_menu_item"] ?: $promo["id"]),
-                      "name" => $promo["promo_nombre"],
-                      "price" => $precioPromo,
-                      "restaurant" => $promo["negocio_nombre"],
-                      "businessId" => (int) ($promo["id_negocio"] ?? 0),
-                      "image" => $imgUrl
-                    ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>)'
-                  >Añadir al carrito 🛒</button>
-                </div>
-              </div>
             <?php endforeach; ?>
           <?php endif; ?>
         </div>
       </div>
-
     </section>
   </main>
+
 
   <!-- Componente de modales reutilizable -->
   <div id="overlays">
@@ -115,28 +96,6 @@
 
   <script>
     window.shizenLayoutReady = Promise.resolve();
-    window.DB_PROMOS = <?= json_encode($promociones ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
-
-    document.addEventListener('DOMContentLoaded', function () {
-      var tabs = document.querySelectorAll('#promoFilterTabs .filter-tab');
-      var cards = document.querySelectorAll('#promosGrid .promo-card');
-
-      tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          tabs.forEach(function (t) { t.classList.remove('active'); });
-          tab.classList.add('active');
-
-          var selectedCat = tab.getAttribute('data-cat');
-          cards.forEach(function (card) {
-            if (selectedCat === 'all' || card.getAttribute('data-cat') === selectedCat) {
-              card.style.display = '';
-            } else {
-              card.style.display = 'none';
-            }
-          });
-        });
-      });
-    });
   </script>
   <script src="js/app.js?v=20260930-cart-clear-1"></script>
 </body>

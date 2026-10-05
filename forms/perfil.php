@@ -25,14 +25,16 @@ $defaultAvatar = $avatarFiles ? 'assets/Perfil/' . basename($avatarFiles[0]) : '
 $avatarPerfil = $_SESSION['usuario_avatar'] ?? $defaultAvatar;
 
 $stmtOrders = $pdo->prepare(
-    'SELECT p.id_pedido, p.descripcion, p.estado, p.fecha_creacion, n.nombre AS negocio_nombre,
+    "SELECT p.id_pedido, p.descripcion, p.estado, p.fecha_creacion, n.nombre AS negocio_nombre,
             c.total, e.estado AS entrega_estado
      FROM pedido p
      LEFT JOIN negocios n ON n.id_negocio = p.id_negocio
      LEFT JOIN compra c ON c.id_pedido = p.id_pedido
      LEFT JOIN entrega e ON e.id_compra = c.id_compra
      WHERE p.id_usuario = ?
-     ORDER BY p.fecha_creacion DESC'
+     AND (
+    LOWER(p.estado) IN ('en camino', 'entregado') OR LOWER (COALESCE(e.estado, '')) IN ('en camino', 'entregado'))
+     ORDER BY p.fecha_creacion DESC"
 );
 $stmtOrders->execute([$userId]);
 $orders = $stmtOrders->fetchAll();
@@ -131,9 +133,9 @@ unset($d);
 
         <div class="profile-tabs-wrap">
           <div class="profile-tabs">
-            <button class="profile-tab active" data-section="purchases" type="button" onclick="openUprofileSection('purchases', this)">&#128722; Historial</button>
+            <button class="profile-tab active" data-section="purchases" type="button" onclick="openUprofileSection('purchases', this)">🧾 Facturas</button>
             <button class="profile-tab" data-section="reviews" type="button" onclick="openUprofileSection('reviews', this)">&#11088; Reseñas</button>
-            <button class="profile-tab" data-section="following" type="button" onclick="openUprofileSection('following', this)"><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5C9.5 20 2 16 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2zm-3.566 15.604c.881-.556 1.676-1.109 2.42-1.701C18.335 14.533 20 11.943 20 9c0-2.36-1.537-4-3.5-4-1.076 0-2.24.57-3.086 1.414L12 7.828l-1.414-1.414C9.74 5.57 8.576 5 7.5 5 5.56 5 4 6.656 4 9c0 2.944 1.666 5.533 4.645 7.903.745.592 1.54 1.145 2.421 1.7.299.189.595.37.934.572.339-.202.635-.383.934-.571z"/></svg> Favoritos</button>
+            <button class="profile-tab" data-section="following" type="button" onclick="openUprofileSection('following', this)"><?php include __DIR__ . '/icono_corazon.php'; ?> Favoritos</button>
           </div>
         </div>  
 
@@ -142,13 +144,13 @@ unset($d);
             <?php if ($orders): ?>
               <div class="orders-list" style="display:grid;gap:12px;">
                 <?php foreach ($orders as $order): ?>
-                  <a class="order-card" href="php/pedido.php?id=<?= (int)$order['id_pedido'] ?>" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                  <a class="order-card" href="php/factura.php?id=<?= (int)$order['id_pedido'] ?>" style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:inherit;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
                     <div>
                       <strong style="color:#1b3a1d;display:block;">Pedido #<?= (int)$order['id_pedido'] ?> · <?= htmlspecialchars($order['negocio_nombre'] ?? 'Shizen') ?></strong>
                       <small style="color:#6b7280;"><?= htmlspecialchars($order['descripcion'] ?? '') ?></small>
                     </div>
                     <div style="text-align:right;">
-                      <span style="font-weight:700;color:#16a34a;display:block;"><?= htmlspecialchars($order['entrega_estado'] ?: $order['estado']) ?></span>
+                      <span style="font-weight:700;color:#16a34a;display:block;"><?= htmlspecialchars($order['entrega_estado'] === 'en camino' ? 'Ver factura' : $order['estado']) ?></span>
                       <small style="color:#9ca3af;"><?= htmlspecialchars($order['fecha_creacion'] ?? '') ?></small>
                     </div>
                   </a>
@@ -223,7 +225,7 @@ unset($d);
               <?php endif; ?>
             <?php else: ?>
               <div class="uprofile-empty" id="ufollowingEmpty">
-                <div class="uprofile-empty-icon"><svg class="heart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5C9.5 20 2 16 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2zm-3.566 15.604c.881-.556 1.676-1.109 2.42-1.701C18.335 14.533 20 11.943 20 9c0-2.36-1.537-4-3.5-4-1.076 0-2.24.57-3.086 1.414L12 7.828l-1.414-1.414C9.74 5.57 8.576 5 7.5 5 5.56 5 4 6.656 4 9c0 2.944 1.666 5.533 4.645 7.903.745.592 1.54 1.145 2.421 1.7.299.189.595.37.934.572.339-.202.635-.383.934-.571z"/></svg></div>
+                <div class="uprofile-empty-icon"><?php include __DIR__ . '/icono_corazon.php'; ?></div>
                 <p>Aún no tienes favoritos.</p>
               </div>
             <?php endif; ?>

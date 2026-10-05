@@ -10,8 +10,15 @@ require_once __DIR__ . '/../clases/Plato.php';
 require_once __DIR__ . '/../clases/Categoria.php';
 require_once __DIR__ . '/../funciones/funciones.php';
 
+$categoriaFiltro = isset($_GET['categoria']) ? (int)$_GET['categoria'] : 0;
+
 try {
     $promociones = Plato::obtenerPromocionesActivas();
+    if ($categoriaFiltro > 0) {
+        $promociones = array_values(array_filter($promociones, function ($p) use ($categoriaFiltro) {
+            return (int)($p['id_categoria'] ?? 0) === $categoriaFiltro;
+        }));
+    }
     foreach ($promociones as &$p) {
         $p['imagen_url'] = resolverImagenUrl($p['imagen_url'] ?? '');
     }

@@ -10,12 +10,18 @@ require_once __DIR__ . '/Database.php';
  * ---------------------------------------------------------
  */
 class Plato {
-    /** Obtiene los platos asociados a una categoría */
-    public static function obtenerPorCategoria(int $categoriaId): array {
+    /** Obtiene los platos asociados a una categoría con orden opcional */
+    public static function obtenerPorCategoria(int $categoriaId, string $orden = 'relevance'): array {
         if ($categoriaId <= 0) return [];
 
+        $orderBy = match ($orden) {
+            'low'  => 'COALESCE(NULLIF(m.precio_promocion, 0), m.precio) ASC, m.nombre ASC',
+            'high' => 'COALESCE(NULLIF(m.precio_promocion, 0), m.precio) DESC, m.nombre ASC',
+            default => 'm.nombre ASC'
+        };
+
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare('
+        $stmt = $pdo->prepare("
             SELECT
                 m.id_menu_item AS id,
                 m.nombre        AS plato_nombre,
@@ -26,12 +32,12 @@ class Plato {
                 m.on_promo,
                 m.precio_promocion,
                 n.id_negocio AS negocio_id,
-                COALESCE(n.nombre, \'Restaurante Shizen\') AS negocio_nombre
+                COALESCE(n.nombre, 'Restaurante Shizen') AS negocio_nombre
             FROM menu_items m
             LEFT JOIN negocios n ON m.id_negocio = n.id_negocio
             WHERE m.id_categoria = ?
-            ORDER BY m.nombre
-        ');
+            ORDER BY {$orderBy}
+        ");
         $stmt->execute([$categoriaId]);
         return $stmt->fetchAll();
     }
