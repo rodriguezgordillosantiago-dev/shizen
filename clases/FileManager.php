@@ -8,15 +8,18 @@ declare(strict_types=1);
  * almacenar archivos subidos (PDFs e imágenes).
  * ---------------------------------------------------------
  */
-class FileManager {
+class FileManager
+{
     private string $basePath;
 
-    public function __construct(?string $basePath = null) {
+    public function __construct(?string $basePath = null)
+    {
         $this->basePath = $basePath ?? (__DIR__ . '/..');
     }
 
     /** Valida si el archivo subido es un PDF real */
-    public function esPdfValido(array $archivo): bool {
+    public function esPdfValido(array $archivo): bool
+    {
         if (!isset($archivo['tmp_name']) || !is_uploaded_file($archivo['tmp_name'])) {
             return false;
         }
@@ -30,7 +33,8 @@ class FileManager {
     }
 
     /** Valida si el archivo subido es una imagen real (JPG, PNG, WEBP) */
-    public function esImagenValida(array $archivo): bool {
+    public function esImagenValida(array $archivo): bool
+    {
         if (!isset($archivo['tmp_name']) || !is_uploaded_file($archivo['tmp_name'])) {
             return false;
         }
@@ -40,19 +44,21 @@ class FileManager {
     }
 
     /** Obtiene la extensión recomendada a partir del tipo MIME de la imagen */
-    public function obtenerExtensionImagen(array $archivo): string {
+    public function obtenerExtensionImagen(array $archivo): string
+    {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mime = $finfo->file($archivo['tmp_name']);
         $mapa = [
             'image/jpeg' => 'jpg',
-            'image/png'  => 'png',
+            'image/png' => 'png',
             'image/webp' => 'webp',
         ];
         return $mapa[$mime] ?? 'jpg';
     }
 
     /** Convierte un texto en un slug seguro para nombres de carpetas y archivos */
-    public function nombreSeguro(string $texto): string {
+    public function nombreSeguro(string $texto): string
+    {
         $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto) ?: $texto;
         $texto = strtolower((string) preg_replace('/[^a-zA-Z0-9]+/', '_', $texto));
         return trim($texto, '_') ?: 'archivo';
@@ -86,4 +92,3 @@ class FileManager {
         return trim($carpetaRelativa, '/') . '/' . $idSeguro . '/' . $nombreArchivo;
     }
 }
-

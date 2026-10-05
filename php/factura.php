@@ -26,19 +26,26 @@ require_once __DIR__ . '/../funciones/funciones.php';
 
 // Funciones auxiliares (protegidas por si ya existen en funciones.php)
 if (!function_exists('e')) {
-    function e($t) { return htmlspecialchars((string)$t, ENT_QUOTES, 'UTF-8'); }
+    function e($t)
+    {
+        return htmlspecialchars((string) $t, ENT_QUOTES, 'UTF-8');
+    }
 }
 if (!function_exists('cop')) {
-    function cop($n) { return '$ ' . number_format((float)$n, 0, ',', '.'); }
+    function cop($n)
+    {
+        return '$ ' . number_format((float) $n, 0, ',', '.');
+    }
 }
-function fecha_larga($ts) {
-    $meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function fecha_larga($ts)
+{
+    $meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
     return date('d', $ts) . ' de ' . $meses[date('n', $ts) - 1] . ' de ' . date('Y', $ts);
 }
 
-$pdo      = obtenerConexion();
-$userId   = (int)($_SESSION['id_usuario'] ?? 0);
-$idPedido = (int)($_GET['id'] ?? 0);
+$pdo = obtenerConexion();
+$userId = (int) ($_SESSION['id_usuario'] ?? 0);
+$idPedido = (int) ($_GET['id'] ?? 0);
 
 // ============================================================
 // DATOS DEL PEDIDO (solo si pertenece al usuario con sesión iniciada)
@@ -75,7 +82,7 @@ $platos = $stmt->fetchAll();
 // ============================================================
 $esquema = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $carpeta = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
-$enlace  = $esquema . '://' . $_SERVER['HTTP_HOST'] . $carpeta . '/' . basename($_SERVER['SCRIPT_NAME']) . '?id=' . $idPedido;
+$enlace = $esquema . '://' . $_SERVER['HTTP_HOST'] . $carpeta . '/' . basename($_SERVER['SCRIPT_NAME']) . '?id=' . $idPedido;
 
 $qr = '';
 if (class_exists('\chillerlan\QRCode\QRCode')) {
@@ -88,85 +95,122 @@ if (class_exists('\chillerlan\QRCode\QRCode')) {
 $tsPedido = !empty($orders['fecha_creacion']) ? strtotime($orders['fecha_creacion']) : time();
 
 $f = [
-  'numero'     => $orders['id_compra'] ?? $orders['id_pedido'],
-  'cliente'    => trim(($_SESSION['usuario_nombre'] ?? '') . ' ' . ($_SESSION['usuario_apellido'] ?? '')),
-  'negocio'    => $orders['negocio_nombre'] ?? '',
-  'pedido'     => '#' . $orders['id_pedido'],
-  'repartidor' => !empty($orders['id_repartidor']) ? '#' . $orders['id_repartidor'] : 'No asignado',
-  'hora'       => date('h:i A', $tsPedido),   // OJO: es la hora de creación del pedido (ver nota)
-  'qr'         => $qr,
-  'items'      => $platos,
+    'numero' => $orders['id_compra'] ?? $orders['id_pedido'],
+    'cliente' => trim(($_SESSION['usuario_nombre'] ?? '') . ' ' . ($_SESSION['usuario_apellido'] ?? '')),
+    'negocio' => $orders['negocio_nombre'] ?? '',
+    'pedido' => '#' . $orders['id_pedido'],
+    'repartidor' => !empty($orders['id_repartidor']) ? '#' . $orders['id_repartidor'] : 'No asignado',
+    'hora' => date('h:i A', $tsPedido),   // OJO: es la hora de creación del pedido (ver nota)
+    'qr' => $qr,
+    'items' => $platos,
 ];
 
 $fechaFactura = fecha_larga($tsPedido);   // fecha de la compra
-$hoy          = fecha_larga(time());      // fecha en que se genera/imprime
+$hoy = fecha_larga(time());      // fecha en que se genera/imprime
 
 $total = 0;
-foreach ($f['items'] as $i) { $total += $i['cantidad'] * $i['precio']; }
+foreach ($f['items'] as $i) {
+    $total += $i['cantidad'] * $i['precio'];
+}
 
 $logo = '../assets/logo_negro.png';
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <base href="../">
-  <title>Shizen · Factura de compra <?= e($f['numero']) ?></title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1">
-  <link rel="stylesheet" href="css/modals.css?v=20261003-rating-fix-1">
-  <link rel="stylesheet" href="css/factura.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <base href="../">
+    <title>factura #<?= (int) $order['id_factura'] ?> | Shizen</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1">
+    <link rel="stylesheet" href="css/modals.css?v=20261003-rating-fix-1">
+    <link rel="stylesheet" href="css/orders.css?v=20261003-5steps-1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shizen · Factura de compra <?= e($f['numero']) ?></title>
+    <link rel="stylesheet" href="../css/factura.css">
 </head>
+
 <body>
-  <?php include __DIR__ . '/../forms/navegacion.php'; ?>
-<div class="factura-nav no-print">
-  <?php include __DIR__ . '/../forms/boton_volver.php'; ?>
-  <button class="btn-print" type="button" onclick="window.print()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-    Imprimir / Guardar PDF
-  </button>
-</div>
-<main class="page">
-  <img id="marca" src="<?= e($logo) ?>" alt="">
-  <header>
-    <img src="<?= e($logo) ?>" alt="Shizen Food">
-    <div class="meta">
-      <h1>Factura de compra</h1>
-      <p>N.º <?= e($f['numero']) ?></p>
-      <p>Fecha: <?= e($fechaFactura) ?></p>
-      <p>Bogotá, D.C., Colombia</p>
+    <?php include __DIR__ . '/../forms/navegacion.php'; ?>
+    <div class="factura-nav no-print">
+        <?php include __DIR__ . '/../forms/boton_volver.php'; ?>
+        <button class="btn-print" type="button" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Imprimir / Guardar PDF
+        </button>
     </div>
-  </header>
+    <main class="page">
+        <img id="marca" src="<?= e($logo) ?>" alt="">
+        <header>
+            <img src="<?= e($logo) ?>" alt="Shizen Food">
+            <div class="meta">
+                <h1>Factura de compra</h1>
+                <p>N.º <?= e($f['numero']) ?></p>
+                <p>Fecha: <?= e($fechaFactura) ?></p>
+                <p>Bogotá, D.C., Colombia</p>
+            </div>
+        </header>
 
-  <section class="info">
-    <div><label>Cliente</label><div><?= e($f['cliente']) ?></div></div>
-    <div><label>Negocio</label><div><?= e($f['negocio']) ?></div></div>
-    <div><label>N.º de pedido</label><div><?= e($f['pedido']) ?></div></div>
-    <div><label>ID del repartidor</label><div><?= e($f['repartidor']) ?></div></div>
-    <div><label>Hora de entrega</label><div><?= e($f['hora']) ?></div></div>
-  </section>
+        <section class="info">
+            <div><label>Cliente</label>
+                <div><?= e($f['cliente']) ?></div>
+            </div>
+            <div><label>Negocio</label>
+                <div><?= e($f['negocio']) ?></div>
+            </div>
+            <div><label>N.º de pedido</label>
+                <div><?= e($f['pedido']) ?></div>
+            </div>
+            <div><label>ID del repartidor</label>
+                <div><?= e($f['repartidor']) ?></div>
+            </div>
+            <div><label>Hora de entrega</label>
+                <div><?= e($f['hora']) ?></div>
+            </div>
+        </section>
 
-  <table>
-    <thead><tr><th>Plato</th><th class="r q">Cant.</th><th class="r m">Precio unit.</th><th class="r m">Subtotal</th></tr></thead>
-    <tbody>
-    <?php foreach ($f['items'] as $i): ?>
-      <tr>
-        <td><?= e($i['plato']) ?></td>
-        <td class="r q"><?= (int)$i['cantidad'] ?></td>
-        <td class="r m"><?= cop($i['precio']) ?></td>
-        <td class="r m"><?= cop($i['cantidad'] * $i['precio']) ?></td>
-      </tr>
-    <?php endforeach; ?>
-    </tbody>
-    <tfoot><tr><td colspan="3" class="r">Total (COP)</td><td class="r"><?= cop($total) ?></td></tr></tfoot>
-  </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Plato</th>
+                    <th class="r q">Cant.</th>
+                    <th class="r m">Precio unit.</th>
+                    <th class="r m">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($f['items'] as $i): ?>
+                    <tr>
+                        <td><?= e($i['plato']) ?></td>
+                        <td class="r q"><?= (int) $i['cantidad'] ?></td>
+                        <td class="r m"><?= cop($i['precio']) ?></td>
+                        <td class="r m"><?= cop($i['cantidad'] * $i['precio']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="r">Total (COP)</td>
+                    <td class="r"><?= cop($total) ?></td>
+                </tr>
+            </tfoot>
+        </table>
 
-  <div id="qr"><?php if ($f['qr']): ?><img src="<?= e($f['qr']) ?>" alt="QR"><?php endif; ?></div>
+        <div id="qr"><?php if ($f['qr']): ?><img src="<?= e($f['qr']) ?>" alt="QR"><?php endif; ?></div>
 
-  <footer>
-    <span>Shizen Food · Bogotá, Colombia</span>
-    <span>Generado el <?= e($hoy) ?></span>
-  </footer>
-</main>
+        <footer>
+            <span>Shizen Food · Bogotá, Colombia</span>
+            <span>Generado el <?= e($hoy) ?></span>
+        </footer>
+    </main>
 </body>
+
 </html>

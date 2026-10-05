@@ -8,12 +8,14 @@ declare(strict_types=1);
  * con interfaz encadenable (Fluent Interface).
  * ---------------------------------------------------------
  */
-class Validador {
+class Validador
+{
     private array $datos;
     private array $errores = [];
     private array $datosLimpios = [];
 
-    public function __construct(array $datos) {
+    public function __construct(array $datos)
+    {
         $this->datos = $datos;
         foreach ($datos as $clave => $valor) {
             if (is_string($valor)) {
@@ -25,7 +27,8 @@ class Validador {
     }
 
     /** Valida que uno o más campos no estén vacíos */
-    public function requerido(string ...$campos): self {
+    public function requerido(string ...$campos): self
+    {
         foreach ($campos as $campo) {
             $valor = $this->datos[$campo] ?? '';
             if (is_string($valor) ? trim($valor) === '' : empty($valor)) {
@@ -36,8 +39,9 @@ class Validador {
     }
 
     /** Valida formato de correo electrónico */
-    public function email(string $campo, string $mensaje = 'Ingresa un correo electrónico válido.'): self {
-        $valor = trim((string)($this->datos[$campo] ?? ''));
+    public function email(string $campo, string $mensaje = 'Ingresa un correo electrónico válido.'): self
+    {
+        $valor = trim((string) ($this->datos[$campo] ?? ''));
         if ($valor !== '' && !filter_var($valor, FILTER_VALIDATE_EMAIL)) {
             $this->errores[$campo] = $mensaje;
         }
@@ -45,8 +49,9 @@ class Validador {
     }
 
     /** Valida longitud mínima */
-    public function longitudMinima(string $campo, int $min, ?string $mensaje = null): self {
-        $valor = (string)($this->datos[$campo] ?? '');
+    public function longitudMinima(string $campo, int $min, ?string $mensaje = null): self
+    {
+        $valor = (string) ($this->datos[$campo] ?? '');
         if (strlen($valor) < $min) {
             $this->errores[$campo] = $mensaje ?? "Debe tener al menos {$min} caracteres.";
         }
@@ -54,9 +59,10 @@ class Validador {
     }
 
     /** Valida que dos campos sean idénticos (ej. contraseñas) */
-    public function coinciden(string $campo1, string $campo2, string $mensaje = 'Las contraseñas no coinciden.'): self {
-        $val1 = (string)($this->datos[$campo1] ?? '');
-        $val2 = (string)($this->datos[$campo2] ?? '');
+    public function coinciden(string $campo1, string $campo2, string $mensaje = 'Las contraseñas no coinciden.'): self
+    {
+        $val1 = (string) ($this->datos[$campo1] ?? '');
+        $val2 = (string) ($this->datos[$campo2] ?? '');
         if ($val1 !== $val2) {
             $this->errores[$campo2] = $mensaje;
         }
@@ -64,8 +70,9 @@ class Validador {
     }
 
     /** Valida formato de texto con patrón regex */
-    public function patron(string $campo, string $regex, string $mensaje): self {
-        $valor = trim((string)($this->datos[$campo] ?? ''));
+    public function patron(string $campo, string $regex, string $mensaje): self
+    {
+        $valor = trim((string) ($this->datos[$campo] ?? ''));
         if ($valor !== '' && !preg_match($regex, $valor)) {
             $this->errores[$campo] = $mensaje;
         }
@@ -73,8 +80,9 @@ class Validador {
     }
 
     /** Valida que el valor esté dentro de un arreglo de opciones permitidas */
-    public function enLista(string $campo, array $permitidos, string $mensaje = 'Selecciona una opción válida.'): self {
-        $valor = (string)($this->datos[$campo] ?? '');
+    public function enLista(string $campo, array $permitidos, string $mensaje = 'Selecciona una opción válida.'): self
+    {
+        $valor = (string) ($this->datos[$campo] ?? '');
         if (!in_array($valor, $permitidos, true)) {
             $this->errores[$campo] = $mensaje;
         }
@@ -82,29 +90,33 @@ class Validador {
     }
 
     /** Agrega un error personalizado */
-    public function agregarError(string $campo, string $mensaje): self {
+    public function agregarError(string $campo, string $mensaje): self
+    {
         $this->errores[$campo] = $mensaje;
         return $this;
     }
 
     /** Indica si no hay errores */
-    public function esValido(): bool {
+    public function esValido(): bool
+    {
         return empty($this->errores);
     }
 
     /** Devuelve la lista de errores */
-    public function obtenerErrores(): array {
+    public function obtenerErrores(): array
+    {
         return array_values($this->errores);
     }
 
     /** Devuelve el valor limpio y sanitizado de un campo */
-    public function obtener(string $campo, mixed $porDefecto = null): mixed {
+    public function obtener(string $campo, mixed $porDefecto = null): mixed
+    {
         return $this->datosLimpios[$campo] ?? $porDefecto;
     }
 
     /** Devuelve todos los datos sanitizados */
-    public function obtenerTodos(): array {
+    public function obtenerTodos(): array
+    {
         return $this->datosLimpios;
     }
 }
-

@@ -29,9 +29,9 @@ function mostrarErrorLogin(string $redirect = ''): void
     exit;
 }
 
-$email    = limpiarTexto($_POST['email']    ?? '');
-$password = (string)($_POST['password']    ?? '');
-$redirect = (string)($_POST['redirect'] ?? '');
+$email = limpiarTexto($_POST['email'] ?? '');
+$password = (string) ($_POST['password'] ?? '');
+$redirect = (string) ($_POST['redirect'] ?? '');
 $redirect = preg_match('#^(?:(?:php|forms)/)?[A-Za-z0-9_-]+\.php(?:\?[A-Za-z0-9_=&%-]*)?$#', $redirect) ? $redirect : '';
 
 $emailValido = filter_var($email, FILTER_VALIDATE_EMAIL) !== false;

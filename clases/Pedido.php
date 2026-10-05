@@ -10,7 +10,8 @@ require_once __DIR__ . '/Database.php';
  * de compra con control transaccional y validación de stock.
  * ---------------------------------------------------------
  */
-class Pedido {
+class Pedido
+{
     /**
      * Procesa y registra un pedido completo en la base de datos
      */
@@ -28,7 +29,7 @@ class Pedido {
 
         try {
             $productIds = array_values(array_unique(array_map(
-                static fn($item): int => (int)($item['id'] ?? 0),
+                static fn($item): int => (int) ($item['id'] ?? 0),
                 $items
             )));
             $productIds = array_values(array_filter($productIds, static fn(int $id): bool => $id > 0));
@@ -42,7 +43,7 @@ class Pedido {
             $stmt->execute($productIds);
             $products = [];
             foreach ($stmt->fetchAll() as $product) {
-                $products[(int)$product['id_menu_item']] = $product;
+                $products[(int) $product['id_menu_item']] = $product;
             }
 
             $total = 0;
@@ -51,25 +52,25 @@ class Pedido {
             $descripcionItems = [];
 
             foreach ($items as $item) {
-                $id = (int)($item['id'] ?? 0);
-                $quantity = (int)($item['quantity'] ?? 0);
+                $id = (int) ($item['id'] ?? 0);
+                $quantity = (int) ($item['quantity'] ?? 0);
 
                 if (!isset($products[$id]) || $quantity < 1 || $quantity > 99) {
                     throw new RuntimeException('Un producto del carrito ya no está disponible.');
                 }
-                if ($products[$id]['stock'] !== null && $quantity > (int)$products[$id]['stock']) {
+                if ($products[$id]['stock'] !== null && $quantity > (int) $products[$id]['stock']) {
                     throw new RuntimeException("No hay stock suficiente para el producto '{$products[$id]['nombre']}'.");
                 }
 
-                $negocioId = (int)($products[$id]['id_negocio'] ?? 1);
-                $price = (int)$products[$id]['precio'];
+                $negocioId = (int) ($products[$id]['id_negocio'] ?? 1);
+                $price = (int) $products[$id]['precio'];
                 $subtotal = $price * $quantity;
                 $total += $subtotal;
                 $descripcionItems[] = "{$quantity}x {$products[$id]['nombre']}";
                 $detalles[] = [
                     'id_menu_item' => $id,
-                    'valor'        => $price,
-                    'cantidad'     => $quantity,
+                    'valor' => $price,
+                    'cantidad' => $quantity,
                 ];
             }
 
@@ -79,7 +80,7 @@ class Pedido {
                 $stmtUser->execute([trim($datosCliente['correo'])]);
                 $foundUser = $stmtUser->fetch();
                 if ($foundUser) {
-                    $idUsuario = (int)$foundUser['id_usuario'];
+                    $idUsuario = (int) $foundUser['id_usuario'];
                 }
             }
 
@@ -105,7 +106,7 @@ class Pedido {
                 'Pendiente'
             ]);
 
-            $pedidoId = (int)$pdo->lastInsertId();
+            $pedidoId = (int) $pdo->lastInsertId();
 
             // 2. Insertar en tabla `detalle_pedido` y descontar stock
             $detailStmt = $pdo->prepare('
@@ -150,7 +151,7 @@ class Pedido {
                 $tokenTransaccion
             ]);
 
-            $compraId = (int)$pdo->lastInsertId();
+            $compraId = (int) $pdo->lastInsertId();
             $stmtEntrega = $pdo->prepare('
                 INSERT INTO entrega (id_compra, estado, fecha_asignacion, codigo_entrega)
                 VALUES (?, ?, NOW(), ?)

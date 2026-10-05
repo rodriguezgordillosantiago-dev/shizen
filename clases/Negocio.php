@@ -10,7 +10,8 @@ require_once __DIR__ . '/Usuario.php';
  * y gestiona los datos comerciales y documentos legales.
  * ---------------------------------------------------------
  */
-class Negocio extends Usuario {
+class Negocio extends Usuario
+{
     private string $cedula;
     private string $horaApertura;
     private string $horaCierre;
@@ -60,7 +61,8 @@ class Negocio extends Usuario {
     }
 
     /** Registra la cuenta de usuario y el registro de negocio en una sola transacción */
-    public function registrarNegocio(): int {
+    public function registrarNegocio(): int
+    {
         $pdo = Database::getConnection();
         $pdo->beginTransaction();
 
@@ -83,21 +85,21 @@ class Negocio extends Usuario {
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                ':id_usuario'                            => $idUsuario,
-                ':gmail_negocio'                         => $this->email,
-                ':nombre'                                => $this->nombre,
-                ':direccion'                             => $this->direccion,
-                ':cedula'                                => $this->cedula,
-                ':hora_apertura'                         => $this->horaApertura,
-                ':hora_cierre'                           => $this->horaCierre,
-                ':logo_url'                              => $this->logoUrl,
-                ':rut_url'                               => $this->rutUrl,
+                ':id_usuario' => $idUsuario,
+                ':gmail_negocio' => $this->email,
+                ':nombre' => $this->nombre,
+                ':direccion' => $this->direccion,
+                ':cedula' => $this->cedula,
+                ':hora_apertura' => $this->horaApertura,
+                ':hora_cierre' => $this->horaCierre,
+                ':logo_url' => $this->logoUrl,
+                ':rut_url' => $this->rutUrl,
                 ':documento_identidad_representante_url' => $this->documentoIdentidadUrl,
-                ':certificado_bancario_url'              => $this->certificadoBancarioUrl,
-                ':certificado_camara_comercio_url'       => $this->certificadoCamaraUrl,
+                ':certificado_bancario_url' => $this->certificadoBancarioUrl,
+                ':certificado_camara_comercio_url' => $this->certificadoCamaraUrl,
             ]);
 
-            $idNegocio = (int)$pdo->lastInsertId();
+            $idNegocio = (int) $pdo->lastInsertId();
             $pdo->commit();
             return $idNegocio;
 
@@ -110,4 +112,3 @@ class Negocio extends Usuario {
         }
     }
 }
-

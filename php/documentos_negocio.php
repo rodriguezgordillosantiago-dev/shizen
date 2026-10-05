@@ -15,13 +15,13 @@ if (!$registro) {
 
 $errores = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (empty($_POST) && empty($_FILES) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
+    if (empty($_POST) && empty($_FILES) && isset($_SERVER['CONTENT_LENGTH']) && (int) $_SERVER['CONTENT_LENGTH'] > 0) {
         $maxPost = ini_get('post_max_size') ?: '64M';
         $errores[] = "Los archivos superan el tamaño máximo permitido por el servidor ({$maxPost}). Por favor sube archivos más livianos.";
     } else {
         $validador = new Validador($_POST);
         $validador->requerido('cedula')
-                  ->patron('cedula', '/^[0-9]{6,12}$/', 'La cédula debe tener entre 6 y 12 dígitos.');
+            ->patron('cedula', '/^[0-9]{6,12}$/', 'La cédula debe tener entre 6 y 12 dígitos.');
 
         $fileManager = new FileManager();
 
@@ -49,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($validador->esValido()) {
             try {
-                $cedula = (string)$validador->obtener('cedula');
-                $nombreNegocio = (string)($registro['nombre'] ?? $registro['nombre_negocio'] ?? 'negocio');
+                $cedula = (string) $validador->obtener('cedula');
+                $nombreNegocio = (string) ($registro['nombre'] ?? $registro['nombre_negocio'] ?? 'negocio');
                 $identificador = $nombreNegocio . '_' . $cedula;
 
                 $rutUrl = $fileManager->guardar($_FILES['rut'], 'legales/negocio', 'rut', $identificador, 'pdf');
@@ -66,12 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $negocio = new Negocio(
                     nombreNegocio: $nombreNegocio,
-                    email: (string)$registro['email'],
-                    password: (string)$registro['password'],
-                    direccion: (string)$registro['direccion'],
+                    email: (string) $registro['email'],
+                    password: (string) $registro['password'],
+                    direccion: (string) $registro['direccion'],
                     cedula: $cedula,
-                    horaApertura: (string)($registro['horaApertura'] ?? '08:00'),
-                    horaCierre: (string)($registro['horaCierre'] ?? '20:00')
+                    horaApertura: (string) ($registro['horaApertura'] ?? '08:00'),
+                    horaCierre: (string) ($registro['horaCierre'] ?? '20:00')
                 );
 
                 $negocio->setDocumentos(
@@ -98,8 +98,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Documentos del negocio | Shizen</title><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/registro_base.css"><link rel="stylesheet" href="../css/registro_negocio.css"><style>.view { display: block; }</style></head><body><main>
-<?php if ($errores): ?><p class="form-server-error"><?= htmlspecialchars(implode(' ', $errores), ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
-<?php readfile(__DIR__ . '/../forms/documentos_negocio.html'); ?>
-</main></body></html>
- 
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos del negocio | Shizen</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/registro_base.css">
+    <link rel="stylesheet" href="../css/registro_negocio.css">
+    <style>
+        .view {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <?php if ($errores): ?>
+            <p class="form-server-error">
+                <?= htmlspecialchars(implode(' ', $errores), ENT_QUOTES, 'UTF-8') ?>
+            </p><?php endif; ?>
+        <?php readfile(__DIR__ . '/../forms/documentos_negocio.html'); ?>
+    </main>
+</body>
+
+</html>

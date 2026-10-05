@@ -10,7 +10,8 @@ require_once __DIR__ . '/Database.php';
  * registro, verificación de credenciales y consultas.
  * ---------------------------------------------------------
  */
-class Usuario {
+class Usuario
+{
     protected ?int $id = null;
     protected string $nombre;
     protected string $apellido;
@@ -42,28 +43,30 @@ class Usuario {
     }
 
     /** Registra un nuevo usuario en la base de datos y retorna su ID */
-    public function registrar(?PDO $conexion = null): int {
+    public function registrar(?PDO $conexion = null): int
+    {
         $pdo = $conexion ?? Database::getConnection();
         $sql = 'INSERT INTO usuario (nombre, apellido, email, password_hash, rol, direccion, localidad)
                 VALUES (:nombre, :apellido, :email, :password_hash, :rol, :direccion, :localidad)';
-        
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':nombre'        => $this->nombre,
-            ':apellido'      => $this->apellido,
-            ':email'         => $this->email,
+            ':nombre' => $this->nombre,
+            ':apellido' => $this->apellido,
+            ':email' => $this->email,
             ':password_hash' => password_hash($this->password, PASSWORD_DEFAULT),
-            ':rol'           => $this->rol,
-            ':direccion'     => $this->direccion,
-            ':localidad'      => $this->localidad,
+            ':rol' => $this->rol,
+            ':direccion' => $this->direccion,
+            ':localidad' => $this->localidad,
         ]);
 
-        $this->id = (int)$pdo->lastInsertId();
+        $this->id = (int) $pdo->lastInsertId();
         return $this->id;
     }
 
     /** Autentica credenciales de usuario para inicio de sesión */
-    public static function autenticar(string $email, string $password): ?array {
+    public static function autenticar(string $email, string $password): ?array
+    {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare('SELECT * FROM usuario WHERE email = ?');
         $stmt->execute([$email]);
@@ -76,7 +79,8 @@ class Usuario {
         return null;
     }
 
-    public static function negocio(int $userId): ?array {
+    public static function negocio(int $userId): ?array
+    {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare(
             'SELECT id_negocio, nombre
@@ -95,17 +99,33 @@ class Usuario {
     }
 
     /** Comprueba si un correo ya se encuentra registrado */
-    public static function emailExiste(string $email): bool {
+    public static function emailExiste(string $email): bool
+    {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare('SELECT 1 FROM usuario WHERE email = ?');
         $stmt->execute([$email]);
-        return (bool)$stmt->fetch();
+        return (bool) $stmt->fetch();
     }
 
     /** Getters */
-    public function getId(): ?int { return $this->id; }
-    public function getNombre(): string { return $this->nombre; }
-    public function getApellido(): string { return $this->apellido; }
-    public function getEmail(): string { return $this->email; }
-    public function getRol(): string { return $this->rol; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+    public function getNombre(): string
+    {
+        return $this->nombre;
+    }
+    public function getApellido(): string
+    {
+        return $this->apellido;
+    }
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+    public function getRol(): string
+    {
+        return $this->rol;
+    }
 }

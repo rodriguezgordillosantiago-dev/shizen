@@ -9,13 +9,16 @@ require_once __DIR__ . '/Database.php';
  * Modelo de Plato / Producto del menú y promociones.
  * ---------------------------------------------------------
  */
-class Plato {
+class Plato
+{
     /** Obtiene los platos asociados a una categoría con orden opcional */
-    public static function obtenerPorCategoria(int $categoriaId, string $orden = 'relevance'): array {
-        if ($categoriaId <= 0) return [];
+    public static function obtenerPorCategoria(int $categoriaId, string $orden = 'relevance'): array
+    {
+        if ($categoriaId <= 0)
+            return [];
 
         $orderBy = match ($orden) {
-            'low'  => 'COALESCE(NULLIF(m.precio_promocion, 0), m.precio) ASC, m.nombre ASC',
+            'low' => 'COALESCE(NULLIF(m.precio_promocion, 0), m.precio) ASC, m.nombre ASC',
             'high' => 'COALESCE(NULLIF(m.precio_promocion, 0), m.precio) DESC, m.nombre ASC',
             default => 'm.nombre ASC'
         };
@@ -43,7 +46,8 @@ class Plato {
     }
 
     /** Obtiene todas las promociones activas desde la tabla promociones */
-    public static function obtenerPromocionesActivas(): array {
+    public static function obtenerPromocionesActivas(): array
+    {
         $pdo = Database::getConnection();
         $stmt = $pdo->query('
             SELECT 

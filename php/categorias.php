@@ -14,7 +14,7 @@ require_once __DIR__ . '/../clases/Plato.php';
 require_once __DIR__ . '/../funciones/funciones.php';
 
 $rawCategoria = $_GET['categoria'] ?? '';
-$orden = trim((string)($_GET['orden'] ?? 'relevance'));
+$orden = trim((string) ($_GET['orden'] ?? 'relevance'));
 if (!in_array($orden, ['relevance', 'low', 'high'], true)) {
     $orden = 'relevance';
 }
@@ -23,7 +23,7 @@ $platos = [];
 
 try {
     $categoria = Categoria::buscar($rawCategoria);
-    $categoriaId = (int)($categoria['id'] ?? 0);
+    $categoriaId = (int) ($categoria['id'] ?? 0);
 
     if ($categoriaId > 0) {
         $platos = Plato::obtenerPorCategoria($categoriaId, $orden);

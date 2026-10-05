@@ -19,7 +19,7 @@ $errores = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validador = new Validador($_POST);
     $validador->requerido('cedula')
-              ->patron('cedula', '/^[0-9]{6,12}$/', 'La cédula debe tener entre 6 y 12 dígitos.');
+        ->patron('cedula', '/^[0-9]{6,12}$/', 'La cédula debe tener entre 6 y 12 dígitos.');
 
     $fileManager = new FileManager();
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($validador->esValido()) {
         try {
-            $cedula = (string)$validador->obtener('cedula');
+            $cedula = (string) $validador->obtener('cedula');
             $identificador = ($registro['nombre'] ?? 'repartidor') . '_' . ($registro['apellido'] ?? '') . '_' . $cedula;
 
             $cedulaUrl = $fileManager->guardar($_FILES['documento_cedula'], 'legales/repartidor', 'cedula', $identificador, 'pdf');
@@ -54,12 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fotoUrl = $fileManager->guardar($foto, 'legales/repartidor', 'foto_repartidor', $identificador, $extFoto);
 
             $repartidor = new Repartidor(
-                nombre: (string)$registro['nombre'],
-                apellido: (string)$registro['apellido'],
-                email: (string)$registro['email'],
-                password: (string)$registro['password'],
-                vehiculo: (string)$registro['vehiculo'],
-                direccion: (string)$registro['direccion'],
+                nombre: (string) $registro['nombre'],
+                apellido: (string) $registro['apellido'],
+                email: (string) $registro['email'],
+                password: (string) $registro['password'],
+                vehiculo: (string) $registro['vehiculo'],
+                direccion: (string) $registro['direccion'],
                 cedula: $cedula
             );
 
@@ -86,8 +86,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Documentos del repartidor | Shizen</title><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/registro_base.css"></head><body><main>
-<?php if ($errores): ?><p class="form-server-error"><?= htmlspecialchars(implode(' ', $errores), ENT_QUOTES, 'UTF-8') ?></p><?php endif; ?>
-<?php require __DIR__ . '/../forms/documentos_repartidor.php'; ?>
-</main></body></html>
- 
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos del repartidor | Shizen</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/registro_base.css">
+</head>
+
+<body>
+    <main>
+        <?php if ($errores): ?>
+            <p class="form-server-error">
+                <?= htmlspecialchars(implode(' ', $errores), ENT_QUOTES, 'UTF-8') ?>
+            </p><?php endif; ?>
+        <?php require __DIR__ . '/../forms/documentos_repartidor.php'; ?>
+    </main>
+</body>
+
+</html>

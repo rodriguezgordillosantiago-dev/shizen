@@ -10,7 +10,8 @@ require_once __DIR__ . '/Usuario.php';
  * y gestiona los datos de vehículo y documentos de transporte.
  * ---------------------------------------------------------
  */
-class Repartidor extends Usuario {
+class Repartidor extends Usuario
+{
     private string $cedula;
     private string $vehiculo;
     private ?string $fotoUrl = null;
@@ -42,7 +43,8 @@ class Repartidor extends Usuario {
     }
 
     /** Indica si el vehículo requiere documentos de motorizado (Moto o Carro) */
-    public function esMotorizado(): bool {
+    public function esMotorizado(): bool
+    {
         return in_array($this->vehiculo, ['Moto', 'Carro'], true);
     }
 
@@ -63,7 +65,8 @@ class Repartidor extends Usuario {
     }
 
     /** Registra la cuenta de usuario y el registro de repartidor en una sola transacción */
-    public function registrarRepartidor(): int {
+    public function registrarRepartidor(): int
+    {
         $pdo = Database::getConnection();
         $pdo->beginTransaction();
 
@@ -84,21 +87,21 @@ class Repartidor extends Usuario {
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
-                ':id_usuario'              => $idUsuario,
-                ':nombre'                  => $this->nombre,
-                ':apellido'                => $this->apellido,
-                ':email_repartidor'        => $this->email,
-                ':direccion'               => $this->direccion,
-                ':cedula'                  => $this->cedula,
-                ':vehiculo'                => $this->vehiculo,
-                ':foto_url'                => $this->fotoUrl,
-                ':cedula_documento_url'    => $this->cedulaDocumentoUrl,
+                ':id_usuario' => $idUsuario,
+                ':nombre' => $this->nombre,
+                ':apellido' => $this->apellido,
+                ':email_repartidor' => $this->email,
+                ':direccion' => $this->direccion,
+                ':cedula' => $this->cedula,
+                ':vehiculo' => $this->vehiculo,
+                ':foto_url' => $this->fotoUrl,
+                ':cedula_documento_url' => $this->cedulaDocumentoUrl,
                 ':licencia_conduccion_url' => $this->licenciaConduccionUrl,
-                ':soat_url'                => $this->soatUrl,
-                ':tarjeta_propiedad_url'   => $this->tarjetaPropiedadUrl,
+                ':soat_url' => $this->soatUrl,
+                ':tarjeta_propiedad_url' => $this->tarjetaPropiedadUrl,
             ]);
 
-            $idRepartidor = (int)$pdo->lastInsertId();
+            $idRepartidor = (int) $pdo->lastInsertId();
             $pdo->commit();
             return $idRepartidor;
 
@@ -111,4 +114,3 @@ class Repartidor extends Usuario {
         }
     }
 }
-
