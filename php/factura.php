@@ -108,12 +108,17 @@ $logo = '../assets/logo_negro.png';
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shizen · Factura de compra <?= e($f['numero']) ?></title>
-<link rel="stylesheet" href="../css/factura.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="../">
+  <title>Shizen · Factura de compra <?= e($f['numero']) ?></title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1">
+  <link rel="stylesheet" href="css/modals.css?v=20261003-rating-fix-1">
+  <link rel="stylesheet" href="css/factura.css">
 </head>
 <body>
+  <?php include __DIR__ . '/../forms/navegacion.php'; ?>
 <div class="factura-nav no-print">
   <?php include __DIR__ . '/../forms/boton_volver.php'; ?>
   <button class="btn-print" type="button" onclick="window.print()">
