@@ -25,5 +25,5 @@ $pdo->prepare(
      VALUES (?,?,?,?,?)
      ON DUPLICATE KEY UPDATE comentario=VALUES(comentario),fecha=VALUES(fecha),puntuacion=VALUES(puntuacion)'
 )->execute([(int) $businessId, (int) $_SESSION['id_usuario'], $comment ?: null, date('Y-m-d H:i:s'), $score]);
-header('Location: pedido.php?id=' . $id);
+header('Location: pedido.php?id=' . $id . '#close');
 exit;

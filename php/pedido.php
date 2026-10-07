@@ -152,10 +152,16 @@ if ($courierPhoto === '') {
     <div class="rating-prompt-box">
       <div class="rating-prompt-info">
         <h3>⭐ Califica tu experiencia</h3>
-        <p>Tu opinión es muy importante para nosotros. Califica el pedido de <strong><?= htmlspecialchars((string)($order['negocio_nombre'] ?? 'Shizen')) ?></strong> y la entrega de <strong><?= htmlspecialchars($courierName) ?></strong>.</p>
+        <?php if ($businessRated && !$courierRated): ?>
+          <p>Ya calificaste al negocio. Puedes calificar también la entrega de <strong><?= htmlspecialchars($courierName) ?></strong>.</p>
+        <?php elseif (!$businessRated && $courierRated): ?>
+          <p>Ya calificaste al repartidor. Puedes calificar también el pedido de <strong><?= htmlspecialchars((string)($order['negocio_nombre'] ?? 'Shizen')) ?></strong>.</p>
+        <?php else: ?>
+          <p>Tu opinión es muy importante para nosotros. Califica el pedido de <strong><?= htmlspecialchars((string)($order['negocio_nombre'] ?? 'Shizen')) ?></strong> y la entrega de <strong><?= htmlspecialchars($courierName) ?></strong>.</p>
+        <?php endif; ?>
       </div>
-      <a href="#ratingModal" class="btn-launch-rating">
-        ★ Calificar pedido
+      <a href="php/pedido.php?id=<?= (int)$order['id_pedido'] ?>#ratingModal" class="btn-launch-rating">
+        ★ <?= ($businessRated || $courierRated) ? 'Completar calificación' : 'Calificar pedido' ?>
       </a>
     </div>
   <?php else: ?>
@@ -169,5 +175,40 @@ if ($courierPhoto === '') {
 
 <div id="overlays"><?php include __DIR__ . '/../forms/modales.php'; ?></div>
 <script src="js/app.js?v=20261003-rating-2"></script>
+<script>
+  // Si el modal se cerró o ya se calificó todo, limpiar el hash #ratingModal para que no reabra
+  if (window.location.hash === '#close' || (<?= json_encode($businessRated && $courierRated) ?> && window.location.hash === '#ratingModal')) {
+    if (window.history.replaceState) {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }
+</script>
+<?php if (isset($_GET['calificado'])): ?>
+<script>
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      icon: 'success',
+      title: '¡Muchas gracias!',
+      text: 'Tu calificación ha sido registrada.',
+      timer: 2500,
+      showConfirmButton: false
+    });
+  }
+  if (window.history.replaceState) {
+    var cleanSearch = window.location.search.replace(/([?&])calificado=1(&|$)/, '$1').replace(/[?&]$/, '');
+    window.history.replaceState(null, '', window.location.pathname + cleanSearch);
+  }
+</script>
+<?php elseif (isset($_GET['error_calif'])): ?>
+<script>
+  if (typeof Swal !== 'undefined') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Atención',
+      text: <?= json_encode((string)$_GET['error_calif']) ?>
+    });
+  }
+</script>
+<?php endif; ?>
 </body></html>
 

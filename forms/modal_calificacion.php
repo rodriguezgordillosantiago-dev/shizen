@@ -4,6 +4,9 @@
  * Funciona con 100% HTML y CSS puro (inputs radio + SVG y selectores CSS :checked).
  */
 $modalOrderId = (int)($order['id_pedido'] ?? 0);
+if ($modalOrderId <= 0) {
+    return;
+}
 $modalBizName = (string)($order['negocio_nombre'] ?? 'Negocio');
 $modalBizLogo = (string)($businessLogo ?? 'assets/logo_negocio.png');
 $modalBizInit = mb_strtoupper(mb_substr(trim($modalBizName) ?: 'S', 0, 1));
@@ -12,13 +15,24 @@ $modalRepName = (string)($courierName ?? 'Repartidor');
 $modalRepFoto = (string)($courierPhoto ?? 'assets/logo-repartidor.png');
 $modalRepInit = mb_strtoupper(mb_substr(trim($modalRepName) ?: 'R', 0, 1));
 $modalCsrf    = htmlspecialchars((string)($_SESSION['csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8');
-?>
+$bothRated    = !empty($businessRated) && !empty($courierRated);
+if ($bothRated): ?>
+<div class="modal-overlay rating-modal-overlay" id="ratingModal" role="dialog" aria-modal="true" aria-labelledby="ratingModalTitle">
+  <div class="modal rating-modal" style="text-align:center;padding:32px 24px;max-width:420px;">
+    <a href="php/pedido.php?id=<?= $modalOrderId ?>#close" onclick="window.location.hash='close';return false;" class="close-btn" aria-label="Cerrar">✕</a>
+    <div style="font-size:42px;margin-bottom:10px;">⭐</div>
+    <h2 id="ratingModalTitle" style="font-size:20px;font-weight:800;color:#1b3a1d;margin-bottom:8px;">¡Calificación registrada!</h2>
+    <p style="color:#6b7280;font-size:14px;line-height:1.5;margin-bottom:24px;">Ya calificaste el negocio y el repartidor de este pedido. ¡Muchas gracias por tu valoración!</p>
+    <a href="php/pedido.php?id=<?= $modalOrderId ?>#close" onclick="window.location.hash='close';return false;" class="btn btn-primary" style="display:inline-block;text-decoration:none;padding:10px 28px;border-radius:999px;">Cerrar</a>
+  </div>
+</div>
+<?php return; endif; ?>
 <div class="modal-overlay rating-modal-overlay" id="ratingModal" role="dialog" aria-modal="true" aria-labelledby="ratingModalTitle">
   <form class="modal rating-modal" method="post" action="php/calificar_pedido.php">
 
     <!-- Hero -->
     <div class="modal-hero">
-      <a href="#close" class="close-btn" aria-label="Cerrar">✕</a>
+      <a href="php/pedido.php?id=<?= $modalOrderId ?>#close" onclick="window.location.hash='close';return false;" class="close-btn" aria-label="Cerrar">✕</a>
 
       <div class="avatars-wrap">
         <div class="avatar-group">
@@ -110,7 +124,7 @@ $modalCsrf    = htmlspecialchars((string)($_SESSION['csrf_token'] ?? ''), ENT_QU
 
       <!-- Acciones -->
       <div class="modal-actions">
-        <a href="#close" class="btn btn-secondary">Ahora no</a>
+        <a href="php/pedido.php?id=<?= $modalOrderId ?>#close" onclick="window.location.hash='close';return false;" class="btn btn-secondary">Ahora no</a>
         <button type="submit" class="btn btn-primary">Enviar</button>
       </div>
 

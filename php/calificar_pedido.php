@@ -19,31 +19,32 @@ function responder(bool $success, string $mensaje, int $status = 200, ?int $pedi
         exit;
     }
     if ($pedidoId) {
-        header('Location: pedido.php?id=' . $pedidoId . ($success ? '&calificado=1' : '&error_calif=' . urlencode($mensaje)));
+        header('Location: pedido.php?id=' . $pedidoId . ($success ? '&calificado=1#close' : '&error_calif=' . urlencode($mensaje) . '#close'));
     } else {
         header('Location: ../index.php');
     }
     exit;
 }
 
+$idPedido = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT) ?: (int)($_POST['id'] ?? 0);
+
 if (empty($_SESSION['id_usuario'])) {
-    responder(false, 'Debes iniciar sesión para calificar.', 401, null, $isJson);
+    responder(false, 'Debes iniciar sesión para calificar.', 401, $idPedido ?: null, $isJson);
 }
 
 $submittedToken = (string) ($_POST['csrf_token'] ?? '');
 if (empty($_SESSION['csrf_token']) || !hash_equals((string) $_SESSION['csrf_token'], $submittedToken)) {
-    responder(false, 'Token CSRF inválido o expirado.', 403, null, $isJson);
+    responder(false, 'Token CSRF inválido o expirado.', 403, $idPedido ?: null, $isJson);
 }
 
-$idPedido = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
 if (!$idPedido) {
     responder(false, 'ID de pedido no válido.', 422, null, $isJson);
 }
 
-$scoreNegocio = filter_input(INPUT_POST, 'puntuacion_negocio', FILTER_VALIDATE_INT);
+$scoreNegocio = filter_input(INPUT_POST, 'puntuacion_negocio', FILTER_VALIDATE_INT) ?: (int)($_POST['puntuacion_negocio'] ?? 0);
 $comentarioNegocio = trim((string) ($_POST['comentario_negocio'] ?? ''));
 
-$scoreRepartidor = filter_input(INPUT_POST, 'puntuacion_repartidor', FILTER_VALIDATE_INT);
+$scoreRepartidor = filter_input(INPUT_POST, 'puntuacion_repartidor', FILTER_VALIDATE_INT) ?: (int)($_POST['puntuacion_repartidor'] ?? 0);
 $comentarioRepartidor = trim((string) ($_POST['comentario_repartidor'] ?? ''));
 
 if ((!$scoreNegocio || $scoreNegocio < 1 || $scoreNegocio > 5) && (!$scoreRepartidor || $scoreRepartidor < 1 || $scoreRepartidor > 5)) {

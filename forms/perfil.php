@@ -172,7 +172,7 @@ unset($d);
                                         style="color:#9ca3af;"><?= htmlspecialchars($order['fecha_creacion'] ?? '') ?></small>
                                 </div>
                             </a>
-                            <?php endforeach; ?>
+                            <?php endforeach; unset($order); ?>
                         </div>
                         <?php else: ?>
                         <div class="uprofile-empty" id="upurchasesEmpty">
