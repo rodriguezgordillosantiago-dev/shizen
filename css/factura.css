@@ -16,10 +16,12 @@
 body {
   margin: 0;
   background: var(--bg);
-  font: 14px/1.5 "Helvetica Neue", Arial, sans-serif;
+  font:
+    14px/1.5 "Helvetica Neue",
+    Arial,
+    sans-serif;
   color: var(--ink);
 }
-
 /* ── Barra superior de acciones (Volver e Imprimir) ────────────────────── */
 .factura-nav {
   width: 210mm;
@@ -44,7 +46,9 @@ body {
   color: #3a8c3f;
   text-decoration: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  transition: background 0.15s, transform 0.1s;
+  transition:
+    background 0.15s,
+    transform 0.1s;
 }
 
 .vol:hover {
@@ -271,11 +275,14 @@ footer {
   .no-print {
     display: none !important;
   }
+  body > *:not(.page) {
+    display: none !important;
+  }
   .page {
     margin: 0;
     box-shadow: none;
     width: auto;
-    min-height: 100vh;
+    min-height: 296mm;
   }
   #marca {
     position: fixed;
@@ -283,5 +290,63 @@ footer {
   th {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .page {
+    width: 100%;
+    min-height: 0;
+    margin: 12px 0;
+    padding: 20px 16px;
+  }
+
+  .factura-nav {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  header img {
+    max-width: 35%;
+    height: auto;
+  }
+
+  table {
+    table-layout: fixed;
+  }
+
+  th,
+  td {
+    padding: 6px 4px;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+  }
+
+  .q,
+  .m {
+    width: auto;
+  }
+
+  #qr {
+    margin-top: 24px;
+  }
+
+  footer {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .info {
+    grid-template-columns: 1fr;
+  }
+
+  .meta h1 {
+    font-size: 17px;
   }
 }

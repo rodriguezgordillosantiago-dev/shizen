@@ -10,7 +10,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $isJson = isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json');
 
-function responder(bool $success, string $mensaje, int $status = 200, ?int $pedidoId = null, bool $isJson = false): void {
+function responder(bool $success, string $mensaje, int $status = 200, ?int $pedidoId = null, bool $isJson = false): void
+{
     if ($isJson) {
         http_response_code($status);
         header('Content-Type: application/json; charset=utf-8');
@@ -29,8 +30,8 @@ if (empty($_SESSION['id_usuario'])) {
     responder(false, 'Debes iniciar sesión para calificar.', 401, null, $isJson);
 }
 
-$submittedToken = (string)($_POST['csrf_token'] ?? '');
-if (empty($_SESSION['csrf_token']) || !hash_equals((string)$_SESSION['csrf_token'], $submittedToken)) {
+$submittedToken = (string) ($_POST['csrf_token'] ?? '');
+if (empty($_SESSION['csrf_token']) || !hash_equals((string) $_SESSION['csrf_token'], $submittedToken)) {
     responder(false, 'Token CSRF inválido o expirado.', 403, null, $isJson);
 }
 
@@ -40,10 +41,10 @@ if (!$idPedido) {
 }
 
 $scoreNegocio = filter_input(INPUT_POST, 'puntuacion_negocio', FILTER_VALIDATE_INT);
-$comentarioNegocio = trim((string)($_POST['comentario_negocio'] ?? ''));
+$comentarioNegocio = trim((string) ($_POST['comentario_negocio'] ?? ''));
 
 $scoreRepartidor = filter_input(INPUT_POST, 'puntuacion_repartidor', FILTER_VALIDATE_INT);
-$comentarioRepartidor = trim((string)($_POST['comentario_repartidor'] ?? ''));
+$comentarioRepartidor = trim((string) ($_POST['comentario_repartidor'] ?? ''));
 
 if ((!$scoreNegocio || $scoreNegocio < 1 || $scoreNegocio > 5) && (!$scoreRepartidor || $scoreRepartidor < 1 || $scoreRepartidor > 5)) {
     responder(false, 'Debes seleccionar al menos una calificación con estrellas.', 422, $idPedido, $isJson);
@@ -59,7 +60,7 @@ $stmt = $pdo->prepare(
      LEFT JOIN entrega e ON e.id_compra = c.id_compra
      WHERE p.id_pedido = ? AND p.id_usuario = ? LIMIT 1"
 );
-$stmt->execute([$idPedido, (int)$_SESSION['id_usuario']]);
+$stmt->execute([$idPedido, (int) $_SESSION['id_usuario']]);
 $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$pedido) {
@@ -76,8 +77,8 @@ if ($scoreNegocio && $scoreNegocio >= 1 && $scoreNegocio <= 5 && !empty($pedido[
          ON DUPLICATE KEY UPDATE comentario = VALUES(comentario), fecha = VALUES(fecha), puntuacion = VALUES(puntuacion)"
     );
     $stmtNeg->execute([
-        (int)$pedido['id_negocio'],
-        (int)$_SESSION['id_usuario'],
+        (int) $pedido['id_negocio'],
+        (int) $_SESSION['id_usuario'],
         $comentarioNegocio !== '' ? $comentarioNegocio : null,
         $ahora,
         $scoreNegocio
@@ -86,13 +87,13 @@ if ($scoreNegocio && $scoreNegocio >= 1 && $scoreNegocio <= 5 && !empty($pedido[
 
 // 2. Guardar calificación de repartidor si se envió
 if ($scoreRepartidor && $scoreRepartidor >= 1 && $scoreRepartidor <= 5) {
-    $repartidorId = (int)($pedido['id_repartidor'] ?? 0);
+    $repartidorId = (int) ($pedido['id_repartidor'] ?? 0);
     if ($repartidorId <= 0) {
         $defaultRep = $pdo->query('SELECT id_repartidor FROM repartidor ORDER BY id_repartidor ASC LIMIT 1')->fetchColumn();
-        $repartidorId = (int)($defaultRep ?: 1);
+        $repartidorId = (int) ($defaultRep ?: 1);
         if (!empty($pedido['id_entrega'])) {
             $pdo->prepare('UPDATE entrega SET id_repartidor = ? WHERE id_entrega = ? AND id_repartidor IS NULL')
-                ->execute([$repartidorId, (int)$pedido['id_entrega']]);
+                ->execute([$repartidorId, (int) $pedido['id_entrega']]);
         }
     }
 
@@ -103,7 +104,7 @@ if ($scoreRepartidor && $scoreRepartidor >= 1 && $scoreRepartidor <= 5) {
     );
     $stmtRep->execute([
         $repartidorId,
-        (int)$_SESSION['id_usuario'],
+        (int) $_SESSION['id_usuario'],
         $idPedido,
         $comentarioRepartidor !== '' ? $comentarioRepartidor : null,
         $ahora,

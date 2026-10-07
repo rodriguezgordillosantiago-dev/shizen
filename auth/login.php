@@ -79,5 +79,18 @@ $_SESSION['usuario_direccion'] = $usuario['direccion'] ?? '';
 $_SESSION['usuario_localidad'] = $usuario['localidad'] ?? $usuario['ciudad'] ?? '';
 $_SESSION['usuario_rol'] = $rol;
 
+if (!empty($usuario['id_icono'])) {
+    $pdo = Database::getConnection();
+    $stmt = $pdo->prepare(
+        'SELECT icono_url FROM icono WHERE id_icono = ? LIMIT 1'
+    );
+    $stmt->execute([(int) $usuario['id_icono']]);
+    $iconoUrl = $stmt->fetchColumn();
+
+    if ($iconoUrl !== false) {
+        $_SESSION['usuario_avatar'] = 'assets/Perfil/' . basename($iconoUrl);
+    }
+}
+
 header('Location: ../' . ($redirect !== '' ? $redirect : 'index.php'));
 exit;

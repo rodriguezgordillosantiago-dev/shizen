@@ -113,7 +113,7 @@ foreach ($f['items'] as $i) {
     $total += $i['cantidad'] * $i['precio'];
 }
 
-$logo = '../assets/logo_negro.png';
+$logo = 'assets/logo_negro.png';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -122,15 +122,12 @@ $logo = '../assets/logo_negro.png';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <base href="../">
-    <title>factura #<?= (int) $order['id_factura'] ?> | Shizen</title>
+    <title>Shizen · Factura de compra <?= e($f['numero']) ?></title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/nav.css?v=20260930-ingreso-icon-1">
     <link rel="stylesheet" href="css/modals.css?v=20261003-rating-fix-1">
     <link rel="stylesheet" href="css/orders.css?v=20261003-5steps-1">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Shizen · Factura de compra <?= e($f['numero']) ?></title>
-    <link rel="stylesheet" href="../css/factura.css">
+    <link rel="stylesheet" href="css/factura.css">
 </head>
 
 <body>
