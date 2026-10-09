@@ -1,7 +1,21 @@
 /* ── Shizen — floating chat panel ─────────────────────────────── */
 
+function _getChatMessages() {
+  try {
+    const s = sessionStorage.getItem("shizen_chat_mensajes");
+    return s ? JSON.parse(s) : [];
+  } catch {
+    return [];
+  }
+}
+
+function _setChatMessages(msgs) {
+  try {
+    sessionStorage.setItem("shizen_chat_mensajes", JSON.stringify(msgs));
+  } catch {}
+}
+
 function initChat() {
-  // Inject HTML
   const root = document.getElementById('chat-root');
   if (!root) return;
   root.innerHTML = `
@@ -73,7 +87,7 @@ function initChat() {
 function renderMessages() {
   const container = document.getElementById('chat-msgs');
   if (!container) return;
-  const msgs = getMensajes();
+  const msgs = _getChatMessages();
   container.innerHTML = msgs.map(m => {
     const isMe = m.de === 'yo';
     return `
@@ -103,15 +117,10 @@ function sendMsg() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if (!text) return;
-  const msgs = getMensajes();
-  msgs.push({ id: Date.now(), de: 'yo', texto: text, hora: nowTime() });
-  setMensajes(msgs);
+  const msgs = _getChatMessages();
+  const time = new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+  msgs.push({ id: Date.now(), de: 'yo', texto: text, hora: time });
+  _setChatMessages(msgs);
   input.value = '';
   renderMessages();
-  setTimeout(() => {
-    const m2 = getMensajes();
-    m2.push({ id: Date.now() + 1, de: 'soporte', texto: 'Recibido, en breve te atendemos. ¡Gracias! 🙌', hora: nowTime() });
-    setMensajes(m2);
-    renderMessages();
-  }, 900);
 }

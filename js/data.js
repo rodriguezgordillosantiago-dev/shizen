@@ -1,83 +1,18 @@
-/* ── Shizen — shared data layer (localStorage) ─────────────────── */
+/* ── Shizen — capa de comunicación con el backend PHP ─────────────────── */
 
-const _DEFAULTS = {
-  activos: [],
-  disponibles: [],
-  historial: [],
-  perfil: {
-    nombre: "Santiago",
-    apellido: "Vargas",
-    telefono: "310 456 7890",
-    localidad: "Chapinero",
-    vehiculo: "Moto",
-    calificacion: 4.8,
-    entregasHoy: 6,
-    gananciasHoy: 25800,
-  },
-  mensajes: [
-    {
-      id: 1,
-      de: "soporte",
-      texto: "¡Hola! ¿En qué te podemos ayudar hoy?",
-      hora: "9:00",
-    },
-    {
-      id: 2,
-      de: "soporte",
-      texto:
-        "Recuerda que puedes reportar cualquier inconveniente con un pedido aquí.",
-      hora: "9:01",
-    },
-  ],
-};
-
-function _get(key) {
-  try {
-    const s = localStorage.getItem("shizen_" + key);
-    return s
-      ? JSON.parse(s)
-      : JSON.parse(JSON.stringify(_DEFAULTS[key]));
-  } catch {
-    return JSON.parse(JSON.stringify(_DEFAULTS[key]));
+function _resolveUrl(path) {
+  if (path === 'php/entregas.php' && window.repartidorApiUrl) {
+    return window.repartidorApiUrl;
   }
-}
-function _set(key, val) {
-  localStorage.setItem(
-    "shizen_" + key,
-    JSON.stringify(val),
-  );
-}
-
-// Accessors
-function getActivos() {
-  return _get("activos");
-}
-function setActivos(v) {
-  _set("activos", v);
-}
-function getDisponibles() {
-  return _get("disponibles");
-}
-function setDisponibles(v) {
-  _set("disponibles", v);
-}
-function getHistorial() {
-  return _get("historial");
-}
-function setHistorial(v) {
-  _set("historial", v);
-}
-function getPerfil() {
-  return _get("perfil");
-}
-function setPerfil(v) {
-  _set("perfil", v);
-}
-function getMensajes() {
-  return _get("mensajes");
-}
-function setMensajes(v) {
-  _set("mensajes", v);
+  const inPages = window.location.pathname.includes('/pages/');
+  const inPhp = window.location.pathname.includes('/php/');
+  if (inPages) {
+    return '../' + path;
+  }
+  if (inPhp) {
+    return path.replace(/^php\//, '');
+  }
+  return path;
 }
 
 // Estado de disponibilidad del repartidor (persistente entre pantallas).
@@ -90,10 +25,11 @@ function repartidorEstaActivo() {
 
 async function cambiarEstadoRepartidor() {
   try {
-    const response = await fetch("../php/entregas.php", {
+    const response = await fetch(_resolveUrl('php/entregas.php'), {
       method: "POST",
       body: new URLSearchParams({ action: "toggle" }),
       credentials: "same-origin",
+      headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', Accept: 'application/json' }
     });
     const result = await response.json();
     if (!response.ok)
@@ -133,8 +69,10 @@ function actualizarBotonEstadoRepartidor() {
       ? "Desactivar estado de repartidor"
       : "Activar estado de repartidor",
   );
-  boton.querySelector(".nav-status-label").textContent =
-    activo ? "Activo" : "Inactivo";
+  const label = boton.querySelector(".nav-status-label");
+  if (label) {
+    label.textContent = activo ? "Activo" : "Inactivo";
+  }
 }
 
 function iniciarBotonEstadoRepartidor() {
@@ -146,25 +84,36 @@ function iniciarBotonEstadoRepartidor() {
   actualizarBotonEstadoRepartidor();
 }
 
-// Helpers
+// ── Servicios API conectados a PHP y MySQL ──
 const MAX_ACTIVOS = 4;
+
 async function cargarEntregas(tipo) {
-  const response = await fetch(
-    "../php/entregas.php?type=" + encodeURIComponent(tipo),
-    { credentials: "same-origin" },
-  );
+  const url = _resolveUrl('php/entregas.php') + '?type=' + encodeURIComponent(tipo);
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    headers: { Accept: 'application/json' }
+  });
+  if (response.status === 401) {
+    window.location.href = window.location.pathname.includes('/pages/') ? "../index.html" : "/";
+    return { items: [] };
+  }
   if (!response.ok)
     throw new Error("No fue posible cargar las entregas.");
   return response.json();
 }
 
 async function cargarEstadisticas() {
-  const response = await fetch("../php/entregas.php?action=stats", {
+  const url = _resolveUrl('php/entregas.php') + '?action=stats';
+  const response = await fetch(url, {
     credentials: "same-origin",
+    headers: { Accept: 'application/json' }
   });
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(result.error || "No fue posible cargar las estadísticas.");
+    throw new Error(
+      result.error ||
+        "No fue posible cargar las estadísticas.",
+    );
   }
   return result;
 }
@@ -174,10 +123,11 @@ async function actualizarEntrega(action, id) {
     action,
     id_entrega: String(id),
   });
-  const response = await fetch("../php/entregas.php", {
+  const response = await fetch(_resolveUrl('php/entregas.php'), {
     method: "POST",
     body,
     credentials: "same-origin",
+    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', Accept: 'application/json' }
   });
   const result = await response.json();
   if (!response.ok || result.updated === false)
@@ -186,15 +136,6 @@ async function actualizarEntrega(action, id) {
         "No fue posible actualizar la entrega.",
     );
   return result;
-}
-function countActivos() {
-  return getActivos().filter(
-    (p) =>
-      p.estado === "aceptado" || p.estado === "en_camino",
-  ).length;
-}
-function cupoLleno() {
-  return countActivos() >= MAX_ACTIVOS;
 }
 
 function fmt(n) {
@@ -208,73 +149,50 @@ function nowTime() {
   });
 }
 
-// Actions
-function aceptarPedido(id) {
-  if (cupoLleno()) return false;
-  const disp = getDisponibles();
-  const pedido = disp.find((p) => p.id === id);
-  if (!pedido) return false;
-  setDisponibles(disp.filter((p) => p.id !== id));
-  const activos = getActivos();
-  activos.push({ ...pedido, estado: "aceptado" });
-  setActivos(activos);
-  return true;
-}
+// Actualiza los badges de la barra de navegación consultando la BD
+async function updateNavBadges() {
+  const baList = [document.getElementById("badge-activos"), document.getElementById("nav-badge-activos")].filter(Boolean);
+  const bnList = [document.getElementById("badge-notificaciones"), document.getElementById("nav-badge-avisos")].filter(Boolean);
 
-function rechazarPedido(id) {
-  setDisponibles(
-    getDisponibles().filter((p) => p.id !== id),
-  );
-}
+  // Badge de pedidos activos
+  if (baList.length > 0) {
+    try {
+      const res = await cargarEntregas("active");
+      const ca = (res.items || []).length;
+      baList.forEach(ba => {
+        ba.textContent = ca > 9 ? "9+" : ca;
+        ba.style.display = ca > 0 ? "block" : "none";
+      });
+    } catch (e) {}
+  }
 
-function avanzarEstado(id) {
-  const activos = getActivos();
-  const idx = activos.findIndex((p) => p.id === id);
-  if (idx === -1) return;
-  const p = activos[idx];
-  if (p.estado === "aceptado") {
-    activos[idx] = { ...p, estado: "en_camino" };
-    setActivos(activos);
-  } else if (p.estado === "en_camino") {
-    const terminado = {
-      ...p,
-      estado: "entregado",
-      hora: "Ahora",
-    };
-    setHistorial([terminado, ...getHistorial()]);
-    setActivos(activos.filter((a) => a.id !== id));
-    const perfil = getPerfil();
-    setPerfil({
-      ...perfil,
-      entregasHoy: perfil.entregasHoy + 1,
-      gananciasHoy: perfil.gananciasHoy + p.ganancia,
-    });
+  // Badge de notificaciones (avisos)
+  if (bnList.length > 0) {
+    try {
+      const resp = await fetch(_resolveUrl('php/notificaciones.php'), {
+        credentials: "same-origin",
+        headers: { Accept: 'application/json' }
+      });
+      if (resp.ok) {
+        const notifData = await resp.json();
+        const items = notifData.items || [];
+        const unreadCount = items.filter(n => Number(n.leida) === 0).length;
+        bnList.forEach(bn => {
+          if (unreadCount > 0) {
+            bn.textContent = unreadCount > 9 ? "9+" : unreadCount;
+            bn.style.display = "block";
+          } else {
+            bn.textContent = "";
+            bn.style.display = "none";
+          }
+        });
+      }
+    } catch (e) {}
   }
 }
 
-function cancelarPedido(id) {
-  const activos = getActivos();
-  const p = activos.find((a) => a.id === id);
-  if (!p) return;
-  setHistorial([
-    { ...p, estado: "cancelado", hora: "Ahora" },
-    ...getHistorial(),
-  ]);
-  setActivos(activos.filter((a) => a.id !== id));
-}
-
-// Update nav badges on any page that has them
-function updateNavBadges() {
-  const ba = document.getElementById("badge-activos");
-  const bp = document.getElementById("badge-pedidos");
-  const ca = countActivos();
-  const cd = getDisponibles().length;
-  if (ba) {
-    ba.textContent = ca > 9 ? "9+" : ca;
-    ba.style.display = ca > 0 ? "flex" : "none";
-  }
-  if (bp) {
-    bp.textContent = cd > 9 ? "9+" : cd;
-    bp.style.display = cd > 0 ? "flex" : "none";
-  }
-}
+document.addEventListener("DOMContentLoaded", () => {
+  iniciarBotonEstadoRepartidor();
+  updateNavBadges();
+  setInterval(updateNavBadges, 15000);
+});

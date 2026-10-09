@@ -1,0 +1,665 @@
+/* activos.css — Estilos específicos de la pantalla de Pedidos Activos (activos.html) */
+
+/* ── Pestañas (Tabs) de Pedidos Activos ── */
+.tabs-pedidos {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-pedido-activo {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 68px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 20px;
+  border: 2px solid #2d6a31;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(16, 40, 26, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: left;
+}
+
+.tab-pedido-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.tab-pedido-num-activo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2d6a31;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tab-pedido-nombre {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  color: #163820;
+}
+
+.tab-pedido-barras {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+}
+
+.tab-barra-completada {
+  flex: 1 1 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #4c9540;
+}
+
+.tab-barra-pendiente {
+  flex: 1 1 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #e8f5e9;
+}
+
+.tab-barra-progreso-llena {
+  flex: 1 1 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #2d6a31;
+}
+
+.tab-pedido-inactivo {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 68px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: left;
+}
+
+.tab-pedido-num-inactivo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4c9540;
+  color: #163820;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.tab-slot-libre {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 68px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 20px;
+  border: 2px dashed #c8e6c9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #4b7055;
+}
+
+.tab-slot-libre-texto {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ── Tarjeta de Detalle del Pedido ── */
+.tarjeta-detalle-pedido {
+  box-sizing: border-box;
+  padding: 14px;
+  border-radius: 30px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(16, 40, 26, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mapa-miniatura {
+  position: relative;
+  height: 72px;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.mapa-svg-render {
+  display: block;
+}
+
+.mapa-chip-pedido {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  background: #163820;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.mapa-chip-estado {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  background: #4c9540;
+  color: #163820;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Encabezado de Tarjeta (Negocio y Ganancia) ── */
+.pedido-info-fila {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.pedido-negocio-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pedido-negocio-nombre {
+  font-family: "Inter", sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.pedido-detalles-platos {
+  font-size: 14px;
+  color: #4b7055;
+}
+
+.pedido-monto-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+}
+
+.pedido-ganas-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4b7055;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pedido-monto-valor {
+  padding: 0 4px;
+  font-family: "Inter", sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.05;
+  background: linear-gradient(transparent 58%, #e8f5e9 58%);
+}
+
+/* ── Stepper Tracker de 4 Pasos ── */
+.stepper-progreso {
+  position: relative;
+  padding: 0 4px;
+}
+
+.stepper-linea-fondo {
+  position: absolute;
+  left: 12.5%;
+  right: 12.5%;
+  top: 9px;
+  height: 3px;
+  border-radius: 2px;
+  background: #e8f5e9;
+}
+
+.stepper-linea-0 {
+  width: 0%;
+  height: 100%;
+  border-radius: 2px;
+  background: #2d6a31;
+}
+
+.stepper-linea-33 {
+  width: 33%;
+  height: 100%;
+  border-radius: 2px;
+  background: #2d6a31;
+}
+
+.stepper-linea-100 {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  background: #2d6a31;
+}
+
+.stepper-paso {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper-punto-activo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid #163820;
+  background: #4c9540;
+}
+
+.stepper-label-activo {
+  font-size: 12px;
+  font-weight: 800;
+  color: #163820;
+}
+
+.stepper-punto-inactivo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid #c8e6c9;
+  background: #ffffff;
+}
+
+.stepper-label-inactivo {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b7055;
+}
+
+.stepper-punto-completado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid #2d6a31;
+  background: #2d6a31;
+}
+
+.stepper-label-completado {
+  font-size: 12px;
+  font-weight: 600;
+  color: #163820;
+}
+
+/* ── Lista de Direcciones (Recoger vs Entregar) ── */
+.rutas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ruta-item-activo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 8px 12px 8px 8px;
+  border-radius: 20px;
+  background: #4c95402e;
+}
+
+.ruta-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f0faf0;
+}
+
+.ruta-datos {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ruta-direccion {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ruta-distancia {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b7055;
+}
+
+.ruta-item-pendiente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 8px 12px 8px 8px;
+  border-radius: 20px;
+  background: transparent;
+}
+
+/* ── Botones de Acción de Pedido (Principal y Secundarios) ── */
+.btn-accion-pedido {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 52px;
+  border-radius: 26px;
+  border: 0;
+  background: linear-gradient(135deg, #2d6a31, #4c9540);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secundario-accion {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  border-radius: 21px;
+  border: 0;
+  background: #f0faf0;
+  color: #163820;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── Caja de Código de Recogida (En Restaurante) ── */
+.codigo-recogida-box {
+  box-sizing: border-box;
+  padding: 12px 14px 12px;
+  border-radius: 22px;
+  background: #163820;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.codigo-recogida-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.codigo-recogida-titulo {
+  font-size: 11px;
+  font-weight: 700;
+  color: #4c9540;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.codigo-recogida-negocio {
+  font-size: 12px;
+  font-weight: 500;
+  color: #a3b89e;
+}
+
+.codigo-recogida-digito {
+  flex: 1 1 0;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #163820;
+  font-family: "Inter", sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.codigo-recogida-aviso {
+  font-size: 13px;
+  color: #a3b89e;
+}
+
+/* ── Modal de Confirmación con PIN Numpad ── */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 844px;
+  background: rgba(16, 40, 26, 0.55);
+}
+
+.modal-sheet {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 14px;
+  box-sizing: border-box;
+  padding: 20px 18px 16px;
+  border-radius: 30px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 16px 40px rgba(16, 40, 26, 0.38);
+}
+
+.modal-sheet-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-subtitulo {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #4b7055;
+}
+
+.pin-casilla-llena {
+  flex: 1 1 0;
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 2px solid #c8e6c9;
+  background: #f0faf0;
+  font-family: "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: #163820;
+}
+
+.pin-casilla-activa {
+  flex: 1 1 0;
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 2px solid #163820;
+  background: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: #163820;
+}
+
+.pin-casilla-vacia {
+  flex: 1 1 0;
+  height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  border: 2px solid #c8e6c9;
+  background: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: #163820;
+}
+
+.modal-error-msg {
+  min-height: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  color: #6b8f6e;
+}
+
+.modal-error-msg.is-error {
+  color: #dc2626;
+}
+
+.modal-overlay-wrap {
+  display: none;
+}
+
+.modal-overlay-wrap.is-open {
+  display: block;
+}
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.numpad-tecla {
+  height: 46px;
+  border-radius: 23px;
+  border: 0;
+  background: #f0faf0;
+  color: #163820;
+  font-family: "Inter", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  cursor: pointer;
+  visibility: visible;
+}
+
+.numpad-espacio-vacio {
+  height: 46px;
+  border-radius: 23px;
+  border: 0;
+  background: #f0faf0;
+  color: #163820;
+  font-family: "Inter", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  cursor: pointer;
+  visibility: hidden;
+}
+
+.numpad-tecla-borrar {
+  height: 46px;
+  border-radius: 23px;
+  border: 0;
+  background: transparent;
+  color: #163820;
+  font-family: "Inter", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  cursor: pointer;
+  visibility: visible;
+}
+
+.btn-confirmar-pin {
+  height: 54px;
+  border-radius: 27px;
+  border: 0;
+  background: #e8f5e9;
+  color: #6b8f6e;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-confirmar-pin.is-ready {
+  background: #2d6a31;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(19, 122, 62, 0.3);
+}
+
+.btn-cancelar-pin {
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: #4b7055;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
