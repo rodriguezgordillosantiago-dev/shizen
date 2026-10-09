@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../BD/conexion.php';
 require_once __DIR__ . '/../funciones/funciones.php';
+require_once __DIR__ . '/nav.php';
 session_name('SHIZEN_REPARTIDOR_SESSION');
 session_start();
 
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $vehiculosPermitidos = ['Moto', 'Bicicleta', 'Carro', 'Monopatín'];
     if (!in_array($vehiculo, $vehiculosPermitidos, true)) {
-        $errores[] = 'El vehículo es obligatorio.';
+        $errores[] = 'El vehículo seleccionado no es válido.';
     }
 
     if (!$errores) {
@@ -78,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $stmt = $conn->prepare(
-    'SELECT u.nombre, u.apellido, u.email, r.vehiculo, r.foto_url,
+    'SELECT u.nombre, u.apellido, u.email, r.id_repartidor, r.vehiculo, r.foto_url,
+            r.cedula, r.estado AS repartidor_estado,
             r.licencia_conduccion_url, r.soat_url, r.tarjeta_propiedad_url
      FROM usuario u
      LEFT JOIN repartidor r ON r.id_usuario = u.id_usuario
@@ -94,20 +96,23 @@ if (!$perfil) {
 }
 
 $nombreCompleto = trim($perfil['nombre'] . ' ' . $perfil['apellido']);
-$iniciales = strtoupper(substr($perfil['nombre'], 0, 1) . substr($perfil['apellido'], 0, 1));
+$iniciales = strtoupper(substr((string)$perfil['nombre'], 0, 1) . substr((string)$perfil['apellido'], 0, 1));
 $fotoUrl = rutaDocumento($perfil['foto_url'] ?? '');
 $fotoHtml = $fotoUrl !== ''
     ? '<img src="' . htmlspecialchars($fotoUrl, ENT_QUOTES, 'UTF-8') . '" alt="Foto de ' . htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8') . '">'
-    : '<span>' . htmlspecialchars($iniciales, ENT_QUOTES, 'UTF-8') . '</span>';
-$vehiculo = $perfil['vehiculo'] ?: 'No registrado';
+    : '<span>' . htmlspecialchars($iniciales ?: 'R', ENT_QUOTES, 'UTF-8') . '</span>';
+$vehiculo = $perfil['vehiculo'] ?: 'Bicicleta';
+$cedula = $perfil['cedula'] ?: 'No registrada';
+$estadoRepartidor = $perfil['repartidor_estado'] ?: 'Activo';
+
 $mensaje = isset($_GET['mensaje']) ? 'Perfil actualizado correctamente.' : '';
 $alertasHtml = '';
 if ($mensaje !== '') {
-    $alertasHtml .= '<p class="profile-alert profile-alert--success">' .
+    $alertasHtml .= '<p class="profile-alert profile-alert--success">&#10003; ' .
         htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8') . '</p>';
 }
 foreach ($errores as $error) {
-    $alertasHtml .= '<p class="profile-alert profile-alert--error">' .
+    $alertasHtml .= '<p class="profile-alert profile-alert--error">&#9888; ' .
         htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . '</p>';
 }
 
@@ -124,6 +129,9 @@ function rutaDocumento(?string $ruta): string
         return '';
     }
     if (str_starts_with($ruta, 'assets/')) {
+        return '/shizenhome/' . ltrim($ruta, './');
+    }
+    if (str_starts_with($ruta, 'legales/')) {
         return '/shizenhome/' . ltrim($ruta, './');
     }
     return '../' . ltrim($ruta, './');
@@ -144,16 +152,15 @@ foreach ($documentos as $nombreDocumento => $rutaDocumentoActual) {
     $nombreSeguro = htmlspecialchars($nombreDocumento, ENT_QUOTES, 'UTF-8');
     $contenidoDocumento = $esImagen
         ? sprintf('<img src="%s" alt="%s">', $rutaSegura, $nombreSeguro)
-        : sprintf('<a href="%s" target="_blank" rel="noopener">Abrir documento</a>', $rutaSegura);
+        : sprintf('<a href="%s" target="_blank" rel="noopener">&#128196; Ver documento</a>', $rutaSegura);
     $documentosHtml .= sprintf(
-        '<article class="vehicle-document-card"><label>%s</label><input class="field" type="text" value="%s" readonly aria-readonly="true"><script>(function(c){if(!c||c.dataset.validacionCampo)return;c.dataset.validacionCampo="1";var e=c.nextElementSibling&&c.nextElementSibling.classList.contains("field-error-inline")?c.nextElementSibling:document.createElement("small");e.className="field-error-inline";e.style.cssText="display:block;color:#c62828;font-size:12px;margin-top:4px;min-height:1em;";if(!e.parentNode)c.insertAdjacentElement("afterend",e);function v(){var x=c.required&&!c.value.trim(),i=x||!c.validity.valid;e.textContent=i?(x?"Este campo es obligatorio.":c.validationMessage):"";c.setAttribute("aria-invalid",i?"true":"false");return!i}["input","change","blur"].forEach(function(t){c.addEventListener(t,v)});if(c.form)c.form.addEventListener("submit",function(a){if(!v())a.preventDefault()})})(document.currentScript.previousElementSibling);</script>%s</article>',
+        '<article class="vehicle-document-card"><label>%s</label>%s</article>',
         $nombreSeguro,
-        $rutaSegura,
         $contenidoDocumento
     );
 }
 if ($documentosHtml === '') {
-    $documentosHtml = '';
+    $documentosHtml = '<div class="profile-empty-state"><div class="profile-empty-icon">&#128196;</div><p>No tienes documentos registrados.</p></div>';
 }
 
 $stmtStats = $conn->prepare(
@@ -169,20 +176,87 @@ $statsRepartidor = $stmtStats->fetch() ?: [];
 $entregasHoy = (int)($statsRepartidor['entregas_hoy'] ?? 0);
 $gananciasHoy = '$' . number_format((float)($statsRepartidor['ganancias_hoy'] ?? 0), 0, ',', '.');
 
+$stmtRating = $conn->prepare(
+    'SELECT COALESCE(AVG(cr.puntuacion), 5.0) AS rating_promedio, COUNT(cr.id_calificacion_repartidor) AS total_resenas
+     FROM repartidor r
+     LEFT JOIN calificacion_repartidor cr ON cr.id_repartidor = r.id_repartidor
+     WHERE r.id_usuario = ?'
+);
+$stmtRating->execute([$idUsuario]);
+$ratingData = $stmtRating->fetch() ?: [];
+$ratingPromedio = number_format((float)($ratingData['rating_promedio'] ?? 5.0), 1);
+$totalResenas = (int)($ratingData['total_resenas'] ?? 0);
+
+$stmtRecientes = $conn->prepare(
+    'SELECT e.id_entrega, e.estado, e.fecha_entrega, c.total, n.nombre AS negocio_nombre, p.descripcion
+     FROM repartidor r
+     JOIN entrega e ON e.id_repartidor = r.id_repartidor
+     JOIN compra c ON c.id_compra = e.id_compra
+     JOIN pedido p ON p.id_pedido = c.id_pedido
+     LEFT JOIN negocios n ON n.id_negocio = p.id_negocio
+     WHERE r.id_usuario = ? AND e.fecha_entrega IS NOT NULL
+     ORDER BY e.fecha_entrega DESC
+     LIMIT 5'
+);
+$stmtRecientes->execute([$idUsuario]);
+$entregasRecientes = $stmtRecientes->fetchAll() ?: [];
+
+$entregasRecientesHtml = '';
+if ($entregasRecientes) {
+    foreach ($entregasRecientes as $ent) {
+        $negocio = htmlspecialchars((string)($ent['negocio_nombre'] ?? 'Restaurante Shizen'), ENT_QUOTES, 'UTF-8');
+        $desc = htmlspecialchars((string)($ent['descripcion'] ?? 'Pedido entregado'), ENT_QUOTES, 'UTF-8');
+        $monto = '$' . number_format((float)($ent['total'] ?? 0), 0, ',', '.');
+        $fecha = htmlspecialchars((string)($ent['fecha_entrega'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $entregasRecientesHtml .= sprintf(
+            '<div class="delivery-history-item">
+               <div class="delivery-history-info">
+                 <strong>%s</strong>
+                 <small>%s</small>
+               </div>
+               <div class="delivery-history-meta">
+                 <span>%s</span>
+                 <small>%s</small>
+               </div>
+             </div>',
+            $negocio,
+            $desc,
+            $monto,
+            $fecha
+        );
+    }
+} else {
+    $entregasRecientesHtml = '<div class="profile-empty-state"><div class="profile-empty-icon">&#128692;</div><p>Aún no tienes entregas completadas hoy.</p></div>';
+}
+
+$vehiculosSelectHtml = '';
+foreach (['Moto', 'Bicicleta', 'Carro', 'Monopatín'] as $opt) {
+    $selected = ($opt === $vehiculo) ? ' selected' : '';
+    $vehiculosSelectHtml .= sprintf('<option value="%s"%s>%s</option>', $opt, $selected, $opt);
+}
+
 $template = file_get_contents(__DIR__ . '/../pages/perfil.html');
 $replacements = [
     '{{NOMBRE_COMPLETO}}' => htmlspecialchars($nombreCompleto, ENT_QUOTES, 'UTF-8'),
-    '{{NOMBRE}}' => htmlspecialchars($perfil['nombre'], ENT_QUOTES, 'UTF-8'),
-    '{{APELLIDO}}' => htmlspecialchars($perfil['apellido'], ENT_QUOTES, 'UTF-8'),
-    '{{INICIALES}}' => htmlspecialchars($iniciales, ENT_QUOTES, 'UTF-8'),
+    '{{NOMBRE}}' => htmlspecialchars((string)$perfil['nombre'], ENT_QUOTES, 'UTF-8'),
+    '{{APELLIDO}}' => htmlspecialchars((string)$perfil['apellido'], ENT_QUOTES, 'UTF-8'),
+    '{{INICIALES}}' => htmlspecialchars($iniciales ?: 'R', ENT_QUOTES, 'UTF-8'),
     '{{FOTO_URL}}' => htmlspecialchars($fotoUrl, ENT_QUOTES, 'UTF-8'),
     '{{FOTO_HTML}}' => $fotoHtml,
-    '{{EMAIL}}' => htmlspecialchars($perfil['email'], ENT_QUOTES, 'UTF-8'),
+    '{{EMAIL}}' => htmlspecialchars((string)$perfil['email'], ENT_QUOTES, 'UTF-8'),
     '{{VEHICULO}}' => htmlspecialchars($vehiculo, ENT_QUOTES, 'UTF-8'),
+    '{{VEHICULOS_OPTIONS}}' => $vehiculosSelectHtml,
+    '{{CEDULA}}' => htmlspecialchars($cedula, ENT_QUOTES, 'UTF-8'),
+    '{{ESTADO}}' => htmlspecialchars($estadoRepartidor, ENT_QUOTES, 'UTF-8'),
     '{{DOCUMENTOS_VEHICULO}}' => $documentosHtml,
+    '{{ENTREGAS_RECIENTES}}' => $entregasRecientesHtml,
+    '{{RATING_PROMEDIO}}' => $ratingPromedio,
+    '{{TOTAL_RESENAS}}' => (string) $totalResenas,
     '{{CSRF_TOKEN}}' => htmlspecialchars($tokenCsrf, ENT_QUOTES, 'UTF-8'),
     '{{ALERTAS}}' => $alertasHtml,
     '{{ENTREGAS_HOY}}' => (string) $entregasHoy,
     '{{GANANCIAS_HOY}}' => htmlspecialchars($gananciasHoy, ENT_QUOTES, 'UTF-8'),
+    '{{NAVBAR}}' => getNavHtml('perfil'),
 ];
 echo strtr($template, $replacements);
+

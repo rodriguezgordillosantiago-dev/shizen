@@ -265,6 +265,66 @@ if ($action === 'deliver_client_code') {
         // Cerrar también la compra como Completada
         $db->prepare("UPDATE compra SET estado = 'Completado' WHERE id_pedido = :order")->execute(['order' => $delivery['id_pedido']]);
         $db->commit();
+
+        // ── Notificar a los 3: cliente, negocio y repartidor ─────────
+        try {
+            $info = $db->prepare(
+                'SELECT p.id_usuario AS cliente_id, p.id_pedido,
+                        n.id_usuario AS negocio_id
+                   FROM pedido p
+                   JOIN negocios n ON n.id_negocio = p.id_negocio
+                  WHERE p.id_pedido = :pedido'
+            );
+            $info->execute(['pedido' => $delivery['id_pedido']]);
+            $dest = $info->fetch(PDO::FETCH_ASSOC);
+
+            if ($dest) {
+                $pedidoNum = (int)$dest['id_pedido'];
+                $notif = $db->prepare(
+                    'INSERT INTO notificacion
+                        (id_usuario, audiencia, id_pedido, tipo, titulo, mensaje)
+                     VALUES (:uid, :aud, :pid, :tipo, :titulo, :msg)'
+                );
+
+                // → Cliente
+                $notif->execute([
+                    'uid'    => (int)$dest['cliente_id'],
+                    'aud'    => 'cliente',
+                    'pid'    => $pedidoNum,
+                    'tipo'   => 'pedido_entregado',
+                    'titulo' => '✅ ¡Pedido entregado!',
+                    'msg'    => 'Tu pedido #' . $pedidoNum . ' fue entregado exitosamente. ¡Buen provecho!',
+                ]);
+
+                // → Negocio
+                $notif->execute([
+                    'uid'    => (int)$dest['negocio_id'],
+                    'aud'    => 'negocio',
+                    'pid'    => $pedidoNum,
+                    'tipo'   => 'pedido_entregado',
+                    'titulo' => '✅ Pedido entregado al cliente',
+                    'msg'    => 'El pedido #' . $pedidoNum . ' fue entregado exitosamente al cliente.',
+                ]);
+
+                // → Repartidor
+                $repUser = $db->prepare('SELECT id_usuario FROM repartidor WHERE id_repartidor = :id');
+                $repUser->execute(['id' => $courierId]);
+                $repUid = (int)$repUser->fetchColumn();
+                if ($repUid > 0) {
+                    $notif->execute([
+                        'uid'    => $repUid,
+                        'aud'    => 'repartidor',
+                        'pid'    => $pedidoNum,
+                        'tipo'   => 'pedido_entregado',
+                        'titulo' => '🎉 ¡Entrega completada!',
+                        'msg'    => 'Completaste la entrega del pedido #' . $pedidoNum . '. ¡Buen trabajo!',
+                    ]);
+                }
+            }
+        } catch (Throwable $ignore) {
+            // Las notificaciones no deben romper la respuesta principal
+        }
+
         echo json_encode(['status' => 'delivered']);
     } catch (Throwable $e) {
         $db->rollBack();

@@ -1,291 +1,214 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Shizen — Inicio</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles/inicio.css?v=orders-card-3" />
-    <link rel="stylesheet" href="styles/navigation.css?v=nav-stable-4" />
-  </head>
-  <body>
-    <div class="scroll" id="content">
-      <!-- Header filled by JS -->
-    </div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shizen repartidor · Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/styles.css?v=20261009-final">
+<link rel="stylesheet" href="styles/inicio.css?v=20261009-final">
+</head>
+<body>
+<div class="pantalla pantalla-marco" id="pantalla-inicio">
 
-    <!-- Bottom Nav -->
-    <nav
-      class="bottom-nav"
-      aria-label="Navegacion principal"
-    >
-      <a
-        href="inicio.html"
-        class="nav-item is-active"
-        aria-current="page"
-        aria-label="Inicio"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 10.5 12 3l9 7.5v8.25A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75V10.5Z"
-          /></svg
-          <path d="M9 21v-5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V21" /></svg
-        ><span>Inicio</span></a
-      >
-      <a
-        href="activos.html"
-        class="nav-item"
-        aria-label="Activos"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7M12 11v10"
-          /></svg
-        ><span>Activos</span
-        ><b class="badge" id="badge-activos"></b
-      ></a>
-      <button
-        id="delivery-status-toggle"
-        class="nav-status-toggle"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="nav-status-icon"
-          ><svg
-            width="18"
-            height="18"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <path
-              stroke-linecap="round"
-              d="M12 2v10m0 0 4-4m-4 4-4-4M5 13v4a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-4"
-            /></svg
-        ></span>
-        <span class="nav-status-label">Activo</span>
-      </button>
-      <a
-        href="notificaciones.php"
-        class="nav-item"
-        aria-label="Notificaciones"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
-          /></svg
-        ><span>Notificaciones</span
-        ><b class="badge" id="badge-notificaciones"></b
-      ></a>
-      <a
-        href="../php/perfil.php"
-        class="nav-item"
-        aria-label="Perfil"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-12 14a8 8 0 0 1 16 0"
-          /></svg
-        ><span>Perfil</span></a
-      >
-    </nav>
+<!-- SVG Map Background -->
+<svg width="390" height="844" viewBox="0 0 390 844" class="mapa-fondo" aria-hidden="true">
+<rect width="390" height="844" fill="#E7EFD9"></rect>
+<path d="M-10 770 C 90 700, 150 810, 260 785 S 380 725, 400 745 L400 860 L-10 860 Z" fill="#CDE5E3"></path>
+<rect x="268" y="430" width="140" height="110" rx="18" fill="#C9E2A8"></rect>
+<rect x="-24" y="570" width="116" height="92" rx="18" fill="#C9E2A8"></rect>
+<g stroke="#FFFFFF" stroke-linecap="round" fill="none">
+<path d="M-10 140 L 400 150" stroke-width="10"></path>
+<path d="M-10 260 L 400 250" stroke-width="10"></path>
+<path d="M-10 500 L 400 510" stroke-width="10"></path>
+<path d="M-10 620 L 400 612" stroke-width="10"></path>
+<path d="M72 -10 L 66 860" stroke-width="10"></path>
+<path d="M160 -10 L 168 860" stroke-width="10"></path>
+<path d="M340 -10 L 346 860" stroke-width="10"></path>
+</g>
+<g stroke="#DDE0B0" stroke-linecap="round" fill="none">
+<path d="M-10 382 L 400 376" stroke-width="25"></path>
+<path d="M250 -10 L 256 860" stroke-width="25"></path>
+<path d="M-10 720 L 400 190" stroke-width="21"></path>
+</g>
+<g stroke="#FBF6D8" stroke-linecap="round" fill="none">
+<path d="M-10 382 L 400 376" stroke-width="21"></path>
+<path d="M250 -10 L 256 860" stroke-width="21"></path>
+<path d="M-10 720 L 400 190" stroke-width="17"></path>
+</g>
+<path d="M195 470 L 195 380 L 253 379 L 253 330" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+<path d="M195 470 L 195 380 L 253 379 L 253 330" stroke="#137A3E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+<circle cx="253" cy="330" r="7" fill="#4c9540" stroke="#163820" stroke-width="2"></circle>
+<circle cx="92" cy="410" r="5" fill="#163820"></circle>
+<circle cx="300" cy="585" r="5" fill="#163820"></circle>
+<circle cx="195" cy="470" r="46" fill="#4c9540" fill-opacity="0.18"></circle>
+<circle cx="195" cy="470" r="27" fill="#4c9540" fill-opacity="0.34"></circle>
+<circle cx="195" cy="470" r="12" fill="#FFFFFF"></circle>
+<circle cx="195" cy="470" r="8.5" fill="#163820"></circle>
+</svg>
 
-    <!-- Chat root -->
-    <div id="chat-root"></div>
+<!-- Floating price tags (live or demo) -->
+<span class="marcador-precio-destacado" id="tag-price-1">$7.200</span>
+<span class="marcador-precio-secundario" id="tag-price-2">$5.400</span>
+<span class="marcador-precio-terciario" id="tag-price-3">$9.800</span>
 
-    <script src="../js/data.js"></script>
-    <script src="../js/chat.js"></script>
-    <script>
-      async function render() {
-        const perfil = {
-          nombre: "",
-          apellido: "",
-          entregasHoy: 0,
-          gananciasHoy: 0,
-          calificacion: 0,
-        };
-        try {
-          Object.assign(perfil, await cargarEstadisticas());
-        } catch (error) {
-          console.error(error);
-        }
-        const [activeResult, availableResult] = await Promise.all([cargarEntregas("active"), cargarEntregas("available")]);
-        const activos = activeResult.items;
-        const disponibles = availableResult.items;
-        const ca = activos.length;
-        const lleno = ca >= 4;
+<!-- Top Bar -->
+<div class="barra-superior">
+<span class="logo-pill">
+<img src="logos/shizen-white.png" alt="Shizen food" class="logo-img">
+</span>
+<span class="caja-ganancias">
+<span class="ganancias-label">Hoy</span>
+<span class="ganancias-monto" id="ganancias-hoy">$0</span>
+</span>
+</div>
 
-        document.getElementById("content").innerHTML = `
-      <!-- Green header -->
-      <div style="background:linear-gradient(135deg,#4c9540,#2d6b22);padding:40px 20px 24px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <div>
-            <p style="margin:0 0 2px;font-size:13px;color:rgba(255,255,255,.75);font-weight:600">Bienvenido de vuelta</p>
-            <h1 style="margin:0;font-size:22px;font-weight:800;color:white">${perfil.nombre} ${perfil.apellido}</h1>
-          </div>
-          <img src="../assets/logo_blanco.png" alt="Shizen"
-            style="height:64px;width:128px;object-fit:contain;filter:brightness(0) invert(1)">
-        </div>
-        <!-- Stats row -->
-        <div style="display:flex;gap:10px">
-          <div style="flex:1;background:white;border-radius:14px;padding:10px;text-align:center">
-            <p style="margin:0 0 2px;font-size:10px;color:#9ca3af;font-weight:600">Entregas hoy</p>
-            <p style="margin:0;font-size:14px;font-weight:800;color:#4c9540">${perfil.entregasHoy}</p>
-          </div>
-          <div style="flex:1;background:white;border-radius:14px;padding:10px;text-align:center">
-            <p style="margin:0 0 2px;font-size:10px;color:#9ca3af;font-weight:600">Ganancias</p>
-            <p style="margin:0;font-size:14px;font-weight:800;color:#f97316">${fmt(perfil.gananciasHoy)}</p>
-          </div>
-          <div style="flex:1;background:white;border-radius:14px;padding:10px;text-align:center">
-            <p style="margin:0 0 2px;font-size:10px;color:#9ca3af;font-weight:600">Calificación</p>
-            <p style="margin:0;font-size:14px;font-weight:800;color:#4c9540">⭐ ${perfil.calificacion}</p>
-          </div>
-        </div>
-      </div>
+<!-- Online/Offline toggle -->
+<div class="toggle-conexion-wrap">
+<button type="button" aria-label="Estado repartidor" class="btn-toggle-conexion" id="btn-toggle" onclick="toggleOnline()">
+<span class="toggle-icono">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v8"></path><path d="M6.3 6.8a8 8 0 1 0 11.4 0"></path></svg>
+</span>
+<span class="toggle-info">
+<span class="toggle-titulo" id="toggle-title">En línea</span>
+<span class="toggle-subtitulo" id="toggle-sub">Recibiendo pedidos</span>
+</span>
+<span class="toggle-switch">
+<span class="toggle-circulo"></span>
+</span>
+</button>
+</div>
 
-      <!-- Cupo banner -->
-      <div style="margin:16px 16px 0">
-        <div style="border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;
-          background:${lleno ? "#fef2f2" : "#f0fdf4"};border:1px solid ${lleno ? "#fecaca" : "#bbf7d0"}">
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="${lleno ? "#ef4444" : "#4c9540"}" stroke-width="2" style="flex-shrink:0">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-          </svg>
-          <div>
-            <p style="margin:0 0 2px;font-size:13px;font-weight:700;color:${lleno ? "#dc2626" : "#166534"}">
-              ${lleno ? "Cupo lleno — máx. 4 pedidos" : `Pedidos activos: ${ca} / 4`}
-            </p>
-            <p style="margin:0;font-size:11px;color:#6b7280">
-              ${lleno ? "Entrega los actuales para aceptar más" : `Puedes aceptar ${4 - ca} más`}
-            </p>
-          </div>
-        </div>
-      </div>
+<!-- Pill notification -->
+<span class="pill-pedidos-curso" id="pill-ofertas" onclick="window.location.href='activos.html'" style="cursor:pointer">
+<span class="pill-indicador-punto"></span>
+<span id="pill-text">0 ofertas cerca</span>
+</span>
 
+<!-- Reusable Native HTML Navbar (Shizen App) -->
+<nav aria-label="Navegación principal" class="nav-barra">
+  <button type="button" aria-label="Inicio" class="nav-btn-activo" onclick="window.location.href='inicio.html'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg>
+    <span class="nav-label-activo">Inicio</span>
+  </button>
+  <button type="button" aria-label="Activos" class="nav-btn" onclick="window.location.href='activos.html'">
+    <span class="nav-icono-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg>
+      <span class="nav-badge" id="nav-badge-activos" style="display:none">0</span>
+    </span>
+    <span class="nav-label">Activos</span>
+  </button>
+  <button type="button" aria-label="Avisos" class="nav-btn" onclick="window.location.href='notificaciones.php'">
+    <span class="nav-icono-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17z"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg>
+      <span class="nav-badge" id="nav-badge-avisos" style="display:none">0</span>
+    </span>
+    <span class="nav-label">Avisos</span>
+  </button>
+  <button type="button" aria-label="Perfil" class="nav-btn" onclick="window.location.href='../php/perfil.php'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-3.9 3.6-6 8-6s8 2.1 8 6"></path></svg>
+    <span class="nav-label">Perfil</span>
+  </button>
+</nav>
 
-      <!-- Available orders preview -->
-      <div style="padding:20px 16px 0">
-        <h2 style="margin:0 0 12px;font-size:15px;font-weight:800;color:#1a1a1a">Nuevos pedidos</h2>
-        ${
-          disponibles.length === 0
-            ? `
-          <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,.07);padding:24px;text-align:center">
-            <p style="margin:0;color:#9ca3af;font-size:13px">No hay pedidos disponibles ahora</p>
-          </div>`
-            : disponibles
-                .slice(0, 2)
-                .map(
-                  (p, orderIndex) => `
-          <article class="new-order-card">
-            <div class="new-order-card__top">
-              <div class="new-order-card__summary">
-                <div class="new-order-card__business">
-                  <span class="new-order-card__badge">NUEVO PEDIDO</span>
-                  <span class="new-order-card__eyebrow">Recoger en</span>
-                  <h3>${p.negocio_nombre || "Negocio sin nombre"}</h3>
-                </div>
-                <div class="new-order-card__amount">
-                  <strong>${fmt(p.total)}</strong>
-                  <span>Pedido #${p.id_pedido}</span>
-                </div>
-              </div>
-            </div>
-            <div class="new-order-card__dishes">
-              <span class="new-order-card__label">Platos por recoger</span>
-              <ul>
-                ${
-                  Array.isArray(p.detalles) && p.detalles.length
-                    ? p.detalles
-                        .map(
-                          (detalle) =>
-                            `<li><strong>${detalle.cantidad}×</strong> ${detalle.nombre}</li>`,
-                        )
-                        .join("")
-                    : "<li>Detalle no disponible</li>"
-                }
-              </ul>
-            </div>
-            ${
-              p.pedido_estado === "Preparado"
-                ? `<div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;margin:6px 0;display:flex;align-items:center;gap:6px">
-                    🧑‍🍳 ¡Plato PREPARADO y listo para recoger!
-                   </div>`
-                : p.tiempo_preparacion
-                  ? `<div style="background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:800;margin:6px 0;display:flex;align-items:center;gap:6px">
-                      ⏱️ Tiempo prep: ~${p.minutos_restantes !== null && p.minutos_restantes > 0 ? p.minutos_restantes + " min restantes" : p.tiempo_preparacion + " min"}
-                     </div>`
-                  : ""
-            }
-            <div class="new-order-card__details">
-              <div class="new-order-card__detail">
-                <span class="new-order-card__detail-icon" aria-hidden="true">⌖</span>
-                <div>
-                  <span class="new-order-card__label">Entregar a</span>
-                  <strong>${p.cliente_nombre || ""} ${p.cliente_apellido || ""}</strong>
-                </div>
-              </div>
-              <div class="new-order-card__detail">
-                <span class="new-order-card__detail-icon" aria-hidden="true">↗</span>
-                <div>
-                  <span class="new-order-card__label">Dirección de entrega</span>
-                  <strong>${p.direccion_entrega || "Dirección por confirmar"}</strong>
-                </div>
-              </div>
-            </div>
-            <button class="new-order-card__accept btn-green" type="button"
-              ${lleno ? "disabled" : ""} onclick="aceptar('${p.id_entrega}')">
-              ${lleno ? "Cupo lleno" : "Aceptar pedido"}
-              <span aria-hidden="true">→</span>
-            </button>
-          </article>`,
-                )
-                .join("")
-        }
-      </div>
-    `;
+</div>
+
+<script src="../js/data.js"></script>
+<script>
+function fmt(n) { return '$' + Number(n).toLocaleString('es-CO'); }
+
+let isOnline = true;
+
+async function loadData() {
+  try {
+    const stats = await cargarEstadisticas();
+    document.getElementById('ganancias-hoy').textContent = fmt(stats.gananciasHoy || 0);
+  } catch (e) {
+    console.error(e);
+  }
+
+  try {
+    const [activeRes, availRes] = await Promise.all([
+      cargarEntregas('active'),
+      cargarEntregas('available')
+    ]);
+
+    const activos = activeRes.items || [];
+    const disponibles = availRes.items || [];
+
+    // Badges
+    const bAct = document.getElementById('nav-badge-activos');
+    if (bAct) {
+      bAct.textContent = activos.length;
+      bAct.style.display = activos.length > 0 ? 'block' : 'none';
+    }
+
+    // Pill text
+    const pill = document.getElementById('pill-text');
+    if (pill) {
+      if (activos.length > 0) {
+        pill.textContent = activos.length === 1 ? '1 pedido en curso' : `${activos.length} pedidos en curso`;
+      } else if (disponibles.length > 0) {
+        pill.textContent = disponibles.length === 1 ? '1 oferta disponible' : `${disponibles.length} ofertas disponibles`;
+      } else {
+        pill.textContent = 'Buscando pedidos...';
       }
+    }
 
-      async function aceptar(id) {
-        try {
-          await actualizarEntrega("accept", id);
-          window.location.href = "activos.html";
-        } catch (error) {
-          alert(error.message);
-        }
+    // Floating price tags
+    if (disponibles.length > 0) {
+      if (disponibles[0]) document.getElementById('tag-price-1').textContent = fmt(disponibles[0].total);
+      if (disponibles[1]) document.getElementById('tag-price-2').textContent = fmt(disponibles[1].total);
+      if (disponibles[2]) document.getElementById('tag-price-3').textContent = fmt(disponibles[2].total);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+  // Notificaciones unread badge
+  try {
+    const resp = await fetch('../php/notificaciones.php');
+    if (resp.ok) {
+      const notifData = await resp.json();
+      const unread = (notifData.items || []).filter(n => Number(n.leida) === 0).length;
+      const bAv = document.getElementById('nav-badge-avisos');
+      if (bAv && unread > 0) {
+        bAv.textContent = unread;
+        bAv.style.display = 'block';
       }
+    }
+  } catch (e) {}
+}
 
-      render();
-      iniciarBotonEstadoRepartidor();
-      initChat();
-    </script>
-  </body>
+async function toggleOnline() {
+  try {
+    isOnline = await cambiarEstadoRepartidor();
+  } catch (e) {
+    isOnline = !isOnline;
+  }
+  updateOnlineUI();
+}
+
+function updateOnlineUI() {
+  const title = document.getElementById('toggle-title');
+  const sub = document.getElementById('toggle-sub');
+  const wrap = document.querySelector('.toggle-conexion-wrap');
+  
+  if (isOnline) {
+    title.textContent = 'En línea';
+    sub.textContent = 'Recibiendo pedidos';
+    wrap.classList.remove('is-offline');
+  } else {
+    title.textContent = 'Desconectado';
+    sub.textContent = 'No recibirás ofertas';
+    wrap.classList.add('is-offline');
+  }
+}
+
+isOnline = repartidorEstaActivo();
+updateOnlineUI();
+loadData();
+</script>
+</body>
 </html>

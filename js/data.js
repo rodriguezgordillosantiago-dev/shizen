@@ -1,107 +1,43 @@
-/* ── Shizen — shared data layer ─────────────────── */
-
-const _DEFAULTS = {
-  activos: [],
-  disponibles: [],
-  historial: [],
-  perfil: {
-    nombre: "",
-    apellido: "",
-    telefono: "",
-    localidad: "",
-    vehiculo: "",
-    calificacion: 0,
-    entregasHoy: 0,
-    gananciasHoy: 0,
-  },
-  mensajes: [],
-};
+/* ── Shizen — capa de comunicación con el backend PHP ─────────────────── */
 
 function _resolveUrl(path) {
-  if (path === 'php/entregas.php' && window.repartidorApiUrl) {
+  if (path === "php/entregas.php" && window.repartidorApiUrl) {
     return window.repartidorApiUrl;
   }
-  if (window.location.pathname.includes('/pages/')) {
-    return '../' + path;
+  const inPages = window.location.pathname.includes("/pages/");
+  const inPhp = window.location.pathname.includes("/php/");
+  if (inPages) {
+    return "../" + path;
   }
-  return '/' + path;
-}
-
-function _get(key) {
-  try {
-    const s = localStorage.getItem("shizen_" + key);
-    return s
-      ? JSON.parse(s)
-      : JSON.parse(JSON.stringify(_DEFAULTS[key]));
-  } catch {
-    return JSON.parse(JSON.stringify(_DEFAULTS[key]));
+  if (inPhp) {
+    return path.replace(/^php\//, "");
   }
-}
-function _set(key, val) {
-  localStorage.setItem(
-    "shizen_" + key,
-    JSON.stringify(val),
-  );
-}
-
-// Accessors
-function getActivos() {
-  return _get("activos");
-}
-function setActivos(v) {
-  _set("activos", v);
-}
-function getDisponibles() {
-  return _get("disponibles");
-}
-function setDisponibles(v) {
-  _set("disponibles", v);
-}
-function getHistorial() {
-  return _get("historial");
-}
-function setHistorial(v) {
-  _set("historial", v);
-}
-function getPerfil() {
-  return _get("perfil");
-}
-function setPerfil(v) {
-  _set("perfil", v);
-}
-function getMensajes() {
-  return _get("mensajes");
-}
-function setMensajes(v) {
-  _set("mensajes", v);
+  return path;
 }
 
 // Estado de disponibilidad del repartidor (persistente entre pantallas).
 function repartidorEstaActivo() {
-  return (
-    localStorage.getItem("shizen_repartidor_activo") !==
-    "false"
-  );
+  return localStorage.getItem("shizen_repartidor_activo") !== "false";
 }
 
 async function cambiarEstadoRepartidor() {
   try {
-    const response = await fetch(_resolveUrl('php/entregas.php'), {
+    const response = await fetch(_resolveUrl("php/entregas.php"), {
       method: "POST",
       body: new URLSearchParams({ action: "toggle" }),
       credentials: "same-origin",
-      headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', Accept: 'application/json' }
+      headers: {
+        "X-CSRF-TOKEN":
+          document.querySelector('meta[name="csrf-token"]')?.content || "",
+        Accept: "application/json",
+      },
     });
     const result = await response.json();
     if (!response.ok)
       throw new Error(
-        result.error ||
-          "No fue posible cambiar la disponibilidad.",
+        result.error || "No fue posible cambiar la disponibilidad.",
       );
-    localStorage.setItem(
-      "shizen_repartidor_activo",
-      String(result.online),
-    );
+    localStorage.setItem("shizen_repartidor_activo", String(result.online));
     actualizarBotonEstadoRepartidor();
     document.dispatchEvent(
       new CustomEvent("estadoRepartidorCambiado", {
@@ -116,9 +52,7 @@ async function cambiarEstadoRepartidor() {
 }
 
 function actualizarBotonEstadoRepartidor() {
-  const boton = document.getElementById(
-    "delivery-status-toggle",
-  );
+  const boton = document.getElementById("delivery-status-toggle");
   if (!boton) return;
 
   const activo = repartidorEstaActivo();
@@ -126,52 +60,50 @@ function actualizarBotonEstadoRepartidor() {
   boton.setAttribute("aria-pressed", String(activo));
   boton.setAttribute(
     "aria-label",
-    activo
-      ? "Desactivar estado de repartidor"
-      : "Activar estado de repartidor",
+    activo ? "Desactivar estado de repartidor" : "Activar estado de repartidor",
   );
-  boton.querySelector(".nav-status-label").textContent =
-    activo ? "Activo" : "Inactivo";
+  const label = boton.querySelector(".nav-status-label");
+  if (label) {
+    label.textContent = activo ? "Activo" : "Inactivo";
+  }
 }
 
 function iniciarBotonEstadoRepartidor() {
-  const boton = document.getElementById(
-    "delivery-status-toggle",
-  );
+  const boton = document.getElementById("delivery-status-toggle");
   if (!boton) return;
   boton.addEventListener("click", cambiarEstadoRepartidor);
   actualizarBotonEstadoRepartidor();
 }
 
-// Helpers
+// ── Servicios API conectados a PHP y MySQL ──
 const MAX_ACTIVOS = 4;
+
 async function cargarEntregas(tipo) {
-  const url = _resolveUrl('php/entregas.php') + (window.repartidorApiUrl ? '?type=' : '?type=') + encodeURIComponent(tipo);
+  const url =
+    _resolveUrl("php/entregas.php") + "?type=" + encodeURIComponent(tipo);
   const response = await fetch(url, {
     credentials: "same-origin",
-    headers: { Accept: 'application/json' }
+    headers: { Accept: "application/json" },
   });
   if (response.status === 401) {
-    window.location.href = window.location.pathname.includes('/pages/') ? "../index.html" : "/";
+    window.location.href = window.location.pathname.includes("/pages/")
+      ? "../index.html"
+      : "/";
     return { items: [] };
   }
-  if (!response.ok)
-    throw new Error("No fue posible cargar las entregas.");
+  if (!response.ok) throw new Error("No fue posible cargar las entregas.");
   return response.json();
 }
 
 async function cargarEstadisticas() {
-  const url = _resolveUrl('php/entregas.php') + (window.repartidorApiUrl ? '?type=stats' : '?action=stats');
+  const url = _resolveUrl("php/entregas.php") + "?action=stats";
   const response = await fetch(url, {
     credentials: "same-origin",
-    headers: { Accept: 'application/json' }
+    headers: { Accept: "application/json" },
   });
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(
-      result.error ||
-        "No fue posible cargar las estadísticas.",
-    );
+    throw new Error(result.error || "No fue posible cargar las estadísticas.");
   }
   return result;
 }
@@ -181,28 +113,20 @@ async function actualizarEntrega(action, id) {
     action,
     id_entrega: String(id),
   });
-  const response = await fetch(_resolveUrl('php/entregas.php'), {
+  const response = await fetch(_resolveUrl("php/entregas.php"), {
     method: "POST",
     body,
     credentials: "same-origin",
-    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', Accept: 'application/json' }
+    headers: {
+      "X-CSRF-TOKEN":
+        document.querySelector('meta[name="csrf-token"]')?.content || "",
+      Accept: "application/json",
+    },
   });
   const result = await response.json();
   if (!response.ok || result.updated === false)
-    throw new Error(
-      result.error ||
-        "No fue posible actualizar la entrega.",
-    );
+    throw new Error(result.error || "No fue posible actualizar la entrega.");
   return result;
-}
-function countActivos() {
-  return getActivos().filter(
-    (p) =>
-      p.estado === "aceptado" || p.estado === "en_camino",
-  ).length;
-}
-function cupoLleno() {
-  return countActivos() >= MAX_ACTIVOS;
 }
 
 function fmt(n) {
@@ -216,50 +140,56 @@ function nowTime() {
   });
 }
 
-// Update nav badges on any page that has them
+// Actualiza los badges de la barra de navegación consultando la BD
 async function updateNavBadges() {
-  const ba = document.getElementById("badge-activos");
-  const bn = document.getElementById("badge-notificaciones");
+  const baList = [
+    document.getElementById("badge-activos"),
+    document.getElementById("nav-badge-activos"),
+  ].filter(Boolean);
+  const bnList = [
+    document.getElementById("badge-notificaciones"),
+    document.getElementById("nav-badge-avisos"),
+  ].filter(Boolean);
 
   // Badge de pedidos activos
-  if (ba) {
+  if (baList.length > 0) {
     try {
       const res = await cargarEntregas("active");
       const ca = (res.items || []).length;
-      ba.textContent = ca > 9 ? "9+" : ca;
-      ba.style.display = ca > 0 ? "flex" : "none";
-    } catch (e) {
-      /* Silencioso si falla */
-    }
+      baList.forEach((ba) => {
+        ba.textContent = ca > 9 ? "9+" : ca;
+        ba.style.display = ca > 0 ? "block" : "none";
+      });
+    } catch (e) {}
   }
 
-  // Badge de notificaciones (punto naranja con conteo)
-  if (bn) {
+  // Badge de notificaciones (avisos)
+  if (bnList.length > 0) {
     try {
-      const resp = await fetch(_resolveUrl('php/notificaciones.php'), {
+      const resp = await fetch(_resolveUrl("php/notificaciones.php"), {
         credentials: "same-origin",
-        headers: { Accept: 'application/json' }
+        headers: { Accept: "application/json" },
       });
       if (resp.ok) {
         const notifData = await resp.json();
         const items = notifData.items || [];
-        const unreadCount = items.filter(n => Number(n.leida) === 0).length;
-        if (unreadCount > 0) {
-          bn.textContent = unreadCount > 9 ? "9+" : unreadCount;
-          bn.style.display = "flex";
-          bn.style.background = "#f97316";
-        } else {
-          bn.textContent = "";
-          bn.style.display = "none";
-        }
+        const unreadCount = items.filter((n) => Number(n.leida) === 0).length;
+        bnList.forEach((bn) => {
+          if (unreadCount > 0) {
+            bn.textContent = unreadCount > 9 ? "9+" : unreadCount;
+            bn.style.display = "block";
+          } else {
+            bn.textContent = "";
+            bn.style.display = "none";
+          }
+        });
       }
-    } catch (e) {
-      /* Silencioso si falla */
-    }
+    } catch (e) {}
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  iniciarBotonEstadoRepartidor();
   updateNavBadges();
   setInterval(updateNavBadges, 15000);
 });

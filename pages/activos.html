@@ -1,221 +1,516 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Shizen — Pedidos</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles/repartidor.css?v=scale-2" />
-    <link rel="stylesheet" href="styles/navigation.css?v=nav-stable-4" />
-  </head>
-  <body>
-    <main class="scroll">
-      <h1 style="margin: 0 0 4px; font-size: 20px">Pedidos activos</h1>
-      <p style="margin: 0 0 18px; color: #9ca3af; font-size: 12px">
-        Gestiona las entregas en curso
-      </p>
-      <div id="orders"></div>
-    </main>
-    <nav class="bottom-nav" aria-label="Navegación principal">
-      <a href="inicio.html" class="nav-item" aria-label="Inicio"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 10.5 12 3l9 7.5v8.25A2.25 2.25 0 0 1 18.75 21H5.25A2.25 2.25 0 0 1 3 18.75V10.5Z"
-          /></svg
-          <path d="M9 21v-5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V21" /></svg
-        ><span>Inicio</span></a
-      >
-      <a
-        href="activos.html"
-        class="nav-item is-active"
-        aria-current="page"
-        aria-label="Activos"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4 8-4V7M12 11v10"
-          /></svg
-        ><span>Activos</span><b class="badge" id="badge-activos"></b
-      ></a>
-      <button
-        id="delivery-status-toggle"
-        class="nav-status-toggle"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="nav-status-icon"
-          ><svg
-            width="18"
-            height="18"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <path
-              stroke-linecap="round"
-              d="M12 2v10m0 0 4-4m-4 4-4-4M5 13v4a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-4"
-            /></svg
-        ></span>
-        <span class="nav-status-label">Activo</span>
-      </button>
-      <a href="notificaciones.php" class="nav-item" aria-label="Notificaciones"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 13h4"
-          /></svg
-        ><span>Notificaciones</span><b class="badge" id="badge-notificaciones"></b
-      ></a>
-      <a href="../php/perfil.php" class="nav-item" aria-label="Perfil"
-        ><svg
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-12 14a8 8 0 0 1 16 0"
-          /></svg
-        ><span>Perfil</span></a
-      >
-    </nav>
-    <div id="chat-root"></div>
-    <script src="../js/data.js"></script>
-    <script src="../js/chat.js?v=compact-2"></script>
-    <script>
-      function fmt(n) { return '$' + Number(n).toLocaleString('es-CO'); }
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shizen repartidor · Activos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/styles.css?v=20261009-final">
+<link rel="stylesheet" href="styles/activos.css?v=20261009-final">
+</head>
+<body>
+<div class="pantalla pantalla-marco" id="pantalla-activos">
 
-      async function render() {
-        try {
-          const result = await cargarEntregas('active');
-          const list = result.items || [];
-          const ba = document.getElementById("badge-activos");
-          if (ba) {
-            ba.textContent = list.length > 9 ? "9+" : list.length;
-            ba.style.display = list.length > 0 ? "flex" : "none";
-          }
-          document.querySelector('#orders').innerHTML = list.length
-            ? list.map(p => {
-              const moving = p.entrega_estado === 'En camino';
-              const codigoR = p.codigo_recogida || '';
-              const codigoC = p.codigo_c || '';
-              let card = `<article class="card order">
-                <div class="order-head">
-                  <div class="order-main">
-                    <p class="name">${p.cliente_nombre} ${p.cliente_apellido}</p>
-                    <p class="muted" style="color:${moving?'#f97316':'#4c9540'};font-weight:700">
-                      ${moving ? '🛵 En camino al destino' : '⏳ Pedido aceptado'}
-                    </p>
-                  </div>
-                  <div class="earn"><strong>${fmt(p.total)}</strong></div>
-                </div>
-                <div class="route">📍 Recoger: ${p.negocio_nombre}<br>🏁 Entregar: ${p.direccion_entrega}</div>`;
+<!-- Top right SVG leaf decoration -->
+<svg width="390" height="300" viewBox="0 0 390 300" class="adorno-hojas-svg" aria-hidden="true">
+<g fill="none" stroke="#DCE5CF" stroke-width="1.5">
+<circle cx="390" cy="0" r="90"></circle>
+<circle cx="390" cy="0" r="140"></circle>
+<circle cx="390" cy="0" r="190"></circle>
+<circle cx="390" cy="0" r="240"></circle>
+</g>
+<g transform="translate(346,30) scale(0.7)">
+<path d="M0 80 C 0 40 40 0 80 0 C 80 40 40 80 0 80 Z" fill="#137A3E"></path>
+<path d="M0 80 L 80 0" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="3" fill="none"></path>
+</g>
+<g transform="translate(312,-10)">
+<path d="M0 80 C 0 40 40 0 80 0 C 80 40 40 80 0 80 Z" fill="#4c9540"></path>
+<path d="M0 80 L 80 0" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="3" fill="none"></path>
+</g>
+</svg>
 
-              if (!moving) {
-                const recogido = p.entrega_estado === 'Recogido en negocio';
-                card += `
-                ${
-                  p.pedido_estado === 'Preparado'
-                    ? `<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px;color:#047857;font-weight:700;display:flex;align-items:center;gap:6px">
-                        🧑‍🍳 ¡El plato ya está PREPARADO por el restaurante!
-                       </div>`
-                    : p.tiempo_preparacion
-                      ? `<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px;color:#c2410c;font-weight:700;display:flex;align-items:center;gap:6px">
-                          ⏱️ Tiempo prep: ~${p.minutos_restantes !== null && p.minutos_restantes > 0 ? p.minutos_restantes + ' min restantes' : p.tiempo_preparacion + ' min'}
-                         </div>`
-                      : ''
-                }
-                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px">
-                  <div style="font-weight:700;color:#1e40af;margin-bottom:4px">🔑 Tu código para el negocio:</div>
-                  <div style="font-size:22px;font-weight:900;letter-spacing:4px;color:#1d4ed8;text-align:center">${codigoR}</div>
-                  <div style="font-size:11px;color:#6b7280;margin-top:4px;text-align:center">Muéstraselo al negocio/cocina para que confirmen la recogida</div>
-                </div>
-                ${recogido
-                  ? ''
-                  : `<div style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px;color:#854d0e;text-align:center">
-                      ⏳ Esperando que el negocio valide tu código antes de poder recoger
-                     </div>`}
-                <div class="actions">
-                  <button class="btn-green" onclick="pickUp('${p.id_entrega}')"
-                    ${recogido ? '' : 'disabled style="opacity:0.55;cursor:not-allowed;background:#94a3b8"'}>
-                    🛵 Recogí el pedido
-                  </button>
-                </div>`;
-              } else {
-                card += `
-                <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:12px;padding:14px;margin:10px 0;font-size:13px">
-                  <div style="font-weight:800;color:#047857;margin-bottom:8px">✅ Ingresa el código que te dio el cliente:</div>
-                  <div style="display:flex;flex-direction:column;gap:10px;width:100%">
-                    <input id="codigo-c-${p.id_entrega}" type="text" inputmode="numeric" maxlength="6" required pattern="[0-9]{6}" title="Ingresa un código de 6 dígitos."
-                           style="width:100%;padding:10px;border:2px solid #059669;border-radius:10px;font-size:18px;font-weight:900;letter-spacing:3px;text-align:center;min-height:48px"
-                           placeholder="Código cliente">
-                    <button class="btn-green" style="width:100%;min-height:48px;font-weight:800;font-size:15px;white-space:nowrap;border-radius:10px" onclick="deliverWithClientCode('${p.id_entrega}')">🏁 Confirmar entrega</button>
-                  </div>
-                  <div style="font-size:11px;color:#6b7280;margin-top:6px">Ingresa el código de 6 dígitos que te proporcione el cliente al momento de la entrega.</div>
-                </div>`;
-              }
+<!-- Header & Content Container -->
+<div class="contenedor-activos-scroll">
+  <!-- Header row -->
+  <div class="activos-cabecera">
+    <div class="activos-logo-fila">
+      <img src="logos/shizen-color.png" alt="Shizen food" class="activos-logo-img">
+      <span class="badge-en-linea">
+        <span class="badge-punto-verde"></span>
+        En línea
+      </span>
+    </div>
+    <h1 class="activos-titulo">Activos</h1>
+    <p class="activos-resumen" id="header-resumen">Cargando pedidos...</p>
+  </div>
 
-              card += `</article>`;
-              return card;
-            }).join('')
-          : `<div class="card" style="padding:32px;text-align:center;color:#9ca3af;font-size:13px">No tienes pedidos activos</div>`;
-        } catch (err) {
-          console.error('Error al renderizar pedidos activos:', err);
-          document.querySelector('#orders').innerHTML = `<div class="card" style="padding:32px;text-align:center;color:#ef4444;font-size:13px">Error al cargar pedidos activos. Por favor recarga la página.</div>`;
-        }
-      }
+  <!-- Order Tabs -->
+  <div class="tabs-pedidos" id="order-tabs"></div>
 
-      async function pickUp(id) {
-        try {
-          await actualizarEntrega('advance', id);
-          await render();
-        } catch (e) { alert(e.message); }
-      }
+  <!-- Selected Order Detail Card -->
+  <div id="order-card-container"></div>
+</div>
 
-      async function deliverWithClientCode(id) {
-        const input = document.getElementById('codigo-c-' + id);
-        const codigo = (input ? input.value.trim() : '');
-        if (!codigo) { alert('Ingresa el código que te dio el cliente.'); return; }
-        if (!/^\d{6}$/.test(codigo)) { alert('El código del cliente debe tener exactamente 6 dígitos numéricos.'); return; }
-        try {
-          const body = new URLSearchParams({ action: 'deliver_client_code', id_entrega: String(id), codigo_cliente: codigo });
-          const resp = await fetch('../php/entregas.php', { method: 'POST', body, credentials: 'same-origin' });
-          const result = await resp.json();
-          if (!resp.ok || result.error) throw new Error(result.error || 'Error al finalizar.');
-          alert('¡Entrega finalizada correctamente!');
-          await render();
-        } catch (e) { alert(e.message); }
-      }
+<!-- Delivery Code Modal (Bottom Sheet) -->
+<div class="modal-overlay-wrap" id="modal-wrapper">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div role="dialog" aria-label="Código de entrega" class="modal-sheet">
+    <div class="modal-sheet-header">
+      <span class="pedido-negocio-nombre">Código de entrega</span>
+      <span class="modal-subtitulo" id="modal-instruccion">Pídeselo al cliente. Lo ve en su app.</span>
+    </div>
 
-      render();
-      iniciarBotonEstadoRepartidor();
-      initChat();
-    </script>
+    <!-- 6 Digits Boxes -->
+    <div class="tabs-pedidos" id="modal-digits-wrap">
+      <span class="pin-casilla-activa" id="d0"></span>
+      <span class="pin-casilla-vacia" id="d1"></span>
+      <span class="pin-casilla-vacia" id="d2"></span>
+      <span class="pin-casilla-vacia" id="d3"></span>
+      <span class="pin-casilla-vacia" id="d4"></span>
+      <span class="pin-casilla-vacia" id="d5"></span>
+    </div>
 
+    <span class="modal-error-msg" id="modal-error-msg">Ingresa el código de 6 dígitos</span>
+
+    <!-- Numpad -->
+    <div class="numpad-grid">
+      <button type="button" class="numpad-tecla" onclick="numpadInput('1')">1</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('2')">2</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('3')">3</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('4')">4</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('5')">5</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('6')">6</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('7')">7</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('8')">8</button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('9')">9</button>
+      <button type="button" class="numpad-espacio-vacio"></button>
+      <button type="button" class="numpad-tecla" onclick="numpadInput('0')">0</button>
+      <button type="button" class="numpad-tecla-borrar" onclick="numpadDelete()">⌫</button>
+    </div>
+
+    <button type="button" class="btn-confirmar-pin" id="modal-submit-btn" onclick="submitDeliveryCode()">Confirmar entrega</button>
+    <button type="button" class="btn-cancelar-pin" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- Reusable Native HTML Navbar (Shizen App) -->
+<nav aria-label="Navegación principal" class="nav-barra">
+  <button type="button" aria-label="Inicio" class="nav-btn" onclick="window.location.href='inicio.html'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg>
+    <span class="nav-label">Inicio</span>
+  </button>
+  <button type="button" aria-label="Activos" class="nav-btn-activo" onclick="window.location.href='activos.html'">
+    <span class="nav-icono-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg>
+      <span class="nav-badge-activo" id="nav-badge-activos" style="display:none">0</span>
+    </span>
+    <span class="nav-label-activo">Activos</span>
+  </button>
+  <button type="button" aria-label="Avisos" class="nav-btn" onclick="window.location.href='notificaciones.php'">
+    <span class="nav-icono-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15L6 17z"></path><path d="M10 21a2 2 0 0 0 4 0"></path></svg>
+      <span class="nav-badge" id="nav-badge-avisos" style="display:none">0</span>
+    </span>
+    <span class="nav-label">Avisos</span>
+  </button>
+  <button type="button" aria-label="Perfil" class="nav-btn" onclick="window.location.href='../php/perfil.php'">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-3.9 3.6-6 8-6s8 2.1 8 6"></path></svg>
+    <span class="nav-label">Perfil</span>
+  </button>
+</nav>
+
+</div>
+
+<script src="../js/data.js"></script>
+<script src="../js/chat.js"></script>
+<script>
+function fmt(n) { return '$' + Number(n).toLocaleString('es-CO'); }
+
+let pedidosActivos = [];
+let currentIndex = 0;
+let modalEntregaId = null;
+let inputCode = '';
+let llegadasLocales = {};
+
+async function loadActivos() {
+  try {
+    const res = await cargarEntregas('active');
+    pedidosActivos = res.items || [];
+
+    // Badge nav
+    const badge = document.getElementById('nav-badge-activos');
+    if (badge) {
+      badge.textContent = pedidosActivos.length;
+      badge.style.display = pedidosActivos.length > 0 ? 'block' : 'none';
+    }
+
+    // Resumen header
+    const totalGanancias = pedidosActivos.reduce((acc, p) => acc + Number(p.total || 0), 0);
+    document.getElementById('header-resumen').textContent =
+      pedidosActivos.length + ' de 4 pedidos · Ganas ' + fmt(totalGanancias);
+
+    if (currentIndex >= pedidosActivos.length) {
+      currentIndex = Math.max(0, pedidosActivos.length - 1);
+    }
+
+    renderTabs();
+    renderDetailCard();
+  } catch (err) {
+    console.error(err);
+    pedidosActivos = [];
+    renderTabs();
+    renderDetailCard();
+  }
+}
+
+function getStepIndex(p) {
+  const est = (p.entrega_estado || '').toLowerCase();
+  if (est === 'entregado') return 4;
+  if (est === 'en camino') return 3;
+  if (est === 'recogido en negocio' || llegadasLocales[p.id_entrega]) return 2;
+  return 1;
+}
+
+function renderTabs() {
+  const container = document.getElementById('order-tabs');
+  if (pedidosActivos.length === 0) {
+    container.innerHTML = `
+      <div class="tab-slot-libre" style="width:100%;height:80px">
+        <span class="tab-slot-libre-texto">No tienes pedidos activos en curso</span>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  for (let i = 0; i < 4; i++) {
+    if (i < pedidosActivos.length) {
+      const p = pedidosActivos[i];
+      const isSel = (i === currentIndex);
+      const step = getStepIndex(p);
+      const barCls = isSel ? 'tab-barra-progreso-llena' : 'tab-barra-completada';
+
+      html += `
+        <button type="button" class="${isSel ? 'tab-pedido-activo' : 'tab-pedido-inactivo'}" onclick="switchTab(${i})">
+          <div class="tab-pedido-header">
+            <span class="${isSel ? 'tab-pedido-num-activo' : 'tab-pedido-num-inactivo'}">${i + 1}</span>
+            <span class="tab-pedido-nombre">${p.cliente_nombre || 'Pedido'}</span>
+          </div>
+          <div class="tab-pedido-barras">
+            <span class="${step >= 1 ? barCls : 'tab-barra-pendiente'}"></span>
+            <span class="${step >= 2 ? barCls : 'tab-barra-pendiente'}"></span>
+            <span class="${step >= 3 ? barCls : 'tab-barra-pendiente'}"></span>
+            <span class="${step >= 4 ? barCls : 'tab-barra-pendiente'}"></span>
+          </div>
+        </button>`;
+    } else {
+      html += `
+        <div class="tab-slot-libre">
+          <span class="tab-slot-libre-texto">+ Libre</span>
+        </div>`;
+    }
+  }
+  container.innerHTML = html;
+}
+
+function switchTab(index) {
+  currentIndex = index;
+  renderTabs();
+  renderDetailCard();
+}
+
+function renderDetailCard() {
+  const container = document.getElementById('order-card-container');
+  if (pedidosActivos.length === 0) {
+    container.innerHTML = `
+      <div class="tarjeta-detalle-pedido" style="text-align:center;padding:40px 16px;">
+        <span style="font-size:32px;display:block;margin-bottom:12px">🛵</span>
+        <span class="pedido-negocio-nombre">Sin pedidos activos</span>
+        <span class="modal-subtitulo" style="margin-top:6px;display:block">Acepta pedidos desde la pestaña Disponibles para ver la ruta aquí.</span>
+      </div>`;
+    return;
+  }
+
+  const p = pedidosActivos[currentIndex];
+  const step = getStepIndex(p);
+  const isMoving = (step >= 3);
+  const isRecogido = (p.entrega_estado === 'Recogido en negocio');
+  const haLlegado = llegadasLocales[p.id_entrega] || isRecogido || isMoving;
+
+  const statusText = step === 4 ? 'Entregado' : isMoving ? 'En camino' : haLlegado ? 'En local' : 'Por recoger';
+
+  // SVG Mini Map
+  const mapSvg = `
+    <svg width="342" height="72" viewBox="0 0 342 72" class="mapa-svg-render" aria-hidden="true">
+      <rect width="342" height="72" fill="#DCECD2"></rect>
+      <rect x="0" y="0" width="120" height="72" fill="#CFE4C3"></rect>
+      <rect x="190" y="0" width="110" height="60" rx="12" fill="#C9E2A8"></rect>
+      <path d="M-10 24 L360 22" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" fill="none"></path>
+      <path d="M-10 52 L360 50" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" fill="none"></path>
+      <path d="M80 -10 L84 82" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" fill="none"></path>
+      <path d="M210 -10 L214 82" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" fill="none"></path>
+      <path d="M38 48 L140 48 L140 24 L284 24 L284 30" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      <path d="M38 48 L140 48 L140 24 L284 24 L284 30" stroke="#137A3E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      <circle cx="38" cy="48" r="9" fill="#163820"></circle>
+      <circle cx="38" cy="48" r="4" fill="#FFFFFF"></circle>
+      <circle cx="284" cy="30" r="10" fill="#4c9540" stroke="#163820" stroke-width="2.5"></circle>
+      <circle cx="284" cy="30" r="4" fill="#163820"></circle>
+    </svg>`;
+
+  // Stepper Tracker
+  const stepTracker = `
+    <div class="stepper-progreso">
+      <div class="stepper-linea-fondo">
+        <div class="${step === 1 ? 'stepper-linea-0' : step === 2 ? 'stepper-linea-33' : 'stepper-linea-100'}"></div>
+      </div>
+      <div class="tabs-pedidos">
+        <div class="stepper-paso">
+          <span class="${step >= 1 ? 'stepper-punto-completado' : 'stepper-punto-inactivo'}">
+            ${step >= 1 ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"><path d="M1 4l3 3 5-6"/></svg>' : ''}
+          </span>
+          <span class="${step === 1 ? 'stepper-label-activo' : 'stepper-label-inactivo'}">Aceptado</span>
+        </div>
+        <div class="stepper-paso">
+          <span class="${step >= 2 ? (step === 2 ? 'stepper-punto-activo' : 'stepper-punto-completado') : 'stepper-punto-inactivo'}">
+            ${step > 2 ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"><path d="M1 4l3 3 5-6"/></svg>' : ''}
+          </span>
+          <span class="${step === 2 ? 'stepper-label-activo' : 'stepper-label-inactivo'}">En local</span>
+        </div>
+        <div class="stepper-paso">
+          <span class="${step >= 3 ? (step === 3 ? 'stepper-punto-activo' : 'stepper-punto-completado') : 'stepper-punto-inactivo'}">
+            ${step > 3 ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"><path d="M1 4l3 3 5-6"/></svg>' : ''}
+          </span>
+          <span class="${step === 3 ? 'stepper-label-activo' : 'stepper-label-inactivo'}">En camino</span>
+        </div>
+        <div class="stepper-paso">
+          <span class="${step === 4 ? 'stepper-punto-activo' : 'stepper-punto-inactivo'}"></span>
+          <span class="${step === 4 ? 'stepper-label-activo' : 'stepper-label-inactivo'}">Entregado</span>
+        </div>
+      </div>
+    </div>`;
+
+  // Pickup Code Box (if arrived at restaurant and not moving yet)
+  let codeCardHtml = '';
+  if (haLlegado && !isMoving) {
+    const code = String(p.codigo_recogida || '0000');
+    const digitsHtml = code.split('').map(d => `<span class="codigo-recogida-digito">${d}</span>`).join('');
+    const avisoNegocio = isRecogido
+      ? `<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:8px 12px;font-size:12px;color:#047857;font-weight:700;text-align:center">¡Negocio validó la entrega! Ya puedes continuar.</div>`
+      : `<div style="background:#fef9c3;border:1px solid #fde047;border-radius:12px;padding:8px 12px;font-size:12px;color:#854d0e;text-align:center">Esperando que el negocio valide tu código</div>`;
+
+    codeCardHtml = `
+      <div class="codigo-recogida-box">
+        <div class="codigo-recogida-header">
+          <span class="codigo-recogida-titulo">Código de recogida</span>
+          <span class="codigo-recogida-negocio">${p.negocio_nombre || ''}</span>
+        </div>
+        <div class="tabs-pedidos">${digitsHtml}</div>
+        <span class="codigo-recogida-aviso">Muéstralo en el local para que te entreguen el pedido.</span>
+      </div>
+      ${avisoNegocio}`;
+  }
+
+  // Dishes summary
+  const platos = Array.isArray(p.detalles) && p.detalles.length
+    ? p.detalles.map(d => `${d.cantidad}× ${d.nombre}`).join(', ')
+    : '2 productos · Pagado en app';
+
+  // Action button
+  let actionButton = '';
+  if (isMoving) {
+    actionButton = `
+      <button type="button" class="btn-accion-pedido" onclick="openModal('${p.id_entrega}', '${p.cliente_nombre || ''} ${p.cliente_apellido || ''}', '${p.id_pedido}')">
+        Ingresar código del cliente
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      </button>`;
+  } else if (!haLlegado) {
+    actionButton = `
+      <button type="button" class="btn-accion-pedido" onclick="marcarLlegadaLocal('${p.id_entrega}')">
+        Llegué al local
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      </button>`;
+  } else {
+    actionButton = `
+      <button type="button" class="btn-accion-pedido" ${isRecogido ? '' : 'disabled style="opacity:0.55;background:#94a3b8;cursor:not-allowed"'} onclick="confirmPickup('${p.id_entrega}')">
+        ${isRecogido ? 'Recogí el pedido' : 'Esperando validación del negocio'}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+      </button>`;
+  }
+
+  container.innerHTML = `
+    <div class="tarjeta-detalle-pedido">
+      <!-- Mini Map -->
+      <div class="mapa-miniatura">
+        ${mapSvg}
+        <span class="mapa-chip-pedido">Pedido #${p.id_pedido}</span>
+        <span class="mapa-chip-estado">${statusText}</span>
+      </div>
+
+      <!-- Business & Amount -->
+      <div class="pedido-info-fila">
+        <div class="pedido-negocio-col">
+          <span class="pedido-negocio-nombre">${p.negocio_nombre || 'Restaurante'}</span>
+          <span class="pedido-detalles-platos">${platos}</span>
+        </div>
+        <div class="pedido-monto-col">
+          <span class="pedido-ganas-label">Ganas</span>
+          <span class="pedido-monto-valor">${fmt(p.total)}</span>
+        </div>
+      </div>
+
+      <!-- Tracker -->
+      ${stepTracker}
+
+      <!-- Pickup Code Box (if arrived at restaurant) -->
+      ${codeCardHtml}
+
+      <!-- Addresses -->
+      <div class="rutas-lista">
+        <div class="${!isMoving ? 'ruta-item-activo' : 'ruta-item-pendiente'}">
+          <span class="ruta-icono">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#163820" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M5 9v11h14V9"></path><path d="M3 9h18"></path><path d="M10 20v-6h4v6"></path></svg>
+          </span>
+          <span class="ruta-datos">
+            <span class="pedido-ganas-label">Recoger</span>
+            <span class="ruta-direccion">${p.negocio_nombre || 'Local'}</span>
+          </span>
+          <span class="ruta-distancia">0,6 km · 4 min</span>
+        </div>
+        <div class="${isMoving ? 'ruta-item-activo' : 'ruta-item-pendiente'}">
+          <span class="ruta-icono">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#163820" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+          </span>
+          <span class="ruta-datos">
+            <span class="pedido-ganas-label">Entregar a ${p.cliente_nombre || ''}</span>
+            <span class="ruta-direccion">${p.direccion_entrega || 'Dirección de entrega'}</span>
+          </span>
+          <span class="ruta-distancia">2,4 km · 9 min</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      ${actionButton}
+
+      <!-- Secondary Buttons (Llamar, Chat, Navegar) -->
+      <div class="tabs-pedidos">
+        <button type="button" class="btn-secundario-accion" onclick="alert('Contactando a soporte / cliente...')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg>
+          Llamar
+        </button>
+        <button type="button" class="btn-secundario-accion" onclick="openChat()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.6A8 8 0 1 1 21 12z"></path></svg>
+          Chat
+        </button>
+        <button type="button" class="btn-secundario-accion" onclick="window.open('https://maps.google.com/?q=' + encodeURIComponent('${(p.direccion_entrega || "Bogota").replace(/'/g, "\\'")}'), '_blank')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z"></path></svg>
+          Navegar
+        </button>
+      </div>
+    </div>`;
+}
+
+function marcarLlegadaLocal(deliveryId) {
+  llegadasLocales[deliveryId] = true;
+  renderTabs();
+  renderDetailCard();
+}
+
+async function confirmPickup(deliveryId) {
+  try {
+    await actualizarEntrega('advance', deliveryId);
+    await loadActivos();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+// ── Modal Numpad Functions ──
+function openModal(deliveryId, clientName, pedidoId) {
+  modalEntregaId = deliveryId;
+  inputCode = '';
+  document.getElementById('modal-instruccion').textContent =
+    'Pídeselo a ' + (clientName.trim() || 'el cliente') + '. Lo ve en su app en el pedido #' + pedidoId + '.';
+  updateModalDisplay();
+  document.getElementById('modal-error-msg').textContent = 'Ingresa el código de 6 dígitos';
+  document.getElementById('modal-error-msg').classList.remove('is-error');
+  document.getElementById('modal-wrapper').classList.add('is-open');
+}
+
+function closeModal() {
+  document.getElementById('modal-wrapper').classList.remove('is-open');
+  modalEntregaId = null;
+  inputCode = '';
+}
+
+function numpadInput(num) {
+  if (inputCode.length >= 6) return;
+  inputCode += num;
+  updateModalDisplay();
+}
+
+function numpadDelete() {
+  if (inputCode.length === 0) return;
+  inputCode = inputCode.slice(0, -1);
+  updateModalDisplay();
+}
+
+function updateModalDisplay() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('d' + i);
+    if (!el) continue;
+    if (i < inputCode.length) {
+      el.textContent = inputCode[i];
+      el.className = 'pin-casilla-llena';
+    } else if (i === inputCode.length) {
+      el.textContent = '';
+      el.className = 'pin-casilla-activa';
+    } else {
+      el.textContent = '';
+      el.className = 'pin-casilla-vacia';
+    }
+  }
+
+  const btn = document.getElementById('modal-submit-btn');
+  if (inputCode.length === 6) {
+    btn.classList.add('is-ready');
+  } else {
+    btn.classList.remove('is-ready');
+  }
+}
+
+async function submitDeliveryCode() {
+  if (inputCode.length !== 6 || !modalEntregaId) {
+    document.getElementById('modal-error-msg').textContent = 'El código debe tener 6 dígitos';
+    document.getElementById('modal-error-msg').classList.add('is-error');
+    return;
+  }
+
+  try {
+    const body = new URLSearchParams({
+      action: 'deliver_client_code',
+      id_entrega: String(modalEntregaId),
+      codigo_cliente: inputCode
+    });
+    const resp = await fetch('../php/entregas.php', { method: 'POST', body, credentials: 'same-origin' });
+    const res = await resp.json();
+    if (!resp.ok || res.error) {
+      document.getElementById('modal-error-msg').textContent = res.error || 'Código incorrecto';
+      document.getElementById('modal-error-msg').classList.add('is-error');
+      inputCode = '';
+      updateModalDisplay();
+      return;
+    }
+
+    closeModal();
+    alert('¡Entrega finalizada con éxito!');
+    await loadActivos();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+loadActivos();
+initChat();
+</script>
 </body>
 </html>

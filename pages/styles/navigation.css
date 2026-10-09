@@ -1,265 +1,135 @@
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  z-index: 40;
-  display: flex;
-  align-items: stretch;
-  width: min(100%, 430px);
-  height: 68px;
+/* navigation.css — Barra de navegación inferior flotante Shizen */
+.nav-barra {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 16px;
+  height: 64px;
+  box-sizing: border-box;
   padding: 0 8px;
-  transform: translateX(-50%);
-  background: #fff;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  border-radius: 32px;
+  background: #163820;
+  box-shadow: 0 12px 28px rgba(16, 40, 26, 0.42);
+  z-index: 100;
 }
 
-.bottom-nav .nav-item,
-.nav-status-toggle {
-  flex: 1;
+body > .nav-barra {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 16px;
+  width: calc(100% - 24px);
+  max-width: 366px;
+}
+
+.nav-btn-activo {
+  flex: 0 0 auto;
+  height: 48px;
+  min-width: 48px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 0;
-  height: 100%;
   gap: 6px;
-  padding: 8px 4px;
-  color: #9ca3af;
-  font: inherit;
-  text-decoration: none;
-  position: relative;
-}
-
-.bottom-nav .nav-item svg {
-  width: 30px;
-  height: 30px;
-}
-
-.bottom-nav .nav-item span,
-.nav-status-label {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.bottom-nav .nav-item.is-active {
-  color: #4c9540;
-}
-
-.nav-status-toggle {
+  padding: 0 16px;
+  border-radius: 24px;
   border: 0;
-  background: none;
   cursor: pointer;
-  color: #9ca3af;
+  background: #ffffff;
+  color: #163820;
+  font-family: "Inter", sans-serif;
+  transition: transform 0.15s ease;
 }
 
-.nav-status-icon {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  margin-top: 0;
-  place-items: center;
-  color: #fff;
-  background: #6b7280;
-  border: 3px solid #f3f4f6;
-  border-radius: 50%;
-  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.18);
+.nav-btn-activo:active {
+  transform: scale(0.97);
 }
 
-.nav-status-toggle.is-online {
-  color: #4c9540;
-}
-.nav-status-toggle.is-online .nav-status-icon {
-  background: #4c9540;
-}
-.nav-status-toggle:focus-visible {
-  outline: 2px solid #4c9540;
-  outline-offset: -3px;
-}
-
-/* Identidad visual Shizen compartida por todas las vistas. */
-html {
-  background: #f0faf0;
-}
-body {
-  background: #f9fefb;
-  color: #1a1a1a;
+.nav-label-activo {
+  display: inline-block;
   font-family: "Inter", sans-serif;
-}
-.bottom-nav {
-  background: #fff;
-  border-top-color: #e8f5e9;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-}
-.bottom-nav .nav-item.is-active,
-.nav-status-toggle.is-online {
-  color: #3a8c3f;
-}
-.nav-status-toggle.is-online .nav-status-icon {
-  background: #3a8c3f;
-}
-.nav-status-icon {
-  border-color: #f0faf0;
-}
-.card {
-  border-color: #e8f5e9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-.btn-green {
-  background: linear-gradient(135deg, #2d6a31, #5cb85c);
-  font-family: "Inter", sans-serif;
-}
-.btn-green:hover {
-  background: #2d6a31;
-}
-.btn-gray {
-  background: #e8f5e9;
-  color: #2d6a31;
-  font-family: "Inter", sans-serif;
-}
-.btn-gray:hover {
-  background: #c8e6c9;
-}
-.actions button,
-.btn-green,
-.btn-gray {
-  min-height: 44px;
-  padding: 10px 14px;
   font-size: 13px;
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
-.badge {
+
+.nav-btn {
+  flex: 1 1 0;
+  height: 48px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  border-radius: 24px;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: #a3b89e;
+  font-family: "Inter", sans-serif;
+  transition: color 0.15s ease;
+}
+
+.nav-btn:hover {
+  color: #ffffff;
+}
+
+.nav-icono-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-badge {
   position: absolute;
-  top: 4px;
-  right: calc(50% - 16px);
+  top: -8px;
+  right: -10px;
   min-width: 18px;
   height: 18px;
+  box-sizing: border-box;
   padding: 0 4px;
   border-radius: 9px;
-  background: #3b82f6;
-  color: #fff;
-  font-size: 10px;
+  background: #f97316;
+  border: 2px solid #163820;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
   font-weight: 800;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-  border: 1.5px solid #fff;
-}
-#badge-notificaciones {
-  background: #f97316 !important;
-  color: #fff !important;
-}
-#badge-activos {
-  background: #3b82f6 !important;
-  color: #fff !important;
-}
-.field {
-  font-family: "Inter", sans-serif;
-  border-color: #c8e6c9;
-}
-.field:focus {
-  border-color: #3a8c3f;
-}
-[style*="color:#4c9540"],
-[style*="color: #4c9540"] {
-  color: #3a8c3f !important;
-}
-[style*="background:#4c9540"],
-[style*="background: #4c9540"] {
-  background: linear-gradient(
-    135deg,
-    #2d6a31,
-    #5cb85c
-  ) !important;
-}
-[style*="#2d6b22"] {
-  background: linear-gradient(
-    135deg,
-    #2d6a31,
-    #5cb85c
-  ) !important;
-}
-.header-back {
-  background: #fff !important;
-  border-bottom-color: #e8f5e9 !important;
-}
-.setting-item {
-  background: #fff;
-  border-bottom-color: #e8f5e9;
-}
-
-/* Medidas únicas para evitar saltos entre vistas. */
-body {
-  width: 100%;
-  max-width: 430px;
-}
-
-.bottom-nav {
-  width: 100%;
-  max-width: 430px;
-  height: 68px;
-  padding: 0 8px;
-}
-
-.bottom-nav .nav-item,
-.bottom-nav .nav-status-toggle {
-  flex: 1 1 0;
-  width: 20%;
-  height: 68px;
-  min-height: 68px;
-  min-width: 0;
-  padding: 8px 4px;
-  gap: 6px;
-}
-
-.bottom-nav .nav-item svg {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
-}
-
-.bottom-nav .nav-item span,
-.bottom-nav .nav-status-label {
-  display: block;
-  width: 100%;
-  overflow: hidden;
+  line-height: 14px;
   text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 14px;
 }
 
-.nav-status-icon {
-  flex: 0 0 42px;
-}
-
-/* La barra no debe depender de los estilos particulares de cada pantalla. */
-.bottom-nav,
-.bottom-nav * {
-  box-sizing: border-box;
-}
-
-.bottom-nav {
-  align-items: stretch;
-  line-height: normal;
-}
-
-.bottom-nav .nav-item,
-.bottom-nav .nav-status-toggle {
-  float: none;
-  align-self: stretch;
-  justify-content: center;
-  line-height: normal;
-}
-
-.bottom-nav .nav-status-toggle {
-  gap: 2px;
-  padding: 2px 4px;
-}
-
-.bottom-nav .nav-item span,
-.bottom-nav .nav-status-label {
+.nav-label {
+  display: none;
   font-family: "Inter", sans-serif;
-  line-height: 14px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
+
+.nav-badge-activo {
+  position: absolute;
+  top: -9px;
+  right: -11px;
+  min-width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #163820;
+  border: 2px solid #4c9540;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
